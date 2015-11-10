@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>com.homeadvisor.kafka</groupId>
+   <artifactId>kafdrop</artifactId>
+   <version>1.0.0-SNAPSHOT</version>
+
+   <description>For when you have a Kaf(ka) cluster to monitor</description>
+
+   <properties>
+      <spring.boot.version>1.2.5.RELEASE</spring.boot.version>
+      <additionalparam>-Xdoclint:none</additionalparam>
+      <curator.version>2.7.1</curator.version>
+   </properties>
+
+   <scm>
+       <connection>scm:git:ssh://buildbox/home/git/microservices/kafka-watch.git</connection>
+       <developerConnection>scm:git:ssh://buildbox/home/git/microservices/kafka-watch.git</developerConnection>
+       <tag>HEAD</tag>
+   </scm>
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <!-- Import dependency management from Spring Boot -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-parent</artifactId>
+            <version>${spring.boot.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <dependencies>
+      <dependency>
+         <groupId>commons-lang</groupId>
+         <artifactId>commons-lang</artifactId>
+         <version>2.6</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.curator</groupId>
+         <artifactId>curator-recipes</artifactId>
+         <version>${curator.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.curator</groupId>
+         <artifactId>curator-x-discovery</artifactId>
+         <version>${curator.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.kafka</groupId>
+         <artifactId>kafka_2.9.2</artifactId>
+         <version>0.8.1.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.freemarker</groupId>
+         <artifactId>freemarker</artifactId>
+         <version>2.3.23</version>
+      </dependency>
+
+      <!-- Spring Boot -->
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-web</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-logging</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-freemarker</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-log4j</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-actuator</artifactId>
+      </dependency>
+
+      <!-- Spring -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-context</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-core</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-beans</artifactId>
+      </dependency>
+
+      <!-- Test Dependencies -->
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>4.11</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.easymock</groupId>
+         <artifactId>easymock</artifactId>
+         <version>3.3.1</version>
+         <scope>test</scope>
+      </dependency>
+
+   </dependencies>
+
+
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.3.2</version>
+            <configuration>
+               <source>1.8</source>
+               <target>1.8</target>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>${spring.boot.version}</version>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>repackage</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <configuration>
+               <mainClass>${start-class}</mainClass>
+            </configuration>
+         </plugin>
+      </plugins>
+      <resources>
+         <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+         </resource>
+      </resources>
+   </build>
+
+   <distributionManagement>
+      <!-- use the following if you're not using a snapshot version. -->
+      <repository>
+         <id>repos</id>
+         <name>SM Release</name>
+         <url>http://192.168.9.1:8081/nexus/content/repositories/releases</url>
+      </repository>
+      <!-- use the following if you ARE using a snapshot version. -->
+      <snapshotRepository>
+         <id>repos</id>
+         <name>SM Snapshots</name>
+         <url>http://192.168.9.1:8081/nexus/content/repositories/sm-snap</url>
+      </snapshotRepository>
+   </distributionManagement>
+
+
+</project>

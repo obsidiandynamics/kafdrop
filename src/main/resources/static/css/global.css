@@ -1,0 +1,47 @@
+/*body {*/
+    /*font: normal 12px 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
+    /*color: #333;*/
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*height: 100%;*/
+/*}*/
+
+/*a, a:visited, a:active {*/
+    /*text-decoration: none;*/
+/*}*/
+
+/*.page {*/
+    /*width: 100%;*/
+/*}*/
+
+.l-content {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin: 0 auto;
+}
+
+.clearing {
+    height: 1px;
+    line-height: 1px;
+    font-size: 1px;
+    clear: both;
+}
+
+/*table {*/
+    /*margin-bottom: 20px;*/
+    /*width: 100%;*/
+    /*border: 1px solid #000;*/
+    /*border-top: none;*/
+/*}*/
+
+/*th, td {*/
+    /*border-top: 1px solid #000;*/
+    /*line-height: 20px;*/
+    /*text-align: left;*/
+    /*vertical-align: top;*/
+    /*padding-left: 6px;*/
+/*}*/
+
+table.overview {
+    width: 25%;
+}
