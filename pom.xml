@@ -4,7 +4,7 @@
 
    <groupId>com.homeadvisor.kafka</groupId>
    <artifactId>kafdrop</artifactId>
-   <version>1.0.0-SNAPSHOT</version>
+   <version>1.0.0</version>
 
    <description>For when you have a Kaf(ka) cluster to monitor</description>
 
@@ -17,7 +17,7 @@
    <scm>
        <connection>scm:git:ssh://buildbox/home/git/microservices/kafdrop.git</connection>
        <developerConnection>scm:git:ssh://buildbox/home/git/microservices/kafdrop.git</developerConnection>
-       <tag>HEAD</tag>
+       <tag>kafdrop-1.0.0</tag>
    </scm>
 
    <dependencyManagement>
