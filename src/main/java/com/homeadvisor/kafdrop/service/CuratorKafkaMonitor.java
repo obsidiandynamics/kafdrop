@@ -186,7 +186,13 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    public Optional<TopicVO> getTopic(String topic)
    {
       validateInitialized();
-      return getTopicData(topic).map(this::parseTopic);
+      final Optional<TopicVO> topicVO = getTopicData(topic).map(this::parseTopic);
+      topicVO.ifPresent(
+         vo ->
+            getTopicPartitionSizes(vo)
+               .entrySet().stream()
+               .forEach(entry -> vo.getPartition(entry.getKey()).ifPresent(p -> p.setSize(entry.getValue()))));
+      return topicVO;
    }
 
    public TopicVO parseTopic(ChildData input)
@@ -271,19 +277,24 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    }
 
    @Override
-   public List<ConsumerVO> getConsumers(final String topic)
+   public List<ConsumerVO> getConsumers(final TopicVO topic)
    {
       validateInitialized();
       return getConsumerStream(Optional.of(topic))
-         .filter(consumer -> consumer.getTopic(topic) != null)
+         .filter(consumer -> consumer.getTopic(topic.getName()) != null)
          .collect(Collectors.toList());
    }
 
+   @Override
+   public List<ConsumerVO> getConsumers(final String topic)
+   {
+      return getConsumers(getTopic(topic).get());
+   }
 
-   private Stream<ConsumerVO> getConsumerStream(Optional<String> topic)
+   private Stream<ConsumerVO> getConsumerStream(Optional<TopicVO> topic)
    {
       return consumerTreeCache.getCurrentChildren(ZkUtils.ConsumersPath()).keySet().stream()
-         .map(g -> getConsumer(g, topic))
+         .map(g -> getConsumerByTopic(g, topic))
          .filter(Optional::isPresent)
          .map(Optional::get)
          .sorted(Comparator.comparing(ConsumerVO::getGroupId));
@@ -293,11 +304,17 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    public Optional<ConsumerVO> getConsumer(String groupId)
    {
       validateInitialized();
-      return getConsumer(groupId, Optional.empty());
+      return getConsumerByTopic(groupId, Optional.<TopicVO>empty());
    }
 
    @Override
-   public Optional<ConsumerVO> getConsumer(String groupId, Optional<String> topic)
+   public Optional<ConsumerVO> getConsumerByTopicName(String groupId, Optional<String> topicName)
+   {
+      return getConsumerByTopic(groupId, topicName.map(this::getTopic).orElse(Optional.<TopicVO>empty()));
+   }
+
+   @Override
+   public Optional<ConsumerVO> getConsumerByTopic(String groupId, Optional<TopicVO> topic)
    {
       final ConsumerVO consumer = new ConsumerVO(groupId);
       final ZKGroupDirs groupDirs = new ZKGroupDirs(groupId);
@@ -306,13 +323,17 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 
        // todo: get number of threads in each instance (subscription -> topic -> # threads)
       Optional.ofNullable(consumerTreeCache.getCurrentChildren(groupDirs.consumerRegistryDir()))
-         .ifPresent(children -> children.keySet().stream().forEach(consumer::addActiveInstance));
+         .ifPresent(
+            children ->
+               children.keySet().stream()
+                  .map(id -> readConsumerRegistration(groupDirs, id))
+                  .forEach(consumer::addActiveInstance));
 
       Stream<String> topicStream;
 
       topic.map(
-         topicName -> (consumerTreeCache.getCurrentData(groupDirs.consumerGroupDir() + "/offsets/" + topicName) != null)
-            ? Stream.of(topicName) : Stream.<String>empty())
+         vo -> (consumerTreeCache.getCurrentData(groupDirs.consumerGroupDir() + "/offsets/" + vo.getName()) != null)
+            ? Stream.of(vo.getName()) : Stream.<String>empty())
          .orElse(
             Optional.ofNullable(
                consumerTreeCache.getCurrentChildren(groupDirs.consumerGroupDir() + "/offsets"))
@@ -320,23 +341,45 @@ public class CuratorKafkaMonitor implements KafkaMonitor
                .orElse(Stream.<String>empty()))
          .map(ConsumerTopicVO::new)
          .forEach(consumerTopic -> {
-            getConsumerPartitionStream(groupId, consumerTopic.getTopic()).forEach(consumerTopic::addOffset);
+            getConsumerPartitionStream(groupId, consumerTopic.getTopic(), topic)
+               .forEach(consumerTopic::addOffset);
             consumer.addTopic(consumerTopic);
          });
       return Optional.of(consumer);
    }
 
-   private Stream<ConsumerPartitionVO> getConsumerPartitionStream(String groupId, String topicName)
+   private ConsumerRegistrationVO readConsumerRegistration(ZKGroupDirs groupDirs, String id)
+   {
+      try
+      {
+         ChildData data = consumerTreeCache.getCurrentData(groupDirs.consumerRegistryDir() + "/" + id);
+         final Map<String, Object> consumerData = objectMapper.reader(Map.class).readValue(data.getData());
+         Map<String, Integer> subscriptions = (Map<String, Integer>) consumerData.get("subscription");
+
+         ConsumerRegistrationVO vo = new ConsumerRegistrationVO(id);
+         vo.setSubscriptions(subscriptions);
+         return vo;
+      }
+      catch (IOException ex)
+      {
+         throw Throwables.propagate(ex);
+      }
+   }
+
+   private Stream<ConsumerPartitionVO> getConsumerPartitionStream(String groupId,
+                                                                  String topicName,
+                                                                  Optional<TopicVO> topicOpt)
    {
       ZKGroupTopicDirs groupTopicDirs = new ZKGroupTopicDirs(groupId, topicName);
 
-      Optional<TopicVO> topicOpt = getTopic(topicName);
+      if (!topicOpt.isPresent() || !topicOpt.get().getName().equals(topicName))
+      {
+         topicOpt = getTopic(topicName);
+      }
 
       if (topicOpt.isPresent())
       {
          TopicVO topic = topicOpt.get();
-
-         final Map<Integer, Long> partitionSizes = getPartitionSizes(topic);
 
          return topic.getPartitions().stream()
             .map(partition -> {
@@ -353,7 +396,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
                      consumerTreeCache.getCurrentData(groupTopicDirs.consumerOffsetDir() + "/" + partitionId))
                      .map(d -> Long.parseLong(new String(d.getData())))
                      .orElse(-1L));
-               consumerPartition.setSize(Optional.ofNullable(partitionSizes.get(partitionId)).orElse(-1L));
+               consumerPartition.setSize(topic.getPartition(partitionId).map(TopicPartitionVO::getSize).orElse(-1L));
 
                return consumerPartition;
             });
@@ -364,33 +407,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       }
    }
 
-   // todo: create a bulk request method we can use to ask for the sizes of multiple topics & partitions at once.
-   /*private long getPartitionSize(TopicVO topic, int partitionId)
-   {
-      final TopicPartitionVO partition = topic.getPartition(partitionId).get();
-
-      long partitionSize = -1;
-      try
-      {
-         final OffsetResponse offsetResponse = getSimpleConsumer(partition.getLeader().getId())
-            .getOffsetsBefore(new OffsetRequest(
-               ImmutableMap.of(
-                  new TopicAndPartition(topic.getName(), partitionId),
-                  new PartitionOffsetRequestInfo(kafka.api.OffsetRequest.LatestTime(), 1)),
-               (short) 1, ""));
-         partitionSize = offsetResponse.offsets(topic.getName(), partition.getId())[0];
-      }
-      catch (Exception ex)
-      {
-         LOG.error("Unable to get partition log size for topic {} partition {}", topic.getName(), partitionId, ex);
-         removeSimpleConsumer(partition.getLeader().getId());
-         partitionSize = -1;
-      }
-
-      return partitionSize;
-   }*/
-
-   private Map<Integer, Long> getPartitionSizes(TopicVO topic)
+   private Map<Integer, Long> getTopicPartitionSizes(TopicVO topic)
    {
       PartitionOffsetRequestInfo requestInfo = new PartitionOffsetRequestInfo(kafka.api.OffsetRequest.LatestTime(), 1);
 

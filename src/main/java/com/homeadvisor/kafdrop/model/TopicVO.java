@@ -60,6 +60,13 @@ public class TopicVO implements Comparable<TopicVO>
       this.partitions = partitions;
    }
 
+   public long getTotalSize()
+   {
+      return partitions.values().stream()
+         .map(TopicPartitionVO::getSize)
+         .reduce(0L, Long::sum);
+   }
+
    public double getPreferredReplicaPercent()
    {
       long preferredLeaderCount = partitions.values().stream()

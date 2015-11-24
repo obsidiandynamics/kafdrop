@@ -1,15 +1,23 @@
 <#import "lib/template.ftl" as template>
-<@template.header "Broker: ${broker.id?string}"/>
+<@template.header "Broker: ${broker.id?string}">
+<style type="text/css">
+    .bs-table.overview td { white-space: nowrap; }
+</style>
+</@template.header>
 
 <#setting number_format="0">
 
-<h1>Broker Id: ${broker.id} (${broker.host}:${broker.port})</h1>
+<h1>Broker Id: ${broker.id}</h1>
 
 <div id="topic-overview">
     <h2>Broker Overview</h2>
 
     <table class="bs-table default overview">
         <tbody>
+        <tr>
+            <td>Host</td>
+            <td>${broker.host}:${broker.port}</td>
+        </tr>
         <tr>
             <td>Start Time</td>
             <td>${broker.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>

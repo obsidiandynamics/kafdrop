@@ -1,5 +1,6 @@
 package com.homeadvisor.kafdrop.controller;
 
+import com.homeadvisor.kafdrop.model.TopicVO;
 import com.homeadvisor.kafdrop.service.KafkaMonitor;
 import com.homeadvisor.kafdrop.service.TopicNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,10 @@ public class TopicController
    @RequestMapping("/{name:.+}")
    public String topicDetails(@PathVariable("name") String topicName, Model model)
    {
-      model.addAttribute("topic", kafkaMonitor.getTopic(topicName)
-         .orElseThrow(() -> new TopicNotFoundException(topicName)));
-      model.addAttribute("consumers", kafkaMonitor.getConsumers(topicName));
+      final TopicVO topic = kafkaMonitor.getTopic(topicName)
+         .orElseThrow(() -> new TopicNotFoundException(topicName));
+      model.addAttribute("topic", topic);
+      model.addAttribute("consumers", kafkaMonitor.getConsumers(topic));
 
       return "topic-detail";
    }

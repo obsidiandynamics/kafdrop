@@ -3,12 +3,13 @@ package com.homeadvisor.kafdrop.model;
 import org.apache.commons.lang.Validate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConsumerVO implements Comparable<ConsumerVO>
 {
    private String groupId;
    private Map<String, ConsumerTopicVO> topics = new TreeMap<>();
-   private List<String> activeInstances = new ArrayList<>();
+   private List<ConsumerRegistrationVO> activeInstances = new ArrayList<>();
 
    public ConsumerVO(String groupId)
    {
@@ -26,14 +27,21 @@ public class ConsumerVO implements Comparable<ConsumerVO>
       this.groupId = groupId;
    }
 
-   public void addActiveInstance(String id)
+   public void addActiveInstance(ConsumerRegistrationVO id)
    {
       activeInstances.add(id);
    }
 
-   public List<String> getActiveInstances()
+   public List<ConsumerRegistrationVO> getActiveInstances()
    {
       return activeInstances;
+   }
+
+   public List<ConsumerRegistrationVO> getActiveInstancesForTopic(String topic)
+   {
+      return activeInstances.stream()
+         .filter(reg -> reg.getSubscriptions().containsKey(topic))
+         .collect(Collectors.toList());
    }
 
    public void addTopic(ConsumerTopicVO topic)

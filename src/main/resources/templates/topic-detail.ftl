@@ -18,6 +18,10 @@
             <td>Preferred Replicas</td>
             <td>${topic.preferredReplicaPercent?string.percent}</td>
         </tr>
+        <tr>
+            <td>Total Size</td>
+            <td>${topic.totalSize}</td>
+        </tr>
         </tbody>
     </table>
 </div>
@@ -41,12 +45,14 @@
     </#if>
 </div>
 
-<div id="partition-detail">
+<div class="row">
+<div id="partition-detail" class="col fivecol">
     <h2>Partition Detail</h2>
-    <table class="bs-table default">
+    <table id="partition-detail-table" class="bs-table small">
         <thead>
         <tr>
             <th>Partition</th>
+            <th>Size</th>
             <th>Leader</th>
             <th>Replicas</th>
             <th>In Sync Replicas</th>
@@ -58,6 +64,7 @@
         <#list topic.partitions as p>
         <tr>
             <td>${p.id}</td>
+            <td>${p.size}</td>
             <td>${p.leader.id}</td>
             <td><#list p.replicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
             <td><#list p.inSyncReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
@@ -69,9 +76,9 @@
     </table>
 </div>
 
-<div id="consumers">
+<div id="consumers" class="col sevencol">
     <h2>Consumers</h2>
-    <table class="bs-table default">
+    <table id="consumers-table" class="bs-table small">
         <thead>
         <tr>
             <th>Group Id</th>
@@ -85,9 +92,9 @@
                 <td><a href="/consumer/${c.groupId}">${c.groupId}</a></td>
                 <td>${c.getTopic(topic.name).lag}</td>
                 <td>
-                    <ul>
-                       <#list c.activeInstances as i>
-                           <li>${i}</li>
+                    <ul class="bs-list flat">
+                       <#list c.getActiveInstancesForTopic(topic.name) as i>
+                           <li>${i.id}</li>
                        </#list>
                     </ul>
                 </td>
@@ -96,5 +103,5 @@
         </tbody>
     </table>
 </div>
-
+</div>
 <@template.footer/>

@@ -22,10 +22,10 @@
 </div>
 
 <div id="topics">
-    <#list consumer.topics as consumerTopic>
-
-    <h2>Topic: <a href="/topic/${consumerTopic.topic}">${consumerTopic.topic}</a></h2>
-        <table class="bs-table default">
+<#list consumer.topics as consumerTopic>
+    <#assign tableId='topic-${consumerTopic_index}-table'>
+    <h2><@template.toggleLink target="#${tableId}" anchor='${tableId}' /> Topic: <a href="/topic/${consumerTopic.topic}">${consumerTopic.topic}</a></h2>
+        <table id="${tableId}" class="bs-table small">
             <thead>
             <tr>
                 <th>Partition</th>
@@ -47,7 +47,7 @@
             </#list>
             </tbody>
         </table>
-    </#list>
+</#list>
 
 </div>
 
