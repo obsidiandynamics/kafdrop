@@ -18,3 +18,11 @@ table.overview {
 .hidden {
     display:none;
 }
+
+.error {
+    color: red;
+}
+
+input[type=text].error {
+    border-color: red;
+}

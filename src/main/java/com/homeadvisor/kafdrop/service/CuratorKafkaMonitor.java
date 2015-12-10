@@ -117,7 +117,8 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       brokerPathCache.close();
    }
 
-   private SimpleConsumer getSimpleConsumer(int brokerId) throws BrokerNotFoundException
+   @Override
+   public SimpleConsumer getSimpleConsumer(int brokerId) throws BrokerNotFoundException
    {
       return consumerMap.computeIfAbsent(brokerId, id -> createSimpleConsumer(id).orElseThrow(BrokerNotFoundException::new));
    }
@@ -188,10 +189,15 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       validateInitialized();
       final Optional<TopicVO> topicVO = getTopicData(topic).map(this::parseTopic);
       topicVO.ifPresent(
-         vo ->
-            getTopicPartitionSizes(vo)
+         vo -> {
+            getTopicPartitionSizes(vo, kafka.api.OffsetRequest.LatestTime())
                .entrySet().stream()
-               .forEach(entry -> vo.getPartition(entry.getKey()).ifPresent(p -> p.setSize(entry.getValue()))));
+               .forEach(entry -> vo.getPartition(entry.getKey()).ifPresent(p -> p.setSize(entry.getValue())));
+            getTopicPartitionSizes(vo, kafka.api.OffsetRequest.EarliestTime())
+               .entrySet().stream()
+               .forEach(entry -> vo.getPartition(entry.getKey()).ifPresent(p -> p.setFirstOffset(entry.getValue())));
+         }
+      );
       return topicVO;
    }
 
@@ -409,7 +415,12 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 
    private Map<Integer, Long> getTopicPartitionSizes(TopicVO topic)
    {
-      PartitionOffsetRequestInfo requestInfo = new PartitionOffsetRequestInfo(kafka.api.OffsetRequest.LatestTime(), 1);
+      return getTopicPartitionSizes(topic, kafka.api.OffsetRequest.LatestTime());
+   }
+
+   private Map<Integer, Long> getTopicPartitionSizes(TopicVO topic, long time)
+   {
+      PartitionOffsetRequestInfo requestInfo = new PartitionOffsetRequestInfo(time, 1);
 
       return topic.getPartitions().stream()
          .collect(Collectors.groupingBy(p -> p.getLeader().getId())) // Group partitions by their leader broker id

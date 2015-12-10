@@ -2,6 +2,9 @@
 <@template.header "Broker: ${broker.id?string}">
 <style type="text/css">
     .bs-table.overview td { white-space: nowrap; }
+
+    td.leader-partitions { word-break: break-all; }
+
 </style>
 </@template.header>
 
@@ -57,7 +60,7 @@
                   <td><a href="/topic/${t.name}">${t.name}</a></td>
                   <td>${t.partitions?size}</td>
                   <td>${t.getLeaderPartitions(broker.id)?size}</td>
-                  <td><#list t.getLeaderPartitions(broker.id) as p>${p.id}<#sep>,</#list></td>
+                  <td class="leader-partitions"><#list t.getLeaderPartitions(broker.id) as p>${p.id}<#sep>,</#list></td>
               </tr>
         </#list>
         </tbody>

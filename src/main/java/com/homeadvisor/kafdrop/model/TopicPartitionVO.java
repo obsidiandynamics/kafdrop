@@ -10,6 +10,7 @@ public class TopicPartitionVO
    private Integer leaderId;
    private Integer preferredLeaderId;
    private long size = -1;
+   private long firstOffset = -1;
 
    public TopicPartitionVO(int id)
    {
@@ -74,6 +75,16 @@ public class TopicPartitionVO
    public void setSize(long size)
    {
       this.size = size;
+   }
+
+   public long getFirstOffset()
+   {
+      return firstOffset;
+   }
+
+   public void setFirstOffset(long firstOffset)
+   {
+      this.firstOffset = firstOffset;
    }
 
    public static class PartitionReplica

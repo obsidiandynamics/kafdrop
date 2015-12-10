@@ -1,14 +1,25 @@
 <#import "lib/template.ftl" as template>
-<@template.header "Topic: ${topic.name}"/>
+<@template.header "Topic: ${topic.name}">
+  <style type="text/css">
+      #action-bar { margin-top: 17px; }
+      th { word-break: break-all; }
+  </style>
+</@template.header>
 
 <#setting number_format="0">
 
-<h1>Kafka Topic: ${topic.name}</h1>
+<h1 class="col threecol">Topic: ${topic.name}</h1>
 
-<div id="topic-overview">
-    <h2>Topic Overview</h2>
+<div id="action-bar">
+    <a class="bs-btn info" href="/topic/${topic.name}/messages">View Messages</a>
+</div>
 
-    <table class="bs-table default overview">
+<div class="row">
+
+<div id="topic-overview" class="col fivecol">
+    <h2>Overview</h2>
+
+    <table class="bs-table default">
         <tbody>
         <tr>
             <td># of Partitions</td>
@@ -22,12 +33,17 @@
             <td>Total Size</td>
             <td>${topic.totalSize}</td>
         </tr>
+        <tr>
+            <td>Total Available Messages</td>
+            <td>${topic.availableSize}</td>
+        </tr>
         </tbody>
     </table>
 </div>
 
-<div>
-    <h2>Topic Configuration</h2>
+
+<div id="topic-config" class="col sevencol">
+    <h2>Configuration</h2>
 
     <#if topic.config?size == 0>
     <div>No topic specific configuration</div>
@@ -45,6 +61,8 @@
     </#if>
 </div>
 
+</div>
+
 <div class="row">
 <div id="partition-detail" class="col fivecol">
     <h2>Partition Detail</h2>
@@ -52,6 +70,8 @@
         <thead>
         <tr>
             <th>Partition</th>
+            <th>First Offset</th>
+            <th>Last Offset</th>
             <th>Size</th>
             <th>Leader</th>
             <th>Replicas</th>
@@ -64,7 +84,9 @@
         <#list topic.partitions as p>
         <tr>
             <td>${p.id}</td>
-            <td>${p.size}</td>
+            <td>${p.firstOffset}</td>
+            <td>${p.size-1}</td>
+            <td>${p.size - p.firstOffset}</td>
             <td>${p.leader.id}</td>
             <td><#list p.replicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
             <td><#list p.inSyncReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
