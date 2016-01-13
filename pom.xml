@@ -11,7 +11,7 @@
    <properties>
       <spring.boot.version>1.2.5.RELEASE</spring.boot.version>
       <additionalparam>-Xdoclint:none</additionalparam>
-      <curator.version>2.7.1</curator.version>
+      <curator.version>2.9.1</curator.version>
    </properties>
 
    <scm>
@@ -48,6 +48,11 @@
          <groupId>org.apache.curator</groupId>
          <artifactId>curator-x-discovery</artifactId>
          <version>${curator.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.zookeeper</groupId>
+         <artifactId>zookeeper</artifactId>
+         <version>3.4.7</version>
       </dependency>
       <dependency>
          <groupId>org.apache.kafka</groupId>
