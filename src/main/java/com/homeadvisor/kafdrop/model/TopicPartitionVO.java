@@ -2,6 +2,7 @@ package com.homeadvisor.kafdrop.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TopicPartitionVO
 {
@@ -61,10 +62,20 @@ public class TopicPartitionVO
 
    public List<PartitionReplica> getInSyncReplicas()
    {
-      return replicas.values().stream()
-         .filter(PartitionReplica::isInService)
+      return inSyncReplicaStream()
          .sorted(Comparator.comparingInt(PartitionReplica::getId))
          .collect(Collectors.toList());
+   }
+
+   private Stream<PartitionReplica> inSyncReplicaStream()
+   {
+      return replicas.values().stream()
+         .filter(PartitionReplica::isInService);
+   }
+
+   public boolean isUnderReplicated()
+   {
+      return inSyncReplicaStream().count() < replicas.size();
    }
 
    public long getSize()

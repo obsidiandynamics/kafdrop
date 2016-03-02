@@ -2,6 +2,7 @@ package com.homeadvisor.kafdrop.model;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 public class ConsumerTopicVO
@@ -32,6 +33,14 @@ public class ConsumerTopicVO
          .reduce(0L, Long::sum);
    }
 
+   public long getMaxLag()
+   {
+      return offsets.values().stream()
+         .map(ConsumerPartitionVO::getLag)
+         .filter(lag -> lag >= 0)
+         .reduce(0L, Long::max);
+   }
+
    public Collection<ConsumerPartitionVO> getPartitions()
    {
       return offsets.values();
@@ -46,6 +55,15 @@ public class ConsumerTopicVO
    {
       return (int) offsets.values().stream()
          .filter(p -> p.getOwner() != null)
+         .count();
+   }
+
+   public int getOwnerCount()
+   {
+      return (int)offsets.values().stream()
+         .map(ConsumerPartitionVO::getOwner)
+         .filter(Objects::nonNull)
+         .distinct()
          .count();
    }
 }

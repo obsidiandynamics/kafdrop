@@ -5,4 +5,6 @@
 **/Thumbs.db
 target
 *.iml
+*.iws
+*.ipr
 .idea/

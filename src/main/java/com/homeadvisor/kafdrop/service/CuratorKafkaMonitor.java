@@ -45,6 +45,9 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    private PathChildrenCache topicConfigPathCache;
    private TreeCache topicTreeCache;
    private TreeCache consumerTreeCache;
+   private NodeCache controllerNodeCache;
+
+   private int controllerId = -1;
 
    private Map<Integer, BrokerVO> brokerCache = new TreeMap<>();
 
@@ -97,6 +100,35 @@ public class CuratorKafkaMonitor implements KafkaMonitor
          }
       });
       consumerTreeCache.start();
+
+      controllerNodeCache = new NodeCache(curatorFramework, ZkUtils.ControllerPath());
+      controllerNodeCache.getListenable().addListener(this::updateController);
+      controllerNodeCache.start(true);
+      updateController();
+   }
+
+   private void updateController()
+   {
+      Optional.ofNullable(controllerNodeCache.getCurrentData())
+         .map(data -> {
+            try
+            {
+               Map controllerData = objectMapper.reader(Map.class).readValue(data.getData());
+               return (Integer) controllerData.get("brokerid");
+            }
+            catch (IOException e)
+            {
+               LOG.error("Unable to read controller data", e);
+               return null;
+            }
+         })
+         .ifPresent(this::updateController);
+   }
+
+   private void updateController(int brokerId)
+   {
+      brokerCache.values()
+         .forEach(broker -> broker.setController(broker.getId() == brokerId));
    }
 
    private void validateInitialized()
@@ -120,7 +152,8 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    @Override
    public SimpleConsumer getSimpleConsumer(int brokerId) throws BrokerNotFoundException
    {
-      return consumerMap.computeIfAbsent(brokerId, id -> createSimpleConsumer(id).orElseThrow(BrokerNotFoundException::new));
+      return consumerMap.computeIfAbsent(brokerId,
+                                         id -> createSimpleConsumer(id).orElseThrow(BrokerNotFoundException::new));
    }
 
    private void removeSimpleConsumer(int brokerId)
@@ -327,7 +360,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 
       if (consumerTreeCache.getCurrentData(groupDirs.consumerGroupDir()) == null) return Optional.empty();
 
-       // todo: get number of threads in each instance (subscription -> topic -> # threads)
+      // todo: get number of threads in each instance (subscription -> topic -> # threads)
       Optional.ofNullable(consumerTreeCache.getCurrentChildren(groupDirs.consumerRegistryDir()))
          .ifPresent(
             children ->
@@ -402,7 +435,9 @@ public class CuratorKafkaMonitor implements KafkaMonitor
                      consumerTreeCache.getCurrentData(groupTopicDirs.consumerOffsetDir() + "/" + partitionId))
                      .map(d -> Long.parseLong(new String(d.getData())))
                      .orElse(-1L));
-               consumerPartition.setSize(topic.getPartition(partitionId).map(TopicPartitionVO::getSize).orElse(-1L));
+               final Optional<TopicPartitionVO> topicPartition = topic.getPartition(partitionId);
+               consumerPartition.setSize(topicPartition.map(TopicPartitionVO::getSize).orElse(-1L));
+               consumerPartition.setFirstOffset(topicPartition.map(TopicPartitionVO::getFirstOffset).orElse(-1L));
 
                return consumerPartition;
             });
@@ -443,7 +478,8 @@ public class CuratorKafkaMonitor implements KafkaMonitor
                // Build a map of partitionId -> topic size from the response
                return brokerPartitions.stream()
                   .collect(Collectors.toMap(TopicPartitionVO::getId,
-                                            partition -> Optional.ofNullable(response.offsets(topic.getName(), partition.getId()))
+                                            partition -> Optional.ofNullable(
+                                               response.offsets(topic.getName(), partition.getId()))
                                                .map(Arrays::stream)
                                                .orElse(LongStream.empty())
                                                .findFirst()
@@ -463,9 +499,9 @@ public class CuratorKafkaMonitor implements KafkaMonitor
                return brokerPartitions.stream().collect(Collectors.toMap(TopicPartitionVO::getId, tp -> -1L));
             }
          })
-      .map(Map::entrySet)
-      .flatMap(Collection::stream)
-      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+         .map(Map::entrySet)
+         .flatMap(Collection::stream)
+         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
    }
 
    private class BrokerListener implements PathChildrenCacheListener
@@ -496,6 +532,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
                break;
             }
          }
+         updateController();
       }
 
    }

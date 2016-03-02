@@ -11,7 +11,7 @@
 <h1 class="col threecol">Topic: ${topic.name}</h1>
 
 <div id="action-bar">
-    <a class="bs-btn info" href="/topic/${topic.name}/messages">View Messages</a>
+    <a class="bs-btn info" href="/topic/${topic.name}/messages"><i class="fa fa-eye"></i> View Messages</a>
 </div>
 
 <div class="row">
@@ -27,7 +27,11 @@
         </tr>
         <tr>
             <td>Preferred Replicas</td>
-            <td>${topic.preferredReplicaPercent?string.percent}</td>
+            <td <#if topic.preferredReplicaPercent lt 1.0>class="warn"</#if>>${topic.preferredReplicaPercent?string.percent}</td>
+        </tr>
+        <tr>
+            <td>Under Replicated Partitions</td>
+            <td <#if topic.underReplicatedPartitions?size gt 0>class="warn"</#if>>${topic.underReplicatedPartitions?size}</td>
         </tr>
         <tr>
             <td>Total Size</td>
@@ -85,13 +89,13 @@
         <tr>
             <td>${p.id}</td>
             <td>${p.firstOffset}</td>
-            <td>${p.size-1}</td>
+            <td>${p.size}</td>
             <td>${p.size - p.firstOffset}</td>
             <td>${p.leader.id}</td>
             <td><#list p.replicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
             <td><#list p.inSyncReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
-            <td <#if !p.leaderPreferred>class="warn"</#if>><#if p.leaderPreferred>Yes<#else>No</#if></td>
-            <td></td>
+            <td <#if !p.leaderPreferred>class="warn"</#if>><@template.yn p.leaderPreferred/></td>
+            <td <#if p.underReplicated>class="warn"</#if>><@template.yn p.underReplicated/></td>
         </tr>
         </#list>
         </tbody>

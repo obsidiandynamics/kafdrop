@@ -55,6 +55,13 @@ public class TopicVO implements Comparable<TopicVO>
          .collect(Collectors.toList());
    }
 
+   public Collection<TopicPartitionVO> getUnderReplicatedPartitions()
+   {
+      return partitions.values().stream()
+         .filter(TopicPartitionVO::isUnderReplicated)
+         .collect(Collectors.toList());
+   }
+
    public void setPartitions(Map<Integer, TopicPartitionVO> partitions)
    {
       this.partitions = partitions;

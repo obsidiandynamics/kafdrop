@@ -15,7 +15,11 @@
         </tr>
         <tr>
             <td>Topics</td>
-            <td>${consumer.topics?size} (${consumer.activeTopicCount} active)</td>
+            <td>${consumer.topics?size}</td>
+        </tr>
+        <tr>
+            <td>Active Topics</td>
+            <td>${consumer.activeTopicCount}</td>
         </tr>
         </tbody>
     </table>
@@ -25,28 +29,57 @@
 <#list consumer.topics as consumerTopic>
     <#assign tableId='topic-${consumerTopic_index}-table'>
     <h2><@template.toggleLink target="#${tableId}" anchor='${tableId}' /> Topic: <a href="/topic/${consumerTopic.topic}">${consumerTopic.topic}</a></h2>
-        <table id="${tableId}" class="bs-table small">
-            <thead>
-            <tr>
-                <th>Partition</th>
-                <th>Size</th>
-                <th>Offset</th>
-                <th>Lag</th>
-                <th>Owner</th>
-            </tr>
-            </thead>
-            <tbody>
-            <#list consumerTopic.partitions as p>
-               <tr>
-                   <td>${p.partitionId}</td>
-                   <td>${p.size}</td>
-                   <td>${p.offset}</td>
-                   <td>${p.lag}</td>
-                   <td>${p.owner!''}</td>
-               </tr>
-            </#list>
-            </tbody>
-        </table>
+    <div id="${tableId}">
+        <p>
+            <table class="bs-table default overview">
+                <tbody>
+                    <tr>
+                        <td>Total Threads</td>
+                        <td>${consumerTopic.ownerCount}</td>
+                    </tr>
+                    <tr>
+                        <td>Partition Coverage</td>
+                        <td>${consumerTopic.coveragePercent * 100.0}%
+                            (${consumerTopic.assignedPartitionCount} of ${consumerTopic.partitions?size})</td>
+                    </tr>
+                    <tr>
+                        <td>Total Lag</td>
+                        <td>${consumerTopic.lag}</td>
+                    </tr>
+                    <tr>
+                        <td>Max Lag</td>
+                        <td>${consumerTopic.maxLag}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </p>
+        <p>
+            <table class="bs-table small">
+                <thead>
+                <tr>
+                    <th>Partition</th>
+                    <th>First Offset</th>
+                    <th>Last Offset</th>
+                    <th>Offset</th>
+                    <th>Lag</th>
+                    <th>Owner</th>
+                </tr>
+                </thead>
+                <tbody>
+                <#list consumerTopic.partitions as p>
+                   <tr>
+                       <td>${p.partitionId}</td>
+                       <td>${p.firstOffset}</td>
+                       <td>${p.size}</td>
+                       <td>${p.offset}</td>
+                       <td>${p.lag}</td>
+                       <td>${p.owner!''}</td>
+                   </tr>
+                </#list>
+                </tbody>
+            </table>
+        </p>
+    </div>
 </#list>
 
 </div>

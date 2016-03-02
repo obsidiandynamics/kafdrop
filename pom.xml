@@ -4,7 +4,7 @@
 
    <groupId>com.homeadvisor.kafka</groupId>
    <artifactId>kafdrop</artifactId>
-   <version>1.0.4-SNAPSHOT</version>
+   <version>1.1.0-SNAPSHOT</version>
 
    <description>For when you have a Kaf(ka) cluster to monitor</description>
 
@@ -152,6 +152,16 @@
          <resource>
             <directory>src/main/resources</directory>
             <filtering>true</filtering>
+            <excludes>
+               <exclude>static/**</exclude>
+            </excludes>
+         </resource>
+         <resource>
+            <directory>src/main/resources</directory>
+            <filtering>false</filtering>
+            <includes>
+               <include>static/**</include>
+            </includes>
          </resource>
       </resources>
    </build>

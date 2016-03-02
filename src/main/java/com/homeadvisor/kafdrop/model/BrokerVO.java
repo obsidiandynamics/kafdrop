@@ -11,6 +11,7 @@ public class BrokerVO
    private int port;
    private int jmxPort;
    private int version;
+   private boolean controller;
    private Date timestamp;
 
    public int getId()
@@ -72,5 +73,15 @@ public class BrokerVO
    public void setTimestamp(Date timestamp)
    {
       this.timestamp = timestamp;
+   }
+
+   public boolean isController()
+   {
+      return controller;
+   }
+
+   public void setController(boolean controller)
+   {
+      this.controller = controller;
    }
 }

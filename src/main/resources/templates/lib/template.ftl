@@ -4,6 +4,7 @@
 <head>
     <title>Kafdrop: ${title}</title>
     <link type="text/css" rel="stylesheet" href="/css/baseless.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/css/font-awesome.min.css"/>
     <link type="text/css" rel="stylesheet" href="/css/global.css"/>
 
     <script src="/js/jquery.min.js"></script>
@@ -24,5 +25,9 @@
 </#macro>
 
 <#macro toggleLink target startVisible=true anchor='#'>
-[<a href="<#if !anchor?starts_with('#')>#</#if>${anchor}" class="toggle-link" data-toggle-target="${target}"><#if startVisible>-<#else>+</#if></a>]
+<a href="<#if !anchor?starts_with('#')>#</#if>${anchor}" class="toggle-link" data-toggle-target="${target}"><i class="fa <#if startVisible>fa-chevron-circle-down<#else>fa-chevron-circle-right</#if>"></i></a>
+</#macro>
+
+<#macro yn value>
+   <#if value>Yes<#else>No</#if>
 </#macro>

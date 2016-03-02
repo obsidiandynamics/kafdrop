@@ -25,17 +25,19 @@
                     <th>JMX Port</th>
                     <th>Version</th>
                     <th>Start Time</th>
+                    <th>Controller?</th>
                 </tr>
                 </thead>
                 <tbody>
                 <#list brokers as b>
                 <tr>
-                    <td>${b.id} (<a href="/broker/${b.id}">details</a>)</td>
+                    <td><a href="/broker/${b.id}"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
                     <td>${b.host}</td>
                     <td>${b.port?string}</td>
                     <td>${b.jmxPort?string}</td>
                     <td>${b.version}</td>
                     <td>${b.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
+                    <td><@template.yn b.controller/></td>
                 </tr>
                 </#list>
                 </tbody>
@@ -45,10 +47,12 @@
         <div id="topics">
             <h3>Topics</h3>
             <table class="bs-table default">
-                <thead>
                 <tr>
                     <th>Name</th>
                     <th>Partitions</th>
+                    <th>% Preferred</th>
+                    <th># Under Replicated</th>
+                    <th>Custom Config?</th>
                     <#--<th>Consumers</th>-->
                 </tr>
                 </thead>
@@ -57,6 +61,9 @@
                 <tr>
                     <td><a href="/topic/${t.name}">${t.name}</a></td>
                     <td>${t.partitions?size}</td>
+                    <td <#if t.preferredReplicaPercent lt 1.0>class="warn"</#if>>${t.preferredReplicaPercent?string.percent}</td>
+                    <td <#if t.underReplicatedPartitions?size gt 0>class="warn"</#if>>${t.underReplicatedPartitions?size}</td>
+                    <td><@template.yn t.config?size gt 0/></td>
                     <#--<td>${t.consumers![]?size}</td>-->
                 </tr>
                 </#list>

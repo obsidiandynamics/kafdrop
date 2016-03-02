@@ -18,12 +18,16 @@
     <table class="bs-table default overview">
         <tbody>
         <tr>
-            <td>Host</td>
+            <td><i class="fa fa-laptop"></i> Host</td>
             <td>${broker.host}:${broker.port}</td>
         </tr>
         <tr>
-            <td>Start Time</td>
+            <td><i class="fa fa-clock-o"></i> Start Time</td>
             <td>${broker.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
+        </tr>
+        <tr>
+            <td>Controller</td>
+            <td><@template.yn broker.controller/></td>
         </tr>
         <tr>
             <td># of Topics</td>

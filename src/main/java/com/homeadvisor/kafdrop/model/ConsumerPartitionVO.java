@@ -7,6 +7,7 @@ public class ConsumerPartitionVO
    private final int partitionId;
    private long offset;
    private long size;
+   private long firstOffset;
    private String owner;
 
    public ConsumerPartitionVO(String groupId, String topic, int partitionId)
@@ -46,9 +47,30 @@ public class ConsumerPartitionVO
       this.size = size;
    }
 
+   public long getFirstOffset()
+   {
+      return firstOffset;
+   }
+
+   public void setFirstOffset(long firstOffset)
+   {
+      this.firstOffset = firstOffset;
+   }
+
    public long getLag()
    {
-      return size >= 0 && offset >= 0 ? size - offset : -1;
+      if (size < 0 || firstOffset < 0)
+      {
+         return 0;
+      }
+      else if (offset < firstOffset)
+      {
+         return size - firstOffset;
+      }
+      else
+      {
+         return size - offset;
+      }
    }
 
    public void setOwner(String owner)

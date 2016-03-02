@@ -5,6 +5,7 @@
        h1 { margin-bottom: 16px; }
        #messageFormPanel { margin-top: 16px; }
        #partitionSizes { margin-left: 16px; }
+       .toggle-msg { float: left;}
    </style>
 
   <script src="/js/message-inspector.js"></script>
@@ -19,7 +20,7 @@
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
     <span class="bs-label">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>
-    <span class="bs-label">Last Offset:</span> <span id="lastOffset">${curPartition.size - 1}</span>
+    <span class="bs-label">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>
     <span class="bs-label">Size:</span> <span id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
 </div>
 
@@ -44,8 +45,7 @@
         <@spring.formInput path="messageForm.count" attributes='class="bs-form-elem ${spring.status.error?string("error", "")}"'/>
         <span class="error"><@spring.showErrors "<br/>"/></span>
 
-        <button class="bs-btn primary" type="submit">View Messages</button>
-
+        <button class="bs-btn primary" type="submit"><i class="fa fa-search"></i> View Messages</button>
 
     </div>
 
@@ -62,7 +62,10 @@
             <span class="bs-label">Key:</span> ${msg.key}
             <span class="bs-label">Checksum/Computed:</span> <span <#if !msg.valid>class="error"</#if>>${msg.checksum}/${msg.computedChecksum}</span>
             <span class="bs-label">Compression:</span> ${msg.compressionCodec}
-            <pre>${msg.message}</pre>
+            <div>
+            <a href="#" class="toggle-msg"><i class="fa fa-chevron-circle-right">&nbsp;</i></a>
+            <pre class="message-body">${msg.message}</pre>
+            </div>
         </div>
     </#list>
     <#elseif !(spring.status.error) && !(messageForm.empty)>
