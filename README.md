@@ -7,8 +7,8 @@ Kafdrop is a UI for monitoring Apache Kafka clusters. The tool displays informat
 Clone this repo and run the following commands from the top level:
 
     > mvn package
-    > java -jar ./target/kafdrop-<VERSION>.jar --zookeeper.connect=<zookeeper host:port>
+    > java -jar ./target/kafdrop-<VERSION>.jar --zookeeper.connect=<host:port>
 
-The open a browser and navigate to http://localhost:9000. The port can be overridden by adding the following config:
+Then open a browser and navigate to http://localhost:9000. The port can be overridden by adding the following config:
 
     --server.port=<port>
