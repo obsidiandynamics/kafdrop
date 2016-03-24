@@ -1,0 +1,33 @@
+server:
+   port: 9000
+
+spring:
+   jmx:
+      enabled: true
+      default_domain: Kafdrop
+   jackson:
+      deserialization:
+         fail_on_unknown_properties: false
+         read_unknown_enum_values_as_null: true
+
+endpoints.jmx.domain: ${spring.jmx.default_domain}
+metrics.jmx.domain: ${spring.jmx.default_domain}-metrics
+management.contextPath: /debug
+
+curator.discovery:
+   enabled: true
+   basePath: /homeadvisor/services
+
+# Properties to expose via the InfoEndpoint & ServiceDiscovery
+info.build:
+   artifact: ${project.artifactId}
+   name: ${project.name}
+   description: ${project.description}
+   version: ${project.version}
+
+# Default values usually provided by Maven during a build
+project:
+   artifactId: kafdrop-DEV
+   name: KafDropr (DEV)
+   description: ${project.name}
+   version: DEV
