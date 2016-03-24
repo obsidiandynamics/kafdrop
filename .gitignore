@@ -20,3 +20,4 @@ target
 *.iws
 *.ipr
 .idea/
+*.swp
