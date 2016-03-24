@@ -8,3 +8,7 @@ Clone this repo and run the following commands from the top level:
 
     > mvn package
     > java -jar ./target/kafdrop-<VERSION>.jar --zookeeper.connect=<zookeeper host:port>
+
+The open a browser and navigate to http://localhost:9000. The port can be overridden by adding the following config:
+
+    --server.port=<port>
