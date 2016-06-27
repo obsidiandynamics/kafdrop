@@ -476,6 +476,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       PartitionOffsetRequestInfo requestInfo = new PartitionOffsetRequestInfo(time, 1);
 
       return topic.getPartitions().stream()
+         .filter(p -> p.getLeader() != null)
          .collect(Collectors.groupingBy(p -> p.getLeader().getId())) // Group partitions by their leader broker id
          .entrySet().parallelStream()
          .map(entry -> {
