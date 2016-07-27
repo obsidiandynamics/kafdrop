@@ -21,6 +21,7 @@ package com.homeadvisor.kafdrop.service;
 import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicPartitionVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
+import com.homeadvisor.kafdrop.util.BrokerChannel;
 import kafka.api.FetchRequest;
 import kafka.api.FetchRequestBuilder;
 import kafka.javaapi.FetchResponse;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Service;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -53,35 +55,41 @@ public class MessageInspector
       final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
       final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
 
-      final SimpleConsumer consumer = kafkaMonitor.getSimpleConsumer(partition.getLeader().getId());
-      final FetchRequestBuilder fetchRequestBuilder = new FetchRequestBuilder()
-         .clientId("KafDrop")
-         .maxWait(5000) // todo: make configurable
-         .minBytes(1);
+      return kafkaMonitor.getBroker(partition.getLeader().getId())
+         .map(broker -> {
+            SimpleConsumer consumer = new SimpleConsumer(broker.getHost(), broker.getPort(), 10000, 100000, "");
 
-      List<MessageVO> messages = new ArrayList<>(count);
-      long currentOffset = offset;
-      while (messages.size() < count)
-      {
-         final FetchRequest fetchRequest =
-            fetchRequestBuilder
-               .addFetch(topicName, partitionId, currentOffset, 1024 * 1024)
-               .build();
+            final FetchRequestBuilder fetchRequestBuilder = new FetchRequestBuilder()
+               .clientId("KafDrop")
+               .maxWait(5000) // todo: make configurable
+               .minBytes(1);
 
-         final FetchResponse fetchResponse = consumer.fetch(fetchRequest);
-         final ByteBufferMessageSet messageSet = fetchResponse.messageSet(topicName, partitionId);
-         if (messageSet.validBytes() <= 0) break;
+            List<MessageVO> messages = new ArrayList<>(count);
+            long currentOffset = offset;
+            while (messages.size() < count)
+            {
+               final FetchRequest fetchRequest =
+                  fetchRequestBuilder
+                     .addFetch(topicName, partitionId, currentOffset, 1024 * 1024)
+                     .build();
+
+               FetchResponse fetchResponse = consumer.fetch(fetchRequest);
+
+               final ByteBufferMessageSet messageSet = fetchResponse.messageSet(topicName, partitionId);
+               if (messageSet.validBytes() <= 0) break;
 
 
-         int oldSize = messages.size();
-         StreamSupport.stream(messageSet.spliterator(), false)
-            .limit(count - messages.size())
-            .map(MessageAndOffset::message)
-            .map(this::createMessage)
-            .forEach(messages::add);
-         currentOffset += messages.size() - oldSize;
-      }
-      return messages;
+               int oldSize = messages.size();
+               StreamSupport.stream(messageSet.spliterator(), false)
+                  .limit(count - messages.size())
+                  .map(MessageAndOffset::message)
+                  .map(this::createMessage)
+                  .forEach(messages::add);
+               currentOffset += messages.size() - oldSize;
+            }
+            return messages;
+         })
+         .orElseGet(Collections::emptyList);
    }
 
    private MessageVO createMessage(Message message)

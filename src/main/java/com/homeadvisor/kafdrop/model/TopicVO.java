@@ -69,7 +69,7 @@ public class TopicVO implements Comparable<TopicVO>
    public Collection<TopicPartitionVO> getLeaderPartitions(int brokerId)
    {
       return partitions.values().stream()
-         .filter(tp -> tp.getLeader().getId() == brokerId)
+         .filter(tp -> tp.getLeader() != null && tp.getLeader().getId() == brokerId)
          .collect(Collectors.toList());
    }
 

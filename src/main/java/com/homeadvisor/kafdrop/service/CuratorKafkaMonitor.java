@@ -21,11 +21,13 @@ package com.homeadvisor.kafdrop.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.homeadvisor.kafdrop.model.*;
+import com.homeadvisor.kafdrop.util.BrokerChannel;
+import kafka.api.ConsumerMetadataRequest;
 import kafka.api.PartitionOffsetRequestInfo;
+import kafka.common.ErrorMapping;
 import kafka.common.TopicAndPartition;
-import kafka.javaapi.OffsetRequest;
-import kafka.javaapi.OffsetResponse;
-import kafka.javaapi.consumer.SimpleConsumer;
+import kafka.javaapi.*;
+import kafka.network.BlockingChannel;
 import kafka.utils.ZKGroupDirs;
 import kafka.utils.ZKGroupTopicDirs;
 import kafka.utils.ZkUtils;
@@ -36,13 +38,16 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCache.StartMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -61,7 +66,6 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 
    private PathChildrenCache brokerPathCache;
    private PathChildrenCache topicConfigPathCache;
-   private TreeCache topicTreeCache;
    private TreeCache consumerTreeCache;
    private NodeCache controllerNodeCache;
 
@@ -69,14 +73,28 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 
    private Map<Integer, BrokerVO> brokerCache = new TreeMap<>();
 
-   private Map<Integer, SimpleConsumer> consumerMap = new ConcurrentHashMap<>();
-
    private AtomicInteger cacheInitCounter = new AtomicInteger();
+
+   private ForkJoinPool threadPool;
+
+   private static final int DEFAULT_THREAD_POOL_SIZE = 10;
+
+   @Value("${kafdrop.monitor.threadPoolSize:10}")
+   private int threadPoolSize = DEFAULT_THREAD_POOL_SIZE;
+
 
    @PostConstruct
    public void start() throws Exception
    {
-      cacheInitCounter.set(4);
+      if (threadPoolSize <= 0)
+      {
+         LOG.warn("Thread pool size {} is less than or equal to zero. Using default of {}",
+                  threadPoolSize, DEFAULT_THREAD_POOL_SIZE);
+         threadPoolSize = DEFAULT_THREAD_POOL_SIZE;
+      }
+      threadPool = new ForkJoinPool(threadPoolSize);
+
+      cacheInitCounter.set(3);
 
       brokerPathCache = new PathChildrenCache(curatorFramework, ZkUtils.BrokerIdsPath(), true);
       brokerPathCache.getListenable().addListener(new BrokerListener());
@@ -98,16 +116,6 @@ public class CuratorKafkaMonitor implements KafkaMonitor
          }
       });
       topicConfigPathCache.start(StartMode.POST_INITIALIZED_EVENT);
-
-      topicTreeCache = new TreeCache(curatorFramework, ZkUtils.BrokerTopicsPath());
-      topicTreeCache.getListenable().addListener((client, event) -> {
-         if (event.getType() == TreeCacheEvent.Type.INITIALIZED)
-         {
-            cacheInitCounter.decrementAndGet();
-            LOG.info("Topic tree cache initialized");
-         }
-      });
-      topicTreeCache.start();
 
       consumerTreeCache = new TreeCache(curatorFramework, ZkUtils.ConsumersPath());
       consumerTreeCache.getListenable().addListener((client, event) -> {
@@ -162,33 +170,9 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    public void stop() throws IOException
    {
       consumerTreeCache.close();
-      topicTreeCache.close();
       topicConfigPathCache.close();
       brokerPathCache.close();
-   }
-
-   @Override
-   public SimpleConsumer getSimpleConsumer(int brokerId) throws BrokerNotFoundException
-   {
-      return consumerMap.computeIfAbsent(brokerId,
-                                         id -> createSimpleConsumer(id).orElseThrow(BrokerNotFoundException::new));
-   }
-
-   private void removeSimpleConsumer(int brokerId)
-   {
-      try
-      {
-         Optional.ofNullable(consumerMap.remove(brokerId)).ifPresent(SimpleConsumer::close);
-      }
-      catch (Exception ex)
-      {
-      }
-   }
-
-   private Optional<SimpleConsumer> createSimpleConsumer(int brokerId)
-   {
-      return Optional.ofNullable(brokerCache.get(brokerId))
-         .map(b -> new SimpleConsumer(b.getHost(), b.getPort(), 10000, 100000, "kafka-watch"));
+      controllerNodeCache.close();
    }
 
    private int brokerId(ChildData input)
@@ -203,9 +187,9 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       return oldBroker;
    }
 
-   private BrokerVO removeBroker(PathChildrenCacheEvent event)
+   private BrokerVO removeBroker(int brokerId)
    {
-      final BrokerVO broker = brokerCache.remove(brokerId(event.getData()));
+      final BrokerVO broker = brokerCache.remove(brokerId);
       LOG.info("Kafka broker {} was removed", broker.getId());
       return broker;
    }
@@ -224,12 +208,36 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       return Optional.ofNullable(brokerCache.get(id));
    }
 
+   private BrokerChannel brokerChannel(Integer brokerId)
+   {
+      if (brokerId == null)
+      {
+         brokerId = randomBroker();
+         if (brokerId == null)
+         {
+            throw new BrokerNotFoundException("No brokers available to select from");
+         }
+      }
+
+      Integer finalBrokerId = brokerId;
+      BrokerVO broker = getBroker(brokerId)
+         .orElseThrow(() -> new BrokerNotFoundException("Broker " + finalBrokerId + " is not available"));
+
+      return BrokerChannel.forBroker(broker.getHost(), broker.getPort());
+   }
+
+   private Integer randomBroker()
+   {
+      List<Integer> brokerIds = brokerCache.keySet().stream().collect(Collectors.toList());
+      Collections.shuffle(brokerIds);
+      return brokerIds.get(0);
+   }
+
    @Override
    public List<TopicVO> getTopics()
    {
       validateInitialized();
-      return topicTreeCache.getCurrentChildren(ZkUtils.BrokerTopicsPath()).values().stream()
-         .map(this::parseTopic)
+      return getTopicMetadata().values().stream()
          .sorted(Comparator.comparing(TopicVO::getName))
          .collect(Collectors.toList());
    }
@@ -238,7 +246,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    public Optional<TopicVO> getTopic(String topic)
    {
       validateInitialized();
-      final Optional<TopicVO> topicVO = getTopicData(topic).map(this::parseTopic);
+      final Optional<TopicVO> topicVO = Optional.ofNullable(getTopicMetadata(topic).get(topic));
       topicVO.ifPresent(
          vo -> {
             getTopicPartitionSizes(vo, kafka.api.OffsetRequest.LatestTime())
@@ -252,50 +260,55 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       return topicVO;
    }
 
-   public TopicVO parseTopic(ChildData input)
+   private Map<String, TopicVO> getTopicMetadata(String... topics)
    {
-      try
+      return brokerChannel(null).execute(channel ->
       {
-         final TopicVO topic = new TopicVO(StringUtils.substringAfterLast(input.getPath(), "/"));
+         final TopicMetadataRequest request = new TopicMetadataRequest((short) 0, 0, "", Arrays.asList(topics));
+         LOG.debug("Sending topic metadata request: {}", request);
+         channel.send(request);
+         final kafka.api.TopicMetadataResponse underlyingResponse =
+            kafka.api.TopicMetadataResponse.readFrom(channel.receive().buffer());
 
-         final TopicRegistrationVO topicRegistration =
-            objectMapper.reader(TopicRegistrationVO.class).readValue(input.getData());
+         LOG.debug("Received topic metadata response: {}", underlyingResponse);
 
-         topic.setConfig(
-            Optional.ofNullable(topicConfigPathCache.getCurrentData(ZkUtils.TopicConfigPath() + "/" + topic.getName()))
-               .map(this::readTopicConfig)
-               .orElse(Collections.emptyMap()));
+         TopicMetadataResponse response = new TopicMetadataResponse(underlyingResponse);
+         return response.topicsMetadata().stream()
+            .filter(tmd -> tmd.errorCode() == ErrorMapping.NoError())
+            .map(this::processTopicMetadata)
+            .collect(Collectors.toMap(TopicVO::getName, t -> t));
+      });
+   }
 
-         for (Map.Entry<Integer, List<Integer>> entry : topicRegistration.getReplicas().entrySet())
-         {
-            final int partitionId = entry.getKey();
-            final List<Integer> partitionBrokerIds = entry.getValue();
+   private TopicVO processTopicMetadata(TopicMetadata tmd)
+   {
+      TopicVO topic = new TopicVO(tmd.topic());
 
-            final TopicPartitionVO partition = new TopicPartitionVO(partitionId);
+      topic.setConfig(
+         Optional.ofNullable(topicConfigPathCache.getCurrentData(ZkUtils.TopicConfigPath() + "/" + topic.getName()))
+            .map(this::readTopicConfig)
+            .orElse(Collections.emptyMap()));
 
-            final TopicPartitionStateVO partitionState = partitionState(topic.getName(), partition.getId());
+      topic.setPartitions(
+         tmd.partitionsMetadata().stream()
+            .map(this::parsePartitionMetadata)
+            .collect(Collectors.toMap(TopicPartitionVO::getId, p -> p))
+      );
+      return topic;
+   }
 
-            partitionBrokerIds.stream()
-               .map(brokerId -> {
-                  TopicPartitionVO.PartitionReplica replica = new TopicPartitionVO.PartitionReplica();
-                  replica.setId(brokerId);
-                  replica.setInService(partitionState.getIsr().contains(brokerId));
-                  replica.setLeader(brokerId == partitionState.getLeader());
-                  return replica;
-               })
-               .forEach(partition::addReplica);
-
-            topic.addPartition(partition);
-         }
-
-         // todo: get partition sizes here as single bulk request?
-
-         return topic;
-      }
-      catch (IOException e)
+   private TopicPartitionVO parsePartitionMetadata(PartitionMetadata pmd)
+   {
+      TopicPartitionVO partition = new TopicPartitionVO(pmd.partitionId());
+      if (pmd.leader() != null)
       {
-         throw Throwables.propagate(e);
+         partition.addReplica(new TopicPartitionVO.PartitionReplica(pmd.leader().id(), true, true));
       }
+
+      pmd.replicas().stream()
+         .map(r -> new TopicPartitionVO.PartitionReplica(r.id(), pmd.isr().contains(r), false))
+         .forEach(partition::addReplica);
+      return partition;
    }
 
    private Map<String, Object> readTopicConfig(ChildData d)
@@ -309,21 +322,6 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       {
          throw Throwables.propagate(e);
       }
-   }
-
-
-   private TopicPartitionStateVO partitionState(String topicName, int partitionId)
-      throws IOException
-   {
-      return objectMapper.reader(TopicPartitionStateVO.class).readValue(
-         topicTreeCache.getCurrentData(
-            ZkUtils.getTopicPartitionLeaderAndIsrPath(topicName, partitionId))
-            .getData());
-   }
-
-   private Optional<ChildData> getTopicData(String topic)
-   {
-      return Optional.ofNullable(topicTreeCache.getCurrentData(ZkUtils.getTopicPath(topic)));
    }
 
    @Override
@@ -389,11 +387,11 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       Stream<String> topicStream;
 
       topic.map(
-         vo -> (consumerTreeCache.getCurrentData(groupDirs.consumerGroupDir() + "/offsets/" + vo.getName()) != null)
+         vo -> (consumerTreeCache.getCurrentData(groupDirs.consumerGroupDir() + "/owners/" + vo.getName()) != null)
             ? Stream.of(vo.getName()) : Stream.<String>empty())
          .orElse(
             Optional.ofNullable(
-               consumerTreeCache.getCurrentChildren(groupDirs.consumerGroupDir() + "/offsets"))
+               consumerTreeCache.getCurrentChildren(groupDirs.consumerGroupDir() + "/owners"))
                .map(c -> c.keySet().stream())
                .orElse(Stream.<String>empty()))
          .map(ConsumerTopicVO::new)
@@ -438,6 +436,8 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       {
          TopicVO topic = topicOpt.get();
 
+         Map<Integer, Long> consumerOffsets = getConsumerOffsets(groupId, topic);
+
          return topic.getPartitions().stream()
             .map(partition -> {
                int partitionId = partition.getId();
@@ -448,11 +448,9 @@ public class CuratorKafkaMonitor implements KafkaMonitor
                      consumerTreeCache.getCurrentData(groupTopicDirs.consumerOwnerDir() + "/" + partitionId))
                      .map(data -> new String(data.getData()))
                      .orElse(null));
-               consumerPartition.setOffset(
-                  Optional.ofNullable(
-                     consumerTreeCache.getCurrentData(groupTopicDirs.consumerOffsetDir() + "/" + partitionId))
-                     .map(d -> Long.parseLong(new String(d.getData())))
-                     .orElse(-1L));
+
+               consumerPartition.setOffset(consumerOffsets.getOrDefault(partitionId, -1L));
+
                final Optional<TopicPartitionVO> topicPartition = topic.getPartition(partitionId);
                consumerPartition.setSize(topicPartition.map(TopicPartitionVO::getSize).orElse(-1L));
                consumerPartition.setFirstOffset(topicPartition.map(TopicPartitionVO::getFirstOffset).orElse(-1L));
@@ -466,6 +464,99 @@ public class CuratorKafkaMonitor implements KafkaMonitor
       }
    }
 
+   private Map<Integer, Long> getConsumerOffsets(String groupId, TopicVO topic)
+   {
+      try
+      {
+         // Kafka doesn't really give us an indication of whether a consumer is
+         // using Kafka or Zookeeper based offset tracking. So look up the offsets
+         // for both and assume that the largest offset is the correct one.
+
+         ForkJoinTask<Map<Integer, Long>> kafkaTask = threadPool.submit(
+            () -> brokerChannel(offsetManagerBroker(groupId))
+               .execute(channel -> getConsumerOffsets(channel, groupId, topic, false))
+         );
+
+         ForkJoinTask<Map<Integer, Long>> zookeeperTask = threadPool.submit(
+            () -> brokerChannel(null).execute(channel -> getConsumerOffsets(channel, groupId, topic, true))
+         );
+
+         Map<Integer, Long> zookeeperOffsets = zookeeperTask.get();
+         Map<Integer, Long> kafkaOffsets = kafkaTask.get();
+         zookeeperOffsets.entrySet().stream()
+            .forEach(entry -> kafkaOffsets.merge(entry.getKey(), entry.getValue(), Math::max));
+         return kafkaOffsets;
+      }
+      catch (InterruptedException ex)
+      {
+         Thread.currentThread().interrupt();
+         throw Throwables.propagate(ex);
+      }
+      catch (ExecutionException ex)
+      {
+         throw Throwables.propagate(ex.getCause());
+      }
+   }
+
+   /**
+    * Returns the map of partitionId to consumer offset for the given group and
+    * topic. Uses the given blocking channel to execute the offset fetch request.
+    *
+    * @param channel          The channel to send requests on
+    * @param groupId          Consumer group to use
+    * @param topic            Topic to query
+    * @param zookeeperOffsets If true, use a version of the API that retrieves
+    *                         offsets from Zookeeper. Otherwise use a version
+    *                         that pulls the offsets from Kafka itself.
+    * @return Map where the key is partitionId and the value is the consumer
+    * offset for that partition.
+    */
+   private Map<Integer, Long> getConsumerOffsets(BlockingChannel channel,
+                                                 String groupId,
+                                                 TopicVO topic,
+                                                 boolean zookeeperOffsets)
+   {
+
+      final OffsetFetchRequest request = new OffsetFetchRequest(
+         groupId,
+         topic.getPartitions().stream()
+            .map(p -> new TopicAndPartition(topic.getName(), p.getId()))
+            .collect(Collectors.toList()),
+         (short) (zookeeperOffsets ? 0 : 1), 0, // version 0 = zookeeper offsets, 1 = kafka offsets
+         kafka.api.OffsetFetchRequest.DefaultClientId());
+
+      LOG.debug("Sending consumer offset request: {}", request);
+
+      channel.send(request.underlying());
+
+      final kafka.api.OffsetFetchResponse underlyingResponse =
+         kafka.api.OffsetFetchResponse.readFrom(channel.receive().buffer());
+
+      LOG.debug("Received consumer offset response: {}", underlyingResponse);
+
+      OffsetFetchResponse response = new OffsetFetchResponse(underlyingResponse);
+
+      return response.offsets().entrySet().stream()
+         .filter(entry -> entry.getValue().error() == ErrorMapping.NoError())
+         .collect(Collectors.toMap(entry -> entry.getKey().partition(), entry -> entry.getValue().offset()));
+   }
+
+   /**
+    * Returns the broker Id that is the offset coordinator for the given group id. If not found, returns null
+    */
+   private Integer offsetManagerBroker(String groupId)
+   {
+      return brokerChannel(null).execute(channel -> {
+         final ConsumerMetadataRequest request =
+            new ConsumerMetadataRequest(groupId, (short) 0, 0, ConsumerMetadataRequest.DefaultClientId());
+         LOG.debug("Sending consumer metadata request: {}", request);
+         channel.send(request);
+         ConsumerMetadataResponse response = ConsumerMetadataResponse.readFrom(channel.receive().buffer());
+         LOG.debug("Received consumer metadata response: {}", response);
+         return (response.errorCode() == ErrorMapping.NoError()) ? response.coordinator().id() : null;
+      });
+   }
+
    private Map<Integer, Long> getTopicPartitionSizes(TopicVO topic)
    {
       return getTopicPartitionSizes(topic, kafka.api.OffsetRequest.LatestTime());
@@ -473,53 +564,77 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 
    private Map<Integer, Long> getTopicPartitionSizes(TopicVO topic, long time)
    {
-      PartitionOffsetRequestInfo requestInfo = new PartitionOffsetRequestInfo(time, 1);
+      try
+      {
+         PartitionOffsetRequestInfo requestInfo = new PartitionOffsetRequestInfo(time, 1);
+         return threadPool.submit(() ->
+               topic.getPartitions().stream()
+                  .filter(p -> p.getLeader() != null)
+                  .collect(Collectors.groupingBy(p -> p.getLeader().getId())) // Group partitions by leader broker id
+                  .entrySet().parallelStream()
+                  .map(entry -> {
+                     final Integer brokerId = entry.getKey();
+                     final List<TopicPartitionVO> brokerPartitions = entry.getValue();
+                     try
+                     {
+                        // Get the size of the partitions for a topic from the leader.
+                        final OffsetRequest offsetRequest = new OffsetRequest(
+                           brokerPartitions.stream()
+                              .collect(Collectors.toMap(
+                                 partition -> new TopicAndPartition(topic.getName(), partition.getId()),
+                                 partition -> requestInfo)),
+                           (short) 0, "");
+                        LOG.debug("Sending offset request: {}", offsetRequest);
+                        final OffsetResponse offsetResponse =
+                           brokerChannel(brokerId).execute(channel -> {
+                              channel.send(offsetRequest.underlying());
+                              final kafka.api.OffsetResponse underlyingResponse =
+                                 kafka.api.OffsetResponse.readFrom(channel.receive().buffer());
 
-      return topic.getPartitions().stream()
-         .collect(Collectors.groupingBy(p -> p.getLeader().getId())) // Group partitions by their leader broker id
-         .entrySet().parallelStream()
-         .map(entry -> {
-            final Integer brokerId = entry.getKey();
-            final List<TopicPartitionVO> brokerPartitions = entry.getValue();
-            try
-            {
-               // Get the size of the partitions by making a request for all partitions for a topic to the leader.
-               final OffsetResponse response =
-                  getSimpleConsumer(brokerId).getOffsetsBefore(
-                     new OffsetRequest(
-                        brokerPartitions.stream()
-                           .collect(Collectors.toMap(
-                              partition -> new TopicAndPartition(topic.getName(), partition.getId()),
-                              partition -> requestInfo)),
-                        (short) 1, ""));
+                              LOG.debug("Received offset response: {}", underlyingResponse);
 
-               // Build a map of partitionId -> topic size from the response
-               return brokerPartitions.stream()
-                  .collect(Collectors.toMap(TopicPartitionVO::getId,
-                                            partition -> Optional.ofNullable(
-                                               response.offsets(topic.getName(), partition.getId()))
-                                               .map(Arrays::stream)
-                                               .orElse(LongStream.empty())
-                                               .findFirst()
-                                               .orElse(-1L)));
-            }
-            catch (Exception ex)
-            {
-               LOG.error("Unable to get partition log size for topic {} partitions ({})",
-                         topic.getName(),
-                         brokerPartitions.stream()
-                            .map(TopicPartitionVO::getId)
-                            .map(String::valueOf)
-                            .collect(Collectors.joining(",")),
-                         ex);
+                              return new OffsetResponse(underlyingResponse);
+                           });
 
-               // Map each partition to -1, indicating we got an error
-               return brokerPartitions.stream().collect(Collectors.toMap(TopicPartitionVO::getId, tp -> -1L));
-            }
-         })
-         .map(Map::entrySet)
-         .flatMap(Collection::stream)
-         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+                        // Build a map of partitionId -> topic size from the response
+                        return brokerPartitions.stream()
+                           .collect(Collectors.toMap(TopicPartitionVO::getId,
+                                                     partition -> Optional.ofNullable(
+                                                        offsetResponse.offsets(topic.getName(), partition.getId()))
+                                                        .map(Arrays::stream)
+                                                        .orElse(LongStream.empty())
+                                                        .findFirst()
+                                                        .orElse(-1L)));
+                     }
+                     catch (Exception ex)
+                     {
+                        LOG.error("Unable to get partition log size for topic {} partitions ({})",
+                                  topic.getName(),
+                                  brokerPartitions.stream()
+                                     .map(TopicPartitionVO::getId)
+                                     .map(String::valueOf)
+                                     .collect(Collectors.joining(",")),
+                                  ex);
+
+                        // Map each partition to -1, indicating we got an error
+                        return brokerPartitions.stream().collect(Collectors.toMap(TopicPartitionVO::getId, tp -> -1L));
+                     }
+                  })
+                  .map(Map::entrySet)
+                  .flatMap(Collection::stream)
+                  .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+            .get();
+      }
+      catch (InterruptedException e)
+      {
+         Thread.currentThread().interrupt();
+         throw Throwables.propagate(e);
+      }
+      catch (ExecutionException e)
+      {
+         throw Throwables.propagate(e.getCause());
+      }
    }
 
    private class BrokerListener implements PathChildrenCacheListener
@@ -531,7 +646,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
          {
             case CHILD_REMOVED:
             {
-               BrokerVO broker = removeBroker(event);
+               BrokerVO broker = removeBroker(brokerId(event.getData()));
                break;
             }
 
@@ -545,7 +660,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
             case INITIALIZED:
             {
                brokerPathCache.getCurrentData().stream()
-                  .map(CuratorKafkaMonitor.this::parseBroker)
+                  .map(BrokerListener.this::parseBroker)
                   .forEach(CuratorKafkaMonitor.this::addBroker);
                break;
             }
@@ -553,19 +668,24 @@ public class CuratorKafkaMonitor implements KafkaMonitor
          updateController();
       }
 
-   }
-
-   private BrokerVO parseBroker(ChildData input)
-   {
-      try
+      private int brokerId(ChildData input)
       {
-         final BrokerVO broker = objectMapper.reader(BrokerVO.class).readValue(input.getData());
-         broker.setId(brokerId(input));
-         return broker;
+         return Integer.parseInt(StringUtils.substringAfter(input.getPath(), ZkUtils.BrokerIdsPath() + "/"));
       }
-      catch (IOException e)
+
+
+      private BrokerVO parseBroker(ChildData input)
       {
-         throw Throwables.propagate(e);
+         try
+         {
+            final BrokerVO broker = objectMapper.reader(BrokerVO.class).readValue(input.getData());
+            broker.setId(brokerId(input));
+            return broker;
+         }
+         catch (IOException e)
+         {
+            throw Throwables.propagate(e);
+         }
       }
    }
 

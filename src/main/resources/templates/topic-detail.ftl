@@ -91,7 +91,7 @@
             <td>${p.firstOffset}</td>
             <td>${p.size}</td>
             <td>${p.size - p.firstOffset}</td>
-            <td>${p.leader.id}</td>
+            <td <#if !(p.leader)??>class="error"</#if>>${(p.leader.id)!"none"}</td>
             <td><#list p.replicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
             <td><#list p.inSyncReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
             <td <#if !p.leaderPreferred>class="warn"</#if>><@template.yn p.leaderPreferred/></td>
@@ -113,7 +113,7 @@
         </tr>
         </thead>
         <tbody>
-        <#list consumers as c>
+        <#list consumers![] as c>
             <tr>
                 <td><a href="/consumer/${c.groupId}">${c.groupId}</a></td>
                 <td>${c.getTopic(topic.name).lag}</td>
