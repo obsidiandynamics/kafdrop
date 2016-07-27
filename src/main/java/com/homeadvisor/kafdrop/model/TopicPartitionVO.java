@@ -122,6 +122,17 @@ public class TopicPartitionVO
       private boolean inService;
       private boolean leader;
 
+      public PartitionReplica()
+      {
+      }
+
+      public PartitionReplica(Integer id, boolean inService, boolean leader)
+      {
+         this.id = id;
+         this.inService = inService;
+         this.leader = leader;
+      }
+
       public Integer getId()
       {
          return id;

@@ -9,9 +9,9 @@
    <description>For when you have a Kaf(ka) cluster to monitor</description>
 
    <properties>
-      <spring.boot.version>1.2.5.RELEASE</spring.boot.version>
+      <spring.boot.version>1.3.6.RELEASE</spring.boot.version>
       <additionalparam>-Xdoclint:none</additionalparam>
-      <curator.version>2.9.1</curator.version>
+      <curator.version>2.10.0</curator.version>
    </properties>
 
    <scm>
@@ -52,12 +52,12 @@
       <dependency>
          <groupId>org.apache.zookeeper</groupId>
          <artifactId>zookeeper</artifactId>
-         <version>3.4.7</version>
+         <version>3.4.8</version>
       </dependency>
       <dependency>
          <groupId>org.apache.kafka</groupId>
          <artifactId>kafka_2.9.2</artifactId>
-         <version>0.8.1.1</version>
+         <version>0.8.2.2</version>
       </dependency>
       <dependency>
          <groupId>org.freemarker</groupId>
