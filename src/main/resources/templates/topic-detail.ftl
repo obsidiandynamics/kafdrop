@@ -27,11 +27,11 @@
         </tr>
         <tr>
             <td>Preferred Replicas</td>
-            <td <#if topic.preferredReplicaPercent lt 1.0>class="warn"</#if>>${topic.preferredReplicaPercent?string.percent}</td>
+            <td <#if topic.preferredReplicaPercent lt 1.0>class="error"</#if>>${topic.preferredReplicaPercent?string.percent}</td>
         </tr>
         <tr>
             <td>Under Replicated Partitions</td>
-            <td <#if topic.underReplicatedPartitions?size gt 0>class="warn"</#if>>${topic.underReplicatedPartitions?size}</td>
+            <td <#if topic.underReplicatedPartitions?size gt 0>class="error"</#if>>${topic.underReplicatedPartitions?size}</td>
         </tr>
         <tr>
             <td>Total Size</td>
@@ -94,8 +94,8 @@
             <td <#if !(p.leader)??>class="error"</#if>>${(p.leader.id)!"none"}</td>
             <td><#list p.replicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
             <td><#list p.inSyncReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
-            <td <#if !p.leaderPreferred>class="warn"</#if>><@template.yn p.leaderPreferred/></td>
-            <td <#if p.underReplicated>class="warn"</#if>><@template.yn p.underReplicated/></td>
+            <td <#if !p.leaderPreferred>class="error"</#if>><@template.yn p.leaderPreferred/></td>
+            <td <#if p.underReplicated>class="error"</#if>><@template.yn p.underReplicated/></td>
         </tr>
         </#list>
         </tbody>

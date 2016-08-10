@@ -19,11 +19,16 @@
 package com.homeadvisor.kafdrop.controller;
 
 import com.homeadvisor.kafdrop.config.CuratorConfiguration;
+import com.homeadvisor.kafdrop.service.BrokerNotFoundException;
 import com.homeadvisor.kafdrop.service.KafkaMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Controller
 public class ClusterController
@@ -41,5 +46,15 @@ public class ClusterController
       model.addAttribute("brokers", kafkaMonitor.getBrokers());
       model.addAttribute("topics", kafkaMonitor.getTopics());
       return "cluster-overview";
+   }
+
+   @ExceptionHandler(BrokerNotFoundException.class)
+   private String brokerNotFound(Model model)
+   {
+      model.addAttribute("zookeeper", zookeeperProperties);
+      model.addAttribute("brokers", Collections.emptyList());
+      model.addAttribute("topics", Collections.emptyList());
+      return "cluster-overview";
+
    }
 }

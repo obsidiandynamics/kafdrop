@@ -29,6 +29,11 @@
                 </tr>
                 </thead>
                 <tbody>
+                <#if brokers?size == 0>
+                    <tr>
+                        <td class="error" colspan="7">No brokers available!</td>
+                    </tr>
+                </#if>
                 <#list brokers as b>
                 <tr>
                     <td><a href="/broker/${b.id}"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
@@ -47,6 +52,7 @@
         <div id="topics">
             <h3>Topics</h3>
             <table class="bs-table default">
+                <thead>
                 <tr>
                     <th>Name</th>
                     <th>Partitions</th>
@@ -57,6 +63,11 @@
                 </tr>
                 </thead>
                 <tbody>
+                <#if topics?size == 0>
+                <tr>
+                    <td colspan="5">No topics available</td>
+                </tr>
+                </#if>
                 <#list topics as t>
                 <tr>
                     <td><a href="/topic/${t.name}">${t.name}</a></td>
