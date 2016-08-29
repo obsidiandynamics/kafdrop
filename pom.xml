@@ -15,8 +15,8 @@
    </properties>
 
    <scm>
-       <connection>scm:git:ssh://buildbox/home/git/microservices/kafdrop.git</connection>
-       <developerConnection>scm:git:ssh://buildbox/home/git/microservices/kafdrop.git</developerConnection>
+       <connection>scm:git:git@git.homeadvisor.com:ta/kafdrop.git</connection>
+       <developerConnection>scm:git:git@git.homeadvisor.com:ta/kafdrop.git</developerConnection>
        <tag>HEAD</tag>
    </scm>
 
