@@ -18,6 +18,7 @@
 
 package com.homeadvisor.kafdrop.service;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,19 @@ public class CuratorKafkaMonitorProperties
    private int threadPoolSize = 10;
 
    private RetryProperties retry = new RetryProperties();
+
+   @NotBlank
+   private String kafkaVersion = "0.8.2.2";
+
+   public String getKafkaVersion()
+   {
+      return kafkaVersion.toString();
+   }
+
+   public void setKafkaVersion(String kafkaVersion)
+   {
+      this.kafkaVersion = kafkaVersion;
+   }
 
    public String getClientId()
    {

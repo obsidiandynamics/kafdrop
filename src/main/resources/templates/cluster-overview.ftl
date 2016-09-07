@@ -3,15 +3,10 @@
 
 <#setting number_format="0">
     <div>
-        <h2>Kafka Cluster Info</h2>
+        <h2>Kafka Cluster Overview</h2>
 
         <div id="zookeeper">
-            <h3>Zookeeper Connection</h3>
-            <ul>
-            <#list zookeeper.connectList as z>
-               <li>${z}</li>
-            </#list>
-            </ul>
+            <b>Zookeeper Hosts:</b> <#list zookeeper.connectList as z>${z}<#if z_has_next>, </#if></#list>
         </div>
 
         <div id="brokers">
