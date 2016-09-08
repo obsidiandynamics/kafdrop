@@ -4,7 +4,7 @@
 
    <groupId>com.homeadvisor.kafka</groupId>
    <artifactId>kafdrop</artifactId>
-   <version>1.2.1-SNAPSHOT</version>
+   <version>1.2.1</version>
 
    <description>For when you have a Kaf(ka) cluster to monitor</description>
 
@@ -17,7 +17,7 @@
    <scm>
        <connection>scm:git:git@git.homeadvisor.com:ta/kafdrop.git</connection>
        <developerConnection>scm:git:git@git.homeadvisor.com:ta/kafdrop.git</developerConnection>
-       <tag>HEAD</tag>
+       <tag>kafdrop-1.2.1</tag>
    </scm>
 
    <dependencyManagement>
