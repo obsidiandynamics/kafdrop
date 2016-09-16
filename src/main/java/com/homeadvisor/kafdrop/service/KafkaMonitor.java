@@ -44,7 +44,7 @@ public interface KafkaMonitor
 
    Optional<ConsumerVO> getConsumer(String groupId);
 
-   Optional<ConsumerVO> getConsumerByTopicName(String groupId, Optional<String> topic);
+   Optional<ConsumerVO> getConsumerByTopicName(String groupId, String topic);
 
-   Optional<ConsumerVO> getConsumerByTopic(String groupId, Optional<TopicVO> topic);
+   Optional<ConsumerVO> getConsumerByTopic(String groupId, TopicVO topic);
 }

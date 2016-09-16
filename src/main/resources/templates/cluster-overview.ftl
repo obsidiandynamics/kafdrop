@@ -3,15 +3,10 @@
 
 <#setting number_format="0">
     <div>
-        <h2>Kafka Cluster Info</h2>
+        <h2>Kafka Cluster Overview</h2>
 
         <div id="zookeeper">
-            <h3>Zookeeper Connection</h3>
-            <ul>
-            <#list zookeeper.connectList as z>
-               <li>${z}</li>
-            </#list>
-            </ul>
+            <b>Zookeeper Hosts:</b> <#list zookeeper.connectList as z>${z}<#if z_has_next>, </#if></#list>
         </div>
 
         <div id="brokers">
@@ -29,6 +24,11 @@
                 </tr>
                 </thead>
                 <tbody>
+                <#if brokers?size == 0>
+                    <tr>
+                        <td class="error" colspan="7">No brokers available!</td>
+                    </tr>
+                </#if>
                 <#list brokers as b>
                 <tr>
                     <td><a href="/broker/${b.id}"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
@@ -47,6 +47,7 @@
         <div id="topics">
             <h3>Topics</h3>
             <table class="bs-table default">
+                <thead>
                 <tr>
                     <th>Name</th>
                     <th>Partitions</th>
@@ -57,6 +58,11 @@
                 </tr>
                 </thead>
                 <tbody>
+                <#if topics?size == 0>
+                <tr>
+                    <td colspan="5">No topics available</td>
+                </tr>
+                </#if>
                 <#list topics as t>
                 <tr>
                     <td><a href="/topic/${t.name}">${t.name}</a></td>

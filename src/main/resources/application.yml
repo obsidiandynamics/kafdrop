@@ -14,6 +14,14 @@ endpoints.jmx.domain: ${spring.jmx.default_domain}
 metrics.jmx.domain: ${spring.jmx.default_domain}-metrics
 management.contextPath: /debug
 
+kafdrop.monitor:
+   kafkaVersion: "0.8.2.2"
+   threadPoolSize: 10
+   retry:
+      maxAttempts: 3
+      backoffMillis: 1000
+
+
 curator.discovery:
    enabled: true
    basePath: /homeadvisor/services
