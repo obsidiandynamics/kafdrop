@@ -138,6 +138,73 @@
             </configuration>
          </plugin>
          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+               <descriptors>
+                  <descriptor>src/main/assembly/bin.xml</descriptor>
+               </descriptors>
+            </configuration>
+            <version>2.2.1</version>
+         </plugin>
+         <plugin>
+            <!-- Build an executable JAR -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addClasspath>true</addClasspath>
+                     <classpathPrefix>lib/</classpathPrefix>
+                     <mainClass>com.homeadvisor.kafdrop.KafDrop</mainClass>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.4.9</version>
+            <configuration>
+               <imageName>kafdrop</imageName>
+               <forceTags>true</forceTags>
+               <dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
+               <imageTags>
+                  <imageTag>${project.version}</imageTag>
+                  <imageTag>latest</imageTag>
+               </imageTags>
+               <resources>
+                  <resource>
+                     <targetPath>/</targetPath>
+                     <directory>${project.build.directory}</directory>
+                     <include>${project.build.finalName}-bin.tar.gz</include>
+                  </resource>
+               </resources>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.7</version>
+            <executions>
+               <execution>
+                  <id>prepare-dockerfile</id>
+                  <phase>validate</phase>
+                  <goals>
+                     <goal>copy-resources</goal>
+                  </goals>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/docker-ready</outputDirectory>
+                     <resources>
+                        <resource>
+                           <directory>src/main/docker</directory>
+                           <filtering>true</filtering>
+                        </resource>
+                     </resources>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
             <version>${spring.boot.version}</version>
