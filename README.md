@@ -16,7 +16,7 @@ After cloning the repository, building should just be a matter of running a stan
 $ mvn clean package
 ```
 
-## Running
+## Running Stand Alone
 
 The build process creates an executable JAR file.  
 
@@ -29,3 +29,25 @@ Then open a browser and navigate to http://localhost:9000. The port can be overr
 ```
     --server.port=<port>
 ```
+
+## Running with Docker
+
+The following maven command will generate a Docker image:
+
+```
+    mvn clean package assembly:single docker:build
+```
+
+Note for Mac Users: You need to convert newline formatting of the kafdrop.sh file *before* running this command:
+
+```
+    dos2unix src/main/docker/*
+```
+
+Once the build finishes you can launch the image as follows:
+
+```
+    docker run -d -p 9000:9000 -e ZOOKEEPER_CONNECT=<host:port,host:port> kafdrop
+```
+
+And access the UI at http://localhost:9000.
