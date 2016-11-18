@@ -164,7 +164,7 @@
          <plugin>
             <groupId>com.spotify</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>0.4.9</version>
+            <version>0.4.13</version>
             <configuration>
                <imageName>kafdrop</imageName>
                <forceTags>true</forceTags>
