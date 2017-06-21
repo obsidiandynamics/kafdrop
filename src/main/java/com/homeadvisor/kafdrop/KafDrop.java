@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HomeAdvisor, Inc.
+ * Copyright 2017 HomeAdvisor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import com.homeadvisor.kafdrop.config.ini.IniFilePropertySource;
 import com.homeadvisor.kafdrop.config.ini.IniFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.Banner;
 import org.springframework.boot.actuate.autoconfigure.MetricFilterAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -44,7 +45,7 @@ public class KafDrop
    public static void main(String[] args)
    {
       new SpringApplicationBuilder(KafDrop.class)
-         .showBanner(false)
+         .bannerMode(Banner.Mode.OFF)
          .listeners(new EnvironmentSetupListener(),
                     new LoggingConfigurationListener())
          .run(args);

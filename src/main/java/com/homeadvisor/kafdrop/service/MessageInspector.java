@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HomeAdvisor, Inc.
+ * Copyright 2017 HomeAdvisor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public class MessageInspector
    @Autowired
    private KafkaMonitor kafkaMonitor;
 
-   public List<MessageVO> getMessages(String topicName, int partitionId, int offset, int count)
+   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count)
    {
       final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
       final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
@@ -64,7 +64,7 @@ public class MessageInspector
                .maxWait(5000) // todo: make configurable
                .minBytes(1);
 
-            List<MessageVO> messages = new ArrayList<>(count);
+            List<MessageVO> messages = new ArrayList<>();
             long currentOffset = offset;
             while (messages.size() < count)
             {
