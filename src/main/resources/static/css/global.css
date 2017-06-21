@@ -44,3 +44,11 @@ table.overview {
 input[type=text].error {
     border-color: red;
 }
+
+.padding {
+    height: 25px;
+}
+
+th {
+    text-align: left;
+}
