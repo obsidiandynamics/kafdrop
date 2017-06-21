@@ -70,5 +70,6 @@
         </tbody>
     </table>
 </div>
+<div class="padding"></div>
 
 <@template.footer/>

@@ -1,6 +1,10 @@
 <#import "lib/template.ftl" as template>
 <@template.header "Broker List"/>
 
+<script src="/js/powerFilter.js"></script>
+
+
+
 <#setting number_format="0">
     <div>
         <h2>Kafka Cluster Overview</h2>
@@ -49,7 +53,14 @@
             <table class="bs-table default">
                 <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>
+                        Name
+
+                        <span style="font-weight:normal;">
+                            &nbsp;<INPUT id='filter' size=25 NAME='searchRow' title='Just type to filter the rows'>&nbsp;
+                            <span id="rowCount"></span>
+                        </span>
+                    </th>
                     <th>Partitions</th>
                     <th>% Preferred</th>
                     <th># Under Replicated</th>
@@ -64,7 +75,7 @@
                 </tr>
                 </#if>
                 <#list topics as t>
-                <tr>
+                <tr class="dataRow">
                     <td><a href="/topic/${t.name}">${t.name}</a></td>
                     <td>${t.partitions?size}</td>
                     <td <#if t.preferredReplicaPercent lt 1.0>class="warn"</#if>>${t.preferredReplicaPercent?string.percent}</td>
@@ -78,4 +89,11 @@
         </div>
     </div>
 
+
+<div class="padding"></div>
+
 <@template.footer/>
+
+<script>
+    $('#filter').focus();
+</script>

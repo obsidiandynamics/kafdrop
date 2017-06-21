@@ -72,5 +72,6 @@
         No messages found in partition ${messageForm.partition} at offset ${messageForm.offset}
     </#if>
 </div>
+<div class="padding"></div>
 
 <@template.footer/>

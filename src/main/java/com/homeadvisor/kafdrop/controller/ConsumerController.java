@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HomeAdvisor, Inc.
+ * Copyright 2017 HomeAdvisor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,20 @@
 
 package com.homeadvisor.kafdrop.controller;
 
+import com.homeadvisor.kafdrop.model.ConsumerVO;
 import com.homeadvisor.kafdrop.service.ConsumerNotFoundException;
 import com.homeadvisor.kafdrop.service.KafkaMonitor;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/consumer")
@@ -39,6 +46,20 @@ public class ConsumerController
       model.addAttribute("consumer", kafkaMonitor.getConsumer(groupId)
          .orElseThrow(() -> new ConsumerNotFoundException(groupId)));
       return "consumer-detail";
+   }
+
+   @ApiOperation(value = "getConsumer", notes = "Get topic and partition details for a consumer group")
+   @ApiResponses(value = {
+         @ApiResponse(code = 200, message = "Success", response = ConsumerVO.class),
+         @ApiResponse(code = 404, message = "Invalid consumer group")
+   })
+   @RequestMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId) throws Exception
+   {
+      final ConsumerVO consumer = kafkaMonitor.getConsumer(groupId)
+            .orElseThrow(() -> new ConsumerNotFoundException(groupId));
+
+      return consumer;
    }
 
 }
