@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class MessageController
+public class MessageController extends BaseController
 {
    @Autowired
    private KafkaMonitor kafkaMonitor;
@@ -65,6 +65,8 @@ public class MessageController
                                  BindingResult errors,
                                  Model model)
    {
+      init(model);
+
       if (messageForm.isEmpty())
       {
          final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();

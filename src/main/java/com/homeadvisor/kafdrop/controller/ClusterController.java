@@ -30,16 +30,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 
 @Controller
-public class ClusterController
+public class ClusterController extends BaseController
 {
    @Autowired
    private KafkaMonitor kafkaMonitor;
@@ -48,11 +46,20 @@ public class ClusterController
    private CuratorConfiguration.ZookeeperProperties zookeeperProperties;
 
    @RequestMapping("/")
-   public String clusterInfo(Model model)
+   public String clusterInfo(Model model,
+                             @RequestParam(value="filter",        required=false) String filter)
    {
+      init(model);
+
       model.addAttribute("zookeeper", zookeeperProperties);
       model.addAttribute("brokers", kafkaMonitor.getBrokers());
       model.addAttribute("topics", kafkaMonitor.getTopics());
+
+      if (filter != null)
+      {
+         model.addAttribute("filter", filter);
+      }
+
       return "cluster-overview";
    }
 

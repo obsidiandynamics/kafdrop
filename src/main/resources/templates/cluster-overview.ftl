@@ -96,4 +96,8 @@
 
 <script>
     $('#filter').focus();
+
+    <#if filter??>
+        $('#filter').val('${filter}');
+    </#if>
 </script>

@@ -125,6 +125,14 @@ $(document).ready(function()
 
         var label = "(" + $('.dataRow:visible').length + ")";
         $('#rowCount').text(label);
+
+
     });
+
+    var curr = $('#filter').val();
+    if (curr != '')
+    {
+        $('#filter').keyup();
+    }
 });
 
