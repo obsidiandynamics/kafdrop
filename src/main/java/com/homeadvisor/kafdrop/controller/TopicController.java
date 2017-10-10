@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/topic")
-public class TopicController extends BaseController
+public class TopicController
 {
    @Autowired
    private KafkaMonitor kafkaMonitor;
@@ -49,8 +49,6 @@ public class TopicController extends BaseController
    @RequestMapping("/{name:.+}")
    public String topicDetails(@PathVariable("name") String topicName, Model model)
    {
-      init(model);
-
       final TopicVO topic = kafkaMonitor.getTopic(topicName)
          .orElseThrow(() -> new TopicNotFoundException(topicName));
       model.addAttribute("topic", topic);

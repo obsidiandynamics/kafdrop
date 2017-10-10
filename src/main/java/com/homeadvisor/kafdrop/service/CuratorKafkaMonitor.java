@@ -364,14 +364,14 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 
             final TopicPartitionVO partition = new TopicPartitionVO(partitionId);
 
-            final TopicPartitionStateVO partitionState = partitionState(topic.getName(), partition.getId());
+            final Optional<TopicPartitionStateVO> partitionState = partitionState(topic.getName(), partition.getId());
 
             partitionBrokerIds.stream()
                .map(brokerId -> {
                   TopicPartitionVO.PartitionReplica replica = new TopicPartitionVO.PartitionReplica();
                   replica.setId(brokerId);
-                  replica.setInService(partitionState.getIsr().contains(brokerId));
-                  replica.setLeader(brokerId == partitionState.getLeader());
+                  replica.setInService(partitionState.map(ps -> ps.getIsr().contains(brokerId)).orElse(false));
+                  replica.setLeader(partitionState.map(ps -> brokerId == ps.getLeader()).orElse(false));
                   return replica;
                })
                .forEach(partition::addReplica);
@@ -460,13 +460,20 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    }
 
 
-   private TopicPartitionStateVO partitionState(String topicName, int partitionId)
+   private Optional<TopicPartitionStateVO> partitionState(String topicName, int partitionId)
       throws IOException
    {
-      return objectMapper.reader(TopicPartitionStateVO.class).readValue(
-         topicTreeCache.getCurrentData(
-            ZkUtils.getTopicPartitionLeaderAndIsrPath(topicName, partitionId))
-            .getData());
+      final Optional<byte[]> partitionData = Optional.ofNullable(topicTreeCache.getCurrentData(
+              ZkUtils.getTopicPartitionLeaderAndIsrPath(topicName, partitionId)))
+              .map(ChildData::getData);
+      if (partitionData.isPresent())
+      {
+         return Optional.ofNullable(objectMapper.reader(TopicPartitionStateVO.class).readValue(partitionData.get()));
+      }
+      else
+      {
+         return Optional.empty();
+      }
    }
 
    @Override

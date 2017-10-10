@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Controller
-public class ClusterController extends BaseController
+public class ClusterController
 {
    @Autowired
    private KafkaMonitor kafkaMonitor;
@@ -47,10 +47,8 @@ public class ClusterController extends BaseController
 
    @RequestMapping("/")
    public String clusterInfo(Model model,
-                             @RequestParam(value="filter",        required=false) String filter)
+                             @RequestParam(value="filter", required=false) String filter)
    {
-      init(model);
-
       model.addAttribute("zookeeper", zookeeperProperties);
       model.addAttribute("brokers", kafkaMonitor.getBrokers());
       model.addAttribute("topics", kafkaMonitor.getTopics());

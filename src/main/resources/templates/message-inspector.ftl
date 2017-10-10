@@ -59,7 +59,7 @@
         <#assign offset=messageForm.offset + msg_index>
         <div data-offset="${offset}" class="message-detail">
             <span class="bs-label">Offset:</span> ${offset}
-            <span class="bs-label">Key:</span> ${msg.key}
+            <span class="bs-label">Key:</span> ${msg.key!''}
             <span class="bs-label">Checksum/Computed:</span> <span <#if !msg.valid>class="error"</#if>>${msg.checksum}/${msg.computedChecksum}</span>
             <span class="bs-label">Compression:</span> ${msg.compressionCodec}
             <div>

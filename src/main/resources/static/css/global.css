@@ -52,3 +52,8 @@ input[type=text].error {
 th {
     text-align: left;
 }
+
+td.profile {
+    padding-left: 3px;
+    vertical-align: bottom;
+}

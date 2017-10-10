@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/consumer")
-public class ConsumerController extends BaseController
+public class ConsumerController
 {
    @Autowired
    private KafkaMonitor kafkaMonitor;
@@ -43,8 +43,6 @@ public class ConsumerController extends BaseController
    @RequestMapping("/{groupId:.+}")
    public String consumerDetail(@PathVariable("groupId") String groupId, Model model)
    {
-      init(model);
-
       model.addAttribute("consumer", kafkaMonitor.getConsumer(groupId)
          .orElseThrow(() -> new ConsumerNotFoundException(groupId)));
       return "consumer-detail";

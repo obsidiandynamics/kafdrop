@@ -3,18 +3,12 @@
         <table border="0">
             <tr>
                 <td><h3 class="app-name brand"><a href="/">Kafdrop</a></h3></td>
-
-                <#if profileTag??>
-                    <td style="vertical-align: bottom;">
-                        &nbsp;${profileTag}
-                        <!--  spring.profiles.active: ${profileTag}  -->
-                    </td>
+                <#if profile??>
+                    <!--  spring.profiles.active: ${profile}  -->
+                    <td class="profile">${profile}</td>
                 </#if>
             </tr>
         </table>
-
-
-
     </div>
     <hr/>
 </div>

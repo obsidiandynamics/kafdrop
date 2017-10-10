@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 @Controller
-public class BrokerController extends BaseController
+public class BrokerController
 {
    @Autowired
    private KafkaMonitor kafkaMonitor;
@@ -44,8 +44,6 @@ public class BrokerController extends BaseController
    @RequestMapping("/broker/{id}")
    public String brokerDetails(@PathVariable("id") int brokerId, Model model)
    {
-      init(model);
-
       model.addAttribute("broker", kafkaMonitor.getBroker(brokerId)
          .orElseThrow(() -> new BrokerNotFoundException(String.valueOf(brokerId))));
       model.addAttribute("topics", kafkaMonitor.getTopics());
