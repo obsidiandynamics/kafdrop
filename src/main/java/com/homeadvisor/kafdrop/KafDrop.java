@@ -29,9 +29,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.io.*;
 import java.util.Objects;
@@ -135,5 +138,19 @@ public class KafDrop
          }
          return null;
       }
+   }
+
+   @Bean
+   public WebMvcConfigurerAdapter webConfig()
+   {
+      return new WebMvcConfigurerAdapter()
+      {
+         @Override
+         public void configureContentNegotiation(ContentNegotiationConfigurer configurer)
+         {
+            super.configureContentNegotiation(configurer);
+            configurer.favorPathExtension(false);
+         }
+      };
    }
 }
