@@ -20,6 +20,7 @@ package com.homeadvisor.kafdrop.controller;
 
 import com.homeadvisor.kafdrop.config.CuratorConfiguration;
 import com.homeadvisor.kafdrop.model.BrokerVO;
+import com.homeadvisor.kafdrop.model.ClusterSummaryVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
 import com.homeadvisor.kafdrop.service.BrokerNotFoundException;
 import com.homeadvisor.kafdrop.service.KafkaMonitor;
@@ -32,9 +33,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ClusterController
@@ -50,8 +51,19 @@ public class ClusterController
                              @RequestParam(value="filter", required=false) String filter)
    {
       model.addAttribute("zookeeper", zookeeperProperties);
-      model.addAttribute("brokers", kafkaMonitor.getBrokers());
-      model.addAttribute("topics", kafkaMonitor.getTopics());
+
+      final List<BrokerVO> brokers = kafkaMonitor.getBrokers();
+      final List<TopicVO> topics = kafkaMonitor.getTopics();
+      final ClusterSummaryVO clusterSummary = kafkaMonitor.getClusterSummary(topics);
+
+      final List<Integer> missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
+              .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
+              .collect(Collectors.toList());
+
+      model.addAttribute("brokers", brokers);
+      model.addAttribute("missingBrokerIds", missingBrokerIds);
+      model.addAttribute("topics", topics);
+      model.addAttribute("clusterSummary", clusterSummary);
 
       if (filter != null)
       {
@@ -74,6 +86,7 @@ public class ClusterController
       vo.zookeeper = zookeeperProperties;
       vo.brokers = kafkaMonitor.getBrokers();
       vo.topics = kafkaMonitor.getTopics();
+      vo.summary = kafkaMonitor.getClusterSummary(vo.topics);
 
       return vo;
    }
@@ -95,6 +108,7 @@ public class ClusterController
    public static class ClusterInfoVO
    {
       public CuratorConfiguration.ZookeeperProperties zookeeper;
+      public ClusterSummaryVO summary;
       public List<BrokerVO> brokers;
       public List<TopicVO> topics;
    }

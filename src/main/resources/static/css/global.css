@@ -16,44 +16,42 @@
  *
  */
 
-.l-content {
-    padding-left: 20px;
-    padding-right: 20px;
-    margin: 0 auto;
+.page-header {
+    margin-top: 0;
 }
 
-.clearing {
-    height: 1px;
-    line-height: 1px;
-    font-size: 1px;
-    clear: both;
+.page-header h1 {
+    font-family: "PT Sans", Helvetica, 'Helvetica Neue', Arial, sans-serif;
+    font-weight: bold;
 }
 
-table.overview {
+.page-header .small {
+    font-size: 50%
+}
+
+.page-header a {
+    text-decoration: none;
+}
+
+.table.overview {
     width: 33%;
 }
 
-.hidden {
-    display: none;
+.container, .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
 }
 
-.error {
-    color: red;
+.l-container {
+    padding-bottom: 25px;
 }
 
-input[type=text].error {
-    border-color: red;
-}
-
-.padding {
-    height: 25px;
-}
-
-th {
+.table th {
     text-align: left;
+    background-color: #eee;
 }
 
-td.profile {
+.table td.profile {
     padding-left: 3px;
     vertical-align: bottom;
 }
