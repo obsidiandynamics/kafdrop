@@ -4,7 +4,7 @@
 
    <groupId>com.homeadvisor.kafka</groupId>
    <artifactId>kafdrop</artifactId>
-   <version>2.0.0</version>
+   <version>2.0.6</version>
 
    <description>For when you have a Kaf(ka) cluster to monitor</description>
 
@@ -12,6 +12,10 @@
       <spring.boot.version>1.3.6.RELEASE</spring.boot.version>
       <additionalparam>-Xdoclint:none</additionalparam>
       <curator.version>2.10.0</curator.version>
+
+      <!-- name of parameter changed in latest mvn javadoc plugin version-->
+      <additionalOptions>-Xdoclint:none</additionalOptions>
+
    </properties>
 
    <scm>
@@ -108,7 +112,7 @@
          <artifactId>spring-beans</artifactId>
       </dependency>
 
-       <!-- Swagger API docs -->
+      <!-- Swagger API docs -->
       <dependency>
          <groupId>io.springfox</groupId>
          <artifactId>springfox-swagger2</artifactId>
@@ -129,6 +133,32 @@
          <scope>test</scope>
       </dependency>
 
+      <!-- Test dependencies -->
+      <dependency>
+         <groupId>org.codehaus.groovy</groupId>
+         <artifactId>groovy-all</artifactId>
+         <version>2.4.6</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.spockframework</groupId>
+         <artifactId>spock-core</artifactId>
+         <version>1.0-groovy-2.4</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+         <artifactId>http-builder</artifactId>
+         <version>0.7.1</version>
+         <scope>test</scope>
+      </dependency>
+      <!-- Right now only needed by integration tests -->
+      <dependency>
+         <groupId>org.apache.kafka</groupId>
+         <artifactId>kafka-clients</artifactId>
+         <version>0.8.2.2</version>
+         <scope>test</scope>
+      </dependency>
    </dependencies>
 
 
@@ -222,9 +252,6 @@
                   </goals>
                </execution>
             </executions>
-            <configuration>
-               <mainClass>${start-class}</mainClass>
-            </configuration>
          </plugin>
       </plugins>
       <resources>
@@ -245,20 +272,178 @@
       </resources>
    </build>
 
-   <distributionManagement>
-      <!-- use the following if you're not using a snapshot version. -->
-      <repository>
-         <id>repos</id>
-         <name>SM Release</name>
-         <url>http://192.168.9.1:8081/nexus/content/repositories/releases</url>
-      </repository>
-      <!-- use the following if you ARE using a snapshot version. -->
-      <snapshotRepository>
-         <id>repos</id>
-         <name>SM Snapshots</name>
-         <url>http://192.168.9.1:8081/nexus/content/repositories/sm-snap</url>
-      </snapshotRepository>
-   </distributionManagement>
+   <profiles>
+      <profile>
+         <id>api-test</id>
+         <properties>
+            <test.base.dir>api-test</test.base.dir>
+            <test.output.dir>api-test-classes</test.output.dir>
+            <api.test.report.dir>${project.build.directory}/api-surefire-reports</api.test.report.dir>
+         </properties>
+         <dependencies>
+         </dependencies>
+         <build>
+            <plugins>
 
+               <!-- Create a new goal that starts ZK, Kakfa, and Kafdrop for integration tests -->
+               <!-- Credit: https://github.com/charithe/kafka-maven-plugin                     -->
 
+               <!-- Start a ZK and Kafka cluster -->
+               <plugin>
+                  <groupId>com.github.charithe</groupId>
+                  <artifactId>kafka-maven-plugin</artifactId>
+                  <version>1.0.0</version>
+                  <configuration>
+                     <zookeeperPort>2180</zookeeperPort>
+                     <kafkaPort>9092</kafkaPort>
+                  </configuration>
+
+                  <!-- Override Kafka and ZK versions to match Kafdrop -->
+                  <dependencies>
+                     <dependency>
+                        <groupId>org.apache.zookeeper</groupId>
+                        <artifactId>zookeeper</artifactId>
+                        <version>3.4.8</version>
+                     </dependency>
+                     <dependency>
+                        <groupId>org.apache.kafka</groupId>
+                        <artifactId>kafka_2.9.2</artifactId>
+                        <version>0.8.2.2</version>
+                     </dependency>
+                     <dependency>
+                        <groupId>org.apache.kafka</groupId>
+                        <artifactId>kafka-clients</artifactId>
+                        <version>0.8.2.2</version>
+                     </dependency>
+                  </dependencies>
+
+                  <!-- Start/stop ZK and Kafka with pre and post integration phases-->
+                  <executions>
+                     <execution>
+                        <id>zk-kafka-pre-integration</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                           <goal>start-kafka-broker</goal>
+                        </goals>
+                     </execution>
+                     <execution>
+                        <id>zk-kafka-post-integration</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                           <goal>stop-kafka-broker</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+
+               <!-- Spring Boot build/start -->
+               <plugin>
+                  <groupId>org.springframework.boot</groupId>
+                  <artifactId>spring-boot-maven-plugin</artifactId>
+                  <version>${spring.boot.version}</version>
+
+                  <configuration>
+                     <mainClass>${start-class}</mainClass>
+                     <!-- Don't want to fork Kafdrop or it prevents the subsequent steps -->
+                     <!-- Careful using JVM args or it forces a fork                     -->
+                     <fork>false</fork>
+                     <arguments>
+                        <argument>--server.port:11017</argument>
+                        <argument>--zookeeper.connect=localhost:2180</argument>
+                     </arguments>
+                  </configuration>
+                  <executions>
+                     <execution>
+                        <goals>
+                           <goal>repackage</goal>
+                        </goals>
+                     </execution>
+                     <execution>
+                        <id>kafdrop-pre-integration</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                           <goal>start</goal>
+                        </goals>
+                     </execution>
+                     <execution>
+                        <id>kafdrop-post-integration</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                           <goal>stop</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <version>2.18</version>
+                  <configuration>
+                     <testSourceDirectory>${project.basedir}/src/api-test/java</testSourceDirectory>
+                     <includes>
+                        <include>**/*Spec.java</include>
+                     </includes>
+                     <reportsDirectory>${api.test.report.dir}</reportsDirectory>
+                     <argLine>${test.arguments}</argLine>
+                  </configuration>
+                  <executions>
+                     <execution>
+                        <phase>integration-test</phase>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-report-plugin</artifactId>
+                  <version>2.18</version>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/api-test-report</outputDirectory>
+                     <reportsDirectory>${api.report.dir}</reportsDirectory>
+                  </configuration>
+                  <executions>
+                     <execution>
+                        <phase>integration-test</phase>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-failsafe-plugin</artifactId>
+                  <version>2.20</version>
+                  <executions>
+                     <execution>
+                        <goals>
+                           <goal>integration-test</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.codehaus.gmavenplus</groupId>
+                  <artifactId>gmavenplus-plugin</artifactId>
+                  <version>1.5</version>
+                  <executions>
+                     <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                           <goal>testCompile</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+                  <configuration>
+                     <testSources>
+                        <testSource>
+                           <directory>${project.basedir}/src/${test.base.dir}/groovy</directory>
+                           <includes>
+                              <include>**/*.groovy</include>
+                           </includes>
+                        </testSource>
+                     </testSources>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
 </project>

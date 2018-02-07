@@ -20,8 +20,10 @@ package com.homeadvisor.kafdrop.service;
 
 import com.homeadvisor.kafdrop.model.BrokerVO;
 import com.homeadvisor.kafdrop.model.ConsumerVO;
+import com.homeadvisor.kafdrop.model.ClusterSummaryVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +37,10 @@ public interface KafkaMonitor
    List<TopicVO> getTopics();
 
    Optional<TopicVO> getTopic(String topic);
+
+   ClusterSummaryVO getClusterSummary();
+
+   ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
 
    List<ConsumerVO> getConsumers();
 

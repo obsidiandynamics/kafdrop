@@ -66,7 +66,7 @@ public class ConsumerTopicVO
 
    public double getCoveragePercent()
    {
-      return ((double)getAssignedPartitionCount()) / offsets.size();
+      return (offsets.size() > 0) ? ((double)getAssignedPartitionCount()) / offsets.size() : 0.0;
    }
 
    public int getAssignedPartitionCount()
