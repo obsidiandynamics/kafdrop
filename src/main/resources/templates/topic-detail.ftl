@@ -1,18 +1,3 @@
-<#--
- Copyright 2016 HomeAdvisor, Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
 <#import "lib/template.ftl" as template>
 <@template.header "Topic: ${topic.name}">
   <style type="text/css">
@@ -23,19 +8,18 @@
 
 <#setting number_format="0">
 
-<h1>Topic: ${topic.name}</h1>
+<h1 class="col threecol">Topic: ${topic.name}</h1>
 
-<div id="action-bar" class="container">
-    <a class="btn btn-default" href="/topic/${topic.name}/messages"><i class="fa fa-eye"></i> View Messages</a>
+<div id="action-bar">
+    <a class="bs-btn info" href="/topic/${topic.name}/messages"><i class="fa fa-eye"></i> View Messages</a>
 </div>
 
-<div class="container-fluid">
 <div class="row">
 
-<div id="topic-overview" class="col-md-5">
+<div id="topic-overview" class="col fivecol">
     <h2>Overview</h2>
 
-    <table class="table table-bordered">
+    <table class="bs-table default">
         <tbody>
         <tr>
             <td># of Partitions</td>
@@ -43,11 +27,11 @@
         </tr>
         <tr>
             <td>Preferred Replicas</td>
-            <td <#if topic.preferredReplicaPercent lt 1.0>class="warning"</#if>>${topic.preferredReplicaPercent?string.percent}</td>
+            <td <#if topic.preferredReplicaPercent lt 1.0>class="error"</#if>>${topic.preferredReplicaPercent?string.percent}</td>
         </tr>
         <tr>
             <td>Under Replicated Partitions</td>
-            <td <#if topic.underReplicatedPartitions?size gt 0>class="warning"</#if>>${topic.underReplicatedPartitions?size}</td>
+            <td <#if topic.underReplicatedPartitions?size gt 0>class="error"</#if>>${topic.underReplicatedPartitions?size}</td>
         </tr>
         <tr>
             <td>Total Size</td>
@@ -62,13 +46,13 @@
 </div>
 
 
-<div id="topic-config" class="col-md-7">
+<div id="topic-config" class="col sevencol">
     <h2>Configuration</h2>
 
     <#if topic.config?size == 0>
     <div>No topic specific configuration</div>
     <#else>
-    <table class="table table-bordered">
+    <table class="bs-table default">
         <tbody>
         <#list topic.config?keys as c>
               <tr>
@@ -84,9 +68,9 @@
 </div>
 
 <div class="row">
-<div id="partition-detail" class="col-md-5">
+<div id="partition-detail" class="col fivecol">
     <h2>Partition Detail</h2>
-    <table id="partition-detail-table" class="table table-bordered table-condensed small">
+    <table id="partition-detail-table" class="bs-table small">
         <thead>
         <tr>
             <th>Partition</th>
@@ -107,20 +91,20 @@
             <td>${p.firstOffset}</td>
             <td>${p.size}</td>
             <td>${p.size - p.firstOffset}</td>
-            <td <#if !(p.leader)??>class="warning"</#if>>${(p.leader.id)!"none"}</td>
+            <td <#if !(p.leader)??>class="error"</#if>>${(p.leader.id)!"none"}</td>
             <td><#list p.replicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
             <td><#list p.inSyncReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
-            <td <#if !p.leaderPreferred>class="warning"</#if>><@template.yn p.leaderPreferred/></td>
-            <td <#if p.underReplicated>class="warning"</#if>><@template.yn p.underReplicated/></td>
+            <td <#if !p.leaderPreferred>class="error"</#if>><@template.yn p.leaderPreferred/></td>
+            <td <#if p.underReplicated>class="error"</#if>><@template.yn p.underReplicated/></td>
         </tr>
         </#list>
         </tbody>
     </table>
 </div>
 
-<div id="consumers" class="col-md-7">
+<div id="consumers" class="col sevencol">
     <h2>Consumers</h2>
-    <table id="consumers-table" class="table table-bordered table-condensed small">
+    <table id="consumers-table" class="bs-table small">
         <thead>
         <tr>
             <th>Group Id</th>
@@ -134,17 +118,16 @@
                 <td><a href="/consumer/${c.groupId}">${c.groupId}</a></td>
                 <td>${c.getTopic(topic.name).lag}</td>
                 <td>
-                    <ul class="list-unstyled">
-                   <#list c.getActiveInstancesForTopic(topic.name) as i>
-                       <li>${i.id}</li>
-                   </#list>
+                    <ul class="bs-list flat">
+                       <#list c.getActiveInstancesForTopic(topic.name) as i>
+                           <li>${i.id}</li>
+                       </#list>
                     </ul>
                 </td>
             </tr>
         </#list>
         </tbody>
     </table>
-</div>
 </div>
 </div>
 <@template.footer/>

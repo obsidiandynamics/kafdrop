@@ -15,11 +15,11 @@ metrics.jmx.domain: ${spring.jmx.default_domain}-metrics
 management.contextPath: /debug
 
 kafdrop.monitor:
-   kafkaVersion: "0.8.2.2"
+   kafkaVersion: "0.11.0.2"
    threadPoolSize: 10
    retry:
-      maxAttempts: 3
-      backoffMillis: 1000
+      maxAttempts: 5
+      backoffMillis: 2000
 
 
 curator.discovery:
@@ -39,3 +39,12 @@ project:
    name: KafDropr (DEV)
    description: ${project.name}
    version: DEV
+
+# env can be 'local', 'stage', 'prod'
+kafka:
+  env: local
+  brokerConnect: localhost:9092
+  isSecured: false
+
+zookeeper:
+  connect: localhost:2181

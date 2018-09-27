@@ -29,6 +29,7 @@ import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.javaapi.message.ByteBufferMessageSet;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,41 +56,9 @@ public class MessageInspector
       final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
       final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
 
-      return kafkaMonitor.getBroker(partition.getLeader().getId())
-         .map(broker -> {
-            SimpleConsumer consumer = new SimpleConsumer(broker.getHost(), broker.getPort(), 10000, 100000, "");
+      TopicPartition topicPartition = new TopicPartition(topicName, partitionId);
+      return kafkaMonitor.getMessages(topicPartition, offset, count);
 
-            final FetchRequestBuilder fetchRequestBuilder = new FetchRequestBuilder()
-               .clientId("KafDrop")
-               .maxWait(5000) // todo: make configurable
-               .minBytes(1);
-
-            List<MessageVO> messages = new ArrayList<>();
-            long currentOffset = offset;
-            while (messages.size() < count)
-            {
-               final FetchRequest fetchRequest =
-                  fetchRequestBuilder
-                     .addFetch(topicName, partitionId, currentOffset, 1024 * 1024)
-                     .build();
-
-               FetchResponse fetchResponse = consumer.fetch(fetchRequest);
-
-               final ByteBufferMessageSet messageSet = fetchResponse.messageSet(topicName, partitionId);
-               if (messageSet.validBytes() <= 0) break;
-
-
-               int oldSize = messages.size();
-               StreamSupport.stream(messageSet.spliterator(), false)
-                  .limit(count - messages.size())
-                  .map(MessageAndOffset::message)
-                  .map(this::createMessage)
-                  .forEach(messages::add);
-               currentOffset += messages.size() - oldSize;
-            }
-            return messages;
-         })
-         .orElseGet(Collections::emptyList);
    }
 
    private MessageVO createMessage(Message message)
