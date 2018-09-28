@@ -16,14 +16,42 @@
  *
  */
 
-jQuery(document).ready(function(){
-   jQuery(document).on('click', '.toggle-link', function(e) {
-      var self = jQuery(this),
-          linkText = self.find("i"),
-          target = jQuery(document).find(self.data('toggle-target'));
+.page-header {
+    margin-top: 0;
+}
 
-      e.preventDefault();
-      target.slideToggle();
-      linkText.toggleClass('fa-chevron-circle-down fa-chevron-circle-right');
-   });
-});
+.page-header h1 {
+    font-family: "PT Sans", Helvetica, 'Helvetica Neue', Arial, sans-serif;
+    font-weight: bold;
+}
+
+.page-header .small {
+    font-size: 50%
+}
+
+.page-header a {
+    text-decoration: none;
+}
+
+.table.overview {
+    width: 33%;
+}
+
+.container, .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.l-container {
+    padding-bottom: 25px;
+}
+
+.table th {
+    text-align: left;
+    background-color: #eee;
+}
+
+.table td.profile {
+    padding-left: 3px;
+    vertical-align: bottom;
+}

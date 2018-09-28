@@ -19,9 +19,12 @@
 package com.homeadvisor.kafdrop.service;
 
 import com.homeadvisor.kafdrop.model.BrokerVO;
-import com.homeadvisor.kafdrop.model.ConsumerVO;
 import com.homeadvisor.kafdrop.model.ClusterSummaryVO;
+import com.homeadvisor.kafdrop.model.ConsumerVO;
+import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
+import com.homeadvisor.kafdrop.util.*;
+import org.apache.kafka.common.TopicPartition;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,9 +37,12 @@ public interface KafkaMonitor
 
    Optional<BrokerVO> getBroker(int id);
 
+   Version getKafkaVersion();
+
    List<TopicVO> getTopics();
 
-   Optional<TopicVO> getTopic(String topic);
+    List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count);
+    Optional<TopicVO> getTopic(String topic);
 
    ClusterSummaryVO getClusterSummary();
 

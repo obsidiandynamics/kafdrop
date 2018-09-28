@@ -19,7 +19,7 @@
 package com.homeadvisor.kafdrop.model;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 public class TopicVO implements Comparable<TopicVO>
 {
@@ -30,119 +30,125 @@ public class TopicVO implements Comparable<TopicVO>
    // partition state
    // delete supported?
 
-
    public TopicVO(String name)
    {
-      this.name = name;
+	  this.name = name;
    }
 
    public String getName()
    {
-      return name;
+	  return name;
    }
 
    public void setName(String name)
    {
-      this.name = name;
+	  this.name = name;
    }
 
    public Map<String, Object> getConfig()
    {
-      return config;
+	  return config;
    }
 
    public void setConfig(Map<String, Object> config)
    {
-      this.config = config;
+	  this.config = config;
+   }
+
+   public Map<Integer, TopicPartitionVO> getPartitionMap()
+   {
+	  return partitions;
    }
 
    public Collection<TopicPartitionVO> getPartitions()
    {
-      return partitions.values();
+	  return partitions.values();
    }
 
    public Optional<TopicPartitionVO> getPartition(int partitionId)
    {
-      return Optional.ofNullable(partitions.get(partitionId));
+	  return Optional.ofNullable(partitions.get(partitionId));
    }
 
    public Collection<TopicPartitionVO> getLeaderPartitions(int brokerId)
    {
-      return partitions.values().stream()
-         .filter(tp -> tp.getLeader() != null && tp.getLeader().getId() == brokerId)
-         .collect(Collectors.toList());
+	  return partitions.values().stream()
+			  .filter(tp -> tp.getLeader() != null && tp.getLeader().getId() == brokerId)
+			  .collect(Collectors.toList());
    }
 
    public Collection<TopicPartitionVO> getUnderReplicatedPartitions()
    {
-      return partitions.values().stream()
-         .filter(TopicPartitionVO::isUnderReplicated)
-         .collect(Collectors.toList());
+	  return partitions.values().stream()
+			  .filter(TopicPartitionVO::isUnderReplicated)
+			  .collect(Collectors.toList());
    }
 
    public void setPartitions(Map<Integer, TopicPartitionVO> partitions)
    {
-      this.partitions = partitions;
+	  this.partitions = partitions;
    }
 
    /**
-    * Returns the total number of messages published to the topic, ever
-    * @return
-    */
+	* Returns the total number of messages published to the topic, ever
+	* @return
+	*/
    public long getTotalSize()
    {
-      return partitions.values().stream()
-         .map(TopicPartitionVO::getSize)
-         .reduce(0L, Long::sum);
+	  return partitions.values().stream()
+			  .map(TopicPartitionVO::getSize)
+			  .reduce(0L, Long::sum);
    }
 
    /**
-    * Returns the total number of messages available to consume from the topic.
-    * @return
-    */
+	* Returns the total number of messages available to consume from the topic.
+	* @return
+	*/
    public long getAvailableSize()
    {
-      return partitions.values().stream()
-         .map(p -> p.getSize() - p.getFirstOffset())
-         .reduce(0L, Long::sum);
+	  return partitions.values().stream()
+			  .map(p -> p.getSize() - p.getFirstOffset())
+			  .reduce(0L, Long::sum);
    }
 
    public double getPreferredReplicaPercent()
    {
-      long preferredLeaderCount = partitions.values().stream()
-         .filter(TopicPartitionVO::isLeaderPreferred)
-         .count();
-      return ((double) preferredLeaderCount) / ((double)partitions.size());
+	  long preferredLeaderCount = partitions.values().stream()
+			  .filter(TopicPartitionVO::isLeaderPreferred)
+			  .count();
+	  return ((double) preferredLeaderCount) / ((double) partitions.size());
    }
 
    public void addPartition(TopicPartitionVO partition)
    {
-      partitions.put(partition.getId(), partition);
+	  partitions.put(partition.getId(), partition);
    }
 
    @Override
    public int compareTo(TopicVO that)
    {
-      return this.name.compareTo(that.name);
+	  return this.name.compareTo(that.name);
    }
 
    @Override
    public boolean equals(Object o)
    {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
+	  if (this == o)
+	  { return true; }
+	  if (o == null || getClass() != o.getClass())
+	  { return false; }
 
-      TopicVO that = (TopicVO) o;
+	  TopicVO that = (TopicVO) o;
 
-      if (!name.equals(that.name)) return false;
+	  if (!name.equals(that.name))
+	  { return false; }
 
-      return true;
+	  return true;
    }
 
    @Override
    public int hashCode()
    {
-      return name.hashCode();
+	  return name.hashCode();
    }
-
 }

@@ -16,42 +16,31 @@
  *
  */
 
-.page-header {
-    margin-top: 0;
+.l-content {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin: 0 auto;
 }
 
-.page-header h1 {
-    font-family: "PT Sans", Helvetica, 'Helvetica Neue', Arial, sans-serif;
-    font-weight: bold;
+.clearing {
+    height: 1px;
+    line-height: 1px;
+    font-size: 1px;
+    clear: both;
 }
 
-.page-header .small {
-    font-size: 50%
-}
-
-.page-header a {
-    text-decoration: none;
-}
-
-.table.overview {
+table.overview {
     width: 33%;
 }
 
-.container, .container-fluid {
-    padding-left: 0;
-    padding-right: 0;
+.hidden {
+    display: none;
 }
 
-.l-container {
-    padding-bottom: 25px;
+.error {
+    color: red;
 }
 
-.table th {
-    text-align: left;
-    background-color: #eee;
-}
-
-.table td.profile {
-    padding-left: 3px;
-    vertical-align: bottom;
+input[type=text].error {
+    border-color: red;
 }

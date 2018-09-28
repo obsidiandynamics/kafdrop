@@ -21,6 +21,7 @@ package com.homeadvisor.kafdrop;
 import com.google.common.base.Throwables;
 import com.homeadvisor.kafdrop.config.ini.IniFilePropertySource;
 import com.homeadvisor.kafdrop.config.ini.IniFileReader;
+import joptsimple.internal.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
@@ -36,7 +37,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -83,17 +89,15 @@ public class KafDrop
             catch (Exception ex)
             {
                System.err.println("Unable to set up logging.dir from logging.file " + loggingFile + ": " +
-                                  Throwables.getStackTraceAsString(ex));
+                                   Throwables.getStackTraceAsString(ex));
             }
          }
          if (environment.containsProperty("debug") &&
-             !"false".equalsIgnoreCase(environment.getProperty("debug", String.class)))
+                 !"false".equalsIgnoreCase(environment.getProperty("debug", String.class)))
          {
             System.setProperty(PROP_SPRING_BOOT_LOG_LEVEL, "DEBUG");
          }
-
       }
-
    }
 
    private static class EnvironmentSetupListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered
@@ -107,19 +111,41 @@ public class KafDrop
          return Ordered.HIGHEST_PRECEDENCE + 10;
       }
 
-      @Override
-      public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event)
-      {
-         final ConfigurableEnvironment environment = event.getEnvironment();
-         if (environment.containsProperty(SM_CONFIG_DIR))
-         {
-            Stream.of("kafdrop", "global")
-               .map(name -> readProperties(environment, name))
-               .filter(Objects::nonNull)
-               .forEach(iniPropSource -> environment.getPropertySources()
-                  .addBefore("applicationConfigurationProperties", iniPropSource));
-         }
-      }
+        @Override
+        public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event)
+        {
+            final ConfigurableEnvironment environment = event.getEnvironment();
+
+            LOG.info("Initializing jaas config");
+            String env = environment.getProperty("kafka.env");
+            Boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
+            LOG.info("env: {} .Issecured kafka: {}", env, isSecured);
+            if (isSecured && Strings.isNullOrEmpty(env)) {
+                throw new RuntimeException("'env' cannot be null if connecting to secured kafka.");
+            }
+
+            LOG.info("ENV: {}", env);
+            String path;
+
+            if (isSecured) {
+                if ((env.equalsIgnoreCase("stage") || env.equalsIgnoreCase("prod") || env.equalsIgnoreCase("local"))) {
+                    path = environment.getProperty("user.dir") + "/kaas_" + env.toLowerCase() + "_jaas.conf";
+                    LOG.info("PATH: {}", path);
+                    System.setProperty("java.security.auth.login.config", path);
+                }
+                else {
+                    throw new RuntimeException("unable to identify env. set 'evn' variable either to 'stage' or 'prod' or local");
+                }
+            }
+
+            if (environment.containsProperty(SM_CONFIG_DIR)) {
+                Stream.of("kafdrop", "global")
+                        .map(name -> readProperties(environment, name))
+                        .filter(Objects::nonNull)
+                        .forEach(iniPropSource -> environment.getPropertySources()
+                                .addBefore("applicationConfigurationProperties", iniPropSource));
+            }
+        }
 
       private IniFilePropertySource readProperties(Environment environment, String name)
       {
