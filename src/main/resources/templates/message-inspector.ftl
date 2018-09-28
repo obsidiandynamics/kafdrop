@@ -70,7 +70,6 @@
     </div>
 
     <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> View Messages</button>
-
 </form>
 </div>
 

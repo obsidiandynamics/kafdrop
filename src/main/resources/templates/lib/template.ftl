@@ -23,6 +23,7 @@
     <link type="text/css" rel="stylesheet" href="/css/global.css"/>
 
     <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
     <script src="/js/global.js"></script>
 
     <#nested>
