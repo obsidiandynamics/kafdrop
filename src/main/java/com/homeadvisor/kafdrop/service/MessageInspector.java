@@ -21,14 +21,7 @@ package com.homeadvisor.kafdrop.service;
 import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicPartitionVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
-import com.homeadvisor.kafdrop.util.BrokerChannel;
-import kafka.api.FetchRequest;
-import kafka.api.FetchRequestBuilder;
-import kafka.javaapi.FetchResponse;
-import kafka.javaapi.consumer.SimpleConsumer;
-import kafka.javaapi.message.ByteBufferMessageSet;
 import kafka.message.Message;
-import kafka.message.MessageAndOffset;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class MessageInspector
@@ -56,10 +45,10 @@ public class MessageInspector
       final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
       final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
 
-      TopicPartition topicPartition = new TopicPartition(topicName, partitionId);
-      return kafkaMonitor.getMessages(topicPartition, offset, count);
+        TopicPartition topicPartition = new TopicPartition(topicName, partitionId);
+        return kafkaMonitor.getMessages(topicPartition, offset, count);
 
-   }
+    }
 
    private MessageVO createMessage(Message message)
    {

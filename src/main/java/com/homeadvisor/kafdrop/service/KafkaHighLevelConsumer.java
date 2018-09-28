@@ -36,7 +36,8 @@ import java.util.stream.Collectors;
 public class KafkaHighLevelConsumer
 {
     private final Logger LOG = LoggerFactory.getLogger(getClass());
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+     private ObjectMapper objectMapper;
     private KafkaConsumer<String, String> kafkaConsumer;
 
     @Autowired

@@ -55,15 +55,15 @@ public class BrokerVO
         return id;
     }
 
-    public void setId(int id)
-    {
-        this.id = id;
-    }
+   public void setId(int id)
+   {
+      this.id = id;
+   }
 
-    public String getHost()
-    {
-        return host;
-    }
+   public String getHost()
+   {
+      return host;
+   }
 
     public void setHost(String host)
     {
@@ -72,10 +72,10 @@ public class BrokerVO
         }
     }
 
-    public int getPort()
-    {
-        return port;
-    }
+   public int getPort()
+   {
+      return port;
+   }
 
     public void setPort(int port)
     {
@@ -84,44 +84,44 @@ public class BrokerVO
         }
     }
 
-    public int getJmxPort()
-    {
-        return jmxPort;
-    }
+   public int getJmxPort()
+   {
+      return jmxPort;
+   }
 
-    @JsonProperty("jmx_port")
-    public void setJmxPort(int jmxPort)
-    {
-        this.jmxPort = jmxPort;
-    }
+   @JsonProperty("jmx_port")
+   public void setJmxPort(int jmxPort)
+   {
+      this.jmxPort = jmxPort;
+   }
 
-    public int getVersion()
-    {
-        return version;
-    }
+   public int getVersion()
+   {
+      return version;
+   }
 
-    public void setVersion(int version)
-    {
-        this.version = version;
-    }
+   public void setVersion(int version)
+   {
+      this.version = version;
+   }
 
-    public Date getTimestamp()
-    {
-        return timestamp;
-    }
+   public Date getTimestamp()
+   {
+      return timestamp;
+   }
 
-    public void setTimestamp(Date timestamp)
-    {
-        this.timestamp = timestamp;
-    }
+   public void setTimestamp(Date timestamp)
+   {
+      this.timestamp = timestamp;
+   }
 
-    public boolean isController()
-    {
-        return controller;
-    }
+   public boolean isController()
+   {
+      return controller;
+   }
 
-    public void setController(boolean controller)
-    {
-        this.controller = controller;
-    }
+   public void setController(boolean controller)
+   {
+      this.controller = controller;
+   }
 }

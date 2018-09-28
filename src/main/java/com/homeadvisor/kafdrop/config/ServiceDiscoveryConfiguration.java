@@ -66,7 +66,7 @@ public class ServiceDiscoveryConfiguration
       @Value("${curator.discovery.basePath:/homeadvisor/services}") String basePath) throws Exception
    {
       final Class payloadClass = Object.class;
-      new EnsurePath(basePath).ensure(curatorFramework.getZookeeperClient());
+      curatorFramework.createContainers(basePath);
       return ServiceDiscoveryBuilder.builder(payloadClass)
          .client(curatorFramework)
          .basePath(basePath)

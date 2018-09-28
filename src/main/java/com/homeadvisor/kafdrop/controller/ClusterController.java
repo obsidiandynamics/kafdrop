@@ -20,6 +20,7 @@ package com.homeadvisor.kafdrop.controller;
 
 import com.homeadvisor.kafdrop.config.CuratorConfiguration;
 import com.homeadvisor.kafdrop.model.BrokerVO;
+import com.homeadvisor.kafdrop.model.ClusterSummaryVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
 import com.homeadvisor.kafdrop.service.BrokerNotFoundException;
 import com.homeadvisor.kafdrop.service.KafkaMonitor;
@@ -31,61 +32,75 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ClusterController
 {
-    @Autowired
-    private KafkaMonitor kafkaMonitor;
+   @Autowired
+   private KafkaMonitor kafkaMonitor;
 
-    @Autowired
-    private CuratorConfiguration.ZookeeperProperties zookeeperProperties;
+   @Autowired
+   private CuratorConfiguration.ZookeeperProperties zookeeperProperties;
 
-    @RequestMapping("/")
-    public String clusterInfo(Model model)
-    {
-        model.addAttribute("zookeeper", zookeeperProperties);
-        model.addAttribute("brokers", kafkaMonitor.getBrokers());
-        model.addAttribute("topics", kafkaMonitor.getTopics());
-        return "cluster-overview";
-    }
+   @RequestMapping("/")
+   public String clusterInfo(Model model,
+                             @RequestParam(value="filter", required=false) String filter)
+   {
+      model.addAttribute("zookeeper", zookeeperProperties);
 
-    @ApiOperation(value = "getCluster", notes = "Get high level broker, topic, and partition data for the Kafka cluster")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success", response = ClusterInfoVO.class)
-    })
-    @RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public @ResponseBody
-    ClusterInfoVO getCluster()
-            throws Exception
-    {
-        ClusterInfoVO vo = new ClusterInfoVO();
+      final List<BrokerVO> brokers = kafkaMonitor.getBrokers();
+      final List<TopicVO> topics = kafkaMonitor.getTopics();
+      final ClusterSummaryVO clusterSummary = kafkaMonitor.getClusterSummary(topics);
 
-        vo.zookeeper = zookeeperProperties;
-        //vo.brokers = kafkaMonitor.getBrokers();
-        vo.brokers = new ArrayList<>();
-        vo.topics = kafkaMonitor.getTopics();
+      final List<Integer> missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
+              .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
+              .collect(Collectors.toList());
 
-        return vo;
-    }
+      model.addAttribute("brokers", brokers);
+      model.addAttribute("missingBrokerIds", missingBrokerIds);
+      model.addAttribute("topics", topics);
+      model.addAttribute("clusterSummary", clusterSummary);
 
-    @ExceptionHandler(BrokerNotFoundException.class)
-    private String brokerNotFound(Model model)
-    {
-        model.addAttribute("zookeeper", zookeeperProperties);
-        model.addAttribute("brokers", Collections.emptyList());
-        model.addAttribute("topics", Collections.emptyList());
-        return "cluster-overview";
-    }
+      if (filter != null)
+      {
+         model.addAttribute("filter", filter);
+      }
+
+      return "cluster-overview";
+   }
+
+   @ApiOperation(value = "getCluster", notes = "Get high level broker, topic, and partition data for the Kafka cluster")
+   @ApiResponses(value = {
+         @ApiResponse(code = 200, message = "Success", response = ClusterInfoVO.class)
+   })
+   @RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+   public @ResponseBody
+   ClusterInfoVO getCluster() throws Exception
+   {
+      ClusterInfoVO vo = new ClusterInfoVO();
+
+      vo.zookeeper = zookeeperProperties;
+      vo.brokers = kafkaMonitor.getBrokers();
+      vo.topics = kafkaMonitor.getTopics();
+      vo.summary = kafkaMonitor.getClusterSummary(vo.topics);
+
+      return vo;
+   }
+
+   @ExceptionHandler(BrokerNotFoundException.class)
+   private String brokerNotFound(Model model)
+   {
+      model.addAttribute("zookeeper", zookeeperProperties);
+      model.addAttribute("brokers", Collections.emptyList());
+      model.addAttribute("topics", Collections.emptyList());
+      return "cluster-overview";
+
+   }
 
     /**
      * Simple DTO to encapsulate the cluster state: ZK properties, broker list,
@@ -94,6 +109,7 @@ public class ClusterController
     public static class ClusterInfoVO
     {
         public CuratorConfiguration.ZookeeperProperties zookeeper;
+        public ClusterSummaryVO summary;
         public List<BrokerVO> brokers;
         public List<TopicVO> topics;
     }
