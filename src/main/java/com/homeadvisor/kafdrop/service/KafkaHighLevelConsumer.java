@@ -41,7 +41,7 @@ public class KafkaHighLevelConsumer
     private KafkaConsumer<String, String> kafkaConsumer;
 
     @Autowired
-    private KafkaConfiguration kafkaaConfiguration;
+    private KafkaConfiguration kafkaConfiguration;
 
     public KafkaHighLevelConsumer() {}
 
@@ -51,17 +51,16 @@ public class KafkaHighLevelConsumer
         if (kafkaConsumer == null) {
 
             Properties properties = new Properties();
-            properties.put("group.id", "kafka-drop-consumer-group");
             properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
             properties.put(ConsumerConfig.GROUP_ID_CONFIG, "kafka-drop-consumer-group");
-            properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
-            properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+            properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, kafkaConfiguration.getKeyDeserializer());
+            properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, kafkaConfiguration.getValueDeserializer());
             properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
             properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
             properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafka-drop-client");
-            properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaaConfiguration.getBrokerConnect());
+            properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getBrokerConnect());
 
-            if (kafkaaConfiguration.getIsSecured() == true) {
+            if (kafkaConfiguration.getIsSecured() == true) {
                 properties.put("sasl.mechanism", "PLAIN");
                 properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
             }
