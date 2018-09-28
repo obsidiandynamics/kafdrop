@@ -164,13 +164,7 @@
          <version>0.7.1</version>
          <scope>test</scope>
       </dependency>
-      <!-- Right now only needed by integration tests -->
-      <dependency>
-         <groupId>org.apache.kafka</groupId>
-         <artifactId>kafka-clients</artifactId>
-         <version>0.8.2.2</version>
-         <scope>test</scope>
-      </dependency>
+
    </dependencies>
 
 
