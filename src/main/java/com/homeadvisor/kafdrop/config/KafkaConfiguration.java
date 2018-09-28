@@ -1,8 +1,8 @@
 package com.homeadvisor.kafdrop.config;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import lombok.*;
+import org.springframework.boot.context.properties.*;
+import org.springframework.stereotype.*;
 
 /**
  * Created by Satendra Sahu on 9/26/18
@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 @Data
 public class KafkaConfiguration
 {
-    private String env = "local";
-    private String brokerConnect;
-    private Boolean isSecured = false;
+   private String env = "local";
+   private String brokerConnect;
+   private Boolean isSecured = false;
+   private String keyDeserializer;
+   private String valueDeserializer;
 }

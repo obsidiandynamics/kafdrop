@@ -40,6 +40,8 @@ import org.apache.commons.lang.*;
 import org.apache.curator.framework.*;
 import org.apache.curator.framework.recipes.cache.*;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache.*;
+import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.common.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.retry.backoff.*;
@@ -170,7 +172,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    }
 
    @Override
-   Version getKafkaVersion()
+   public Version getKafkaVersion()
    {
 	  return kafkaVersion;
    }
@@ -338,7 +340,12 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    {
 	  validateInitialized();
 	  final Optional<TopicVO> topicVO = Optional.ofNullable(getTopicMetadata(topic).get(topic));
-	  if (kafkaVersion.compareTo(new Version(0, 9, 0)) >= 0)
+	  if (kafkaVersion.compareTo(new Version(0, 8, 2)) > 0)
+	  {
+		 topicVO.ifPresent(vo -> {
+			vo.setPartitions(getTopicPartitionSizes(vo));
+		 });
+	  } else
 	  {
 		 topicVO.ifPresent(
 				 vo -> {
@@ -350,12 +357,6 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 							.forEach(entry -> vo.getPartition(entry.getKey()).ifPresent(p -> p.setFirstOffset(entry.getValue())));
 				 }
 		 );
-	  } else
-	  {
-
-		 topicVO.ifPresent(vo -> {
-			vo.setPartitions(getTopicPartitionSizes(vo));
-		 });
 	  }
 	  return topicVO;
    }

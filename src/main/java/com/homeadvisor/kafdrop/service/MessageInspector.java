@@ -26,6 +26,7 @@ import kafka.javaapi.FetchResponse;
 import kafka.javaapi.consumer.*;
 import kafka.javaapi.message.ByteBufferMessageSet;
 import kafka.message.*;
+import org.apache.kafka.common.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
