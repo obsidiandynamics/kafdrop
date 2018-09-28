@@ -18,14 +18,10 @@
 
 package com.homeadvisor.kafdrop.model;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
-public class TopicVO
-		implements Comparable<TopicVO>
+public class TopicVO implements Comparable<TopicVO>
 {
    private String name;
    private Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
@@ -95,7 +91,6 @@ public class TopicVO
 
    /**
 	* Returns the total number of messages published to the topic, ever
-	*
 	* @return
 	*/
    public long getTotalSize()
@@ -107,7 +102,6 @@ public class TopicVO
 
    /**
 	* Returns the total number of messages available to consume from the topic.
-	*
 	* @return
 	*/
    public long getAvailableSize()
