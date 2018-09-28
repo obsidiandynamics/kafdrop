@@ -74,30 +74,30 @@ public class KafDrop
          return Ordered.HIGHEST_PRECEDENCE;
       }
 
-       @Override
-       public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event)
-       {
-           Environment environment = event.getEnvironment();
-           final String loggingFile = environment.getProperty(PROP_LOGGING_FILE);
-           if (loggingFile != null)
-           {
-               System.setProperty(PROP_LOGGER, "FILE");
-               try
-               {
-                   System.setProperty("logging.dir", new File(loggingFile).getParent());
-               }
-               catch (Exception ex)
-               {
-                   System.err.println("Unable to set up logging.dir from logging.file " + loggingFile + ": " +
-                           Throwables.getStackTraceAsString(ex));
-               }
-           }
-           if (environment.containsProperty("debug") &&
-                   !"false".equalsIgnoreCase(environment.getProperty("debug", String.class)))
-           {
-               System.setProperty(PROP_SPRING_BOOT_LOG_LEVEL, "DEBUG");
-           }
-       }
+      @Override
+      public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event)
+      {
+         Environment environment = event.getEnvironment();
+         final String loggingFile = environment.getProperty(PROP_LOGGING_FILE);
+         if (loggingFile != null)
+         {
+            System.setProperty(PROP_LOGGER, "FILE");
+            try
+            {
+               System.setProperty("logging.dir", new File(loggingFile).getParent());
+            }
+            catch (Exception ex)
+            {
+               System.err.println("Unable to set up logging.dir from logging.file " + loggingFile + ": " +
+                       Throwables.getStackTraceAsString(ex));
+            }
+         }
+         if (environment.containsProperty("debug") &&
+                 !"false".equalsIgnoreCase(environment.getProperty("debug", String.class)))
+         {
+            System.setProperty(PROP_SPRING_BOOT_LOG_LEVEL, "DEBUG");
+         }
+      }
    }
 
    private static class EnvironmentSetupListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered
