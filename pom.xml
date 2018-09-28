@@ -37,101 +37,99 @@
       </dependencies>
    </dependencyManagement>
 
+   <dependencies>
+      <dependency>
+         <groupId>commons-lang</groupId>
+         <artifactId>commons-lang</artifactId>
+         <version>2.6</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.curator</groupId>
+         <artifactId>curator-recipes</artifactId>
+         <version>${curator.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.curator</groupId>
+         <artifactId>curator-x-discovery</artifactId>
+         <version>${curator.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.zookeeper</groupId>
+         <artifactId>zookeeper</artifactId>
+         <version>3.4.8</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.kafka</groupId>
+         <artifactId>kafka_2.9.2</artifactId>
+         <version>0.8.2.2</version>
+      </dependency>
 
+      <dependency>
+         <groupId>org.projectlombok</groupId>
+         <artifactId>lombok</artifactId>
+         <version>1.16.6</version>
+      </dependency>
 
-    <dependencies>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>${curator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-x-discovery</artifactId>
-            <version>${curator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>3.4.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.9.2</artifactId>
-            <version>0.8.2.2</version>
-        </dependency>
+      <dependency>
+         <groupId>org.apache.kafka</groupId>
+         <artifactId>kafka-clients</artifactId>
+         <version>0.11.0.2</version>
+      </dependency>
+      <dependency>
+         <groupId>org.freemarker</groupId>
+         <artifactId>freemarker</artifactId>
+         <version>2.3.23</version>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.retry</groupId>
+         <artifactId>spring-retry</artifactId>
+         <version>1.1.3.RELEASE</version>
+      </dependency>
 
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.6</version>
-        </dependency>
+      <!-- Spring Boot -->
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-web</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-logging</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-freemarker</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-log4j</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-actuator</artifactId>
+      </dependency>
 
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-            <version>0.11.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.23</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
-            <version>1.1.3.RELEASE</version>
-        </dependency>
+      <!-- Spring -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-context</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-core</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-beans</artifactId>
+      </dependency>
 
-        <!-- Spring Boot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-freemarker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </dependency>
-
-        <!-- Swagger API docs -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.7.0</version>
-        </dependency>
+      <!-- Swagger API docs -->
+      <dependency>
+         <groupId>io.springfox</groupId>
+         <artifactId>springfox-swagger2</artifactId>
+         <version>2.7.0</version>
+      </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
@@ -217,22 +215,21 @@
         </resources>
     </build>
 
+   <profiles>
+      <profile>
+         <id>api-test</id>
+         <properties>
+            <test.base.dir>api-test</test.base.dir>
+            <test.output.dir>api-test-classes</test.output.dir>
+            <api.test.report.dir>${project.build.directory}/api-surefire-reports</api.test.report.dir>
+         </properties>
+         <dependencies>
+         </dependencies>
+         <build>
+            <plugins>
 
-    <profiles>
-        <profile>
-            <id>api-test</id>
-            <properties>
-                <test.base.dir>api-test</test.base.dir>
-                <test.output.dir>api-test-classes</test.output.dir>
-                <api.test.report.dir>${project.build.directory}/api-surefire-reports</api.test.report.dir>
-            </properties>
-            <dependencies>
-            </dependencies>
-            <build>
-                <plugins>
-
-                    <!-- Create a new goal that starts ZK, Kakfa, and Kafdrop for integration tests -->
-                    <!-- Credit: https://github.com/charithe/kafka-maven-plugin                     -->
+               <!-- Create a new goal that starts ZK, Kakfa, and Kafdrop for integration tests -->
+               <!-- Credit: https://github.com/charithe/kafka-maven-plugin                     -->
 
                     <!-- Start a ZK and Kafka cluster -->
                     <plugin>
@@ -244,49 +241,49 @@
                             <kafkaPort>9092</kafkaPort>
                         </configuration>
 
-                        <!-- Override Kafka and ZK versions to match Kafdrop -->
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.zookeeper</groupId>
-                                <artifactId>zookeeper</artifactId>
-                                <version>3.4.8</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.apache.kafka</groupId>
-                                <artifactId>kafka_2.9.2</artifactId>
-                                <version>0.8.2.2</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.apache.kafka</groupId>
-                                <artifactId>kafka-clients</artifactId>
-                                <version>0.8.2.2</version>
-                            </dependency>
-                        </dependencies>
+                  <!-- Override Kafka and ZK versions to match Kafdrop -->
+                  <dependencies>
+                     <dependency>
+                        <groupId>org.apache.zookeeper</groupId>
+                        <artifactId>zookeeper</artifactId>
+                        <version>3.4.8</version>
+                     </dependency>
+                     <dependency>
+                        <groupId>org.apache.kafka</groupId>
+                        <artifactId>kafka_2.9.2</artifactId>
+                        <version>0.8.2.2</version>
+                     </dependency>
+                     <dependency>
+                        <groupId>org.apache.kafka</groupId>
+                        <artifactId>kafka-clients</artifactId>
+                        <version>0.8.2.2</version>
+                     </dependency>
+                  </dependencies>
 
-                        <!-- Start/stop ZK and Kafka with pre and post integration phases-->
-                        <executions>
-                            <execution>
-                                <id>zk-kafka-pre-integration</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>start-kafka-broker</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>zk-kafka-post-integration</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop-kafka-broker</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+                  <!-- Start/stop ZK and Kafka with pre and post integration phases-->
+                  <executions>
+                     <execution>
+                        <id>zk-kafka-pre-integration</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                           <goal>start-kafka-broker</goal>
+                        </goals>
+                     </execution>
+                     <execution>
+                        <id>zk-kafka-post-integration</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                           <goal>stop-kafka-broker</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
 
-                    <!-- Spring Boot build/start -->
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <version>${spring.boot.version}</version>
+               <!-- Spring Boot build/start -->
+               <plugin>
+                  <groupId>org.springframework.boot</groupId>
+                  <artifactId>spring-boot-maven-plugin</artifactId>
+                  <version>${spring.boot.version}</version>
 
                         <configuration>
                             <mainClass>${start-class}</mainClass>
