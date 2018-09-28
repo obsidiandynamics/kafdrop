@@ -89,7 +89,7 @@ public class KafDrop
             catch (Exception ex)
             {
                System.err.println("Unable to set up logging.dir from logging.file " + loggingFile + ": " +
-                       Throwables.getStackTraceAsString(ex));
+                                   Throwables.getStackTraceAsString(ex));
             }
          }
          if (environment.containsProperty("debug") &&

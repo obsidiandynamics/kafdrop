@@ -32,7 +32,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Collections;
 import java.util.List;
@@ -102,21 +107,21 @@ public class ClusterController
 
    }
 
-    /**
-     * Simple DTO to encapsulate the cluster state: ZK properties, broker list,
-     * and topic list.
-     */
-    public static class ClusterInfoVO
-    {
-        public CuratorConfiguration.ZookeeperProperties zookeeper;
-        public ClusterSummaryVO summary;
-        public List<BrokerVO> brokers;
-        public List<TopicVO> topics;
-    }
+   /**
+    * Simple DTO to encapsulate the cluster state: ZK properties, broker list,
+    * and topic list.
+    */
+   public static class ClusterInfoVO
+   {
+      public CuratorConfiguration.ZookeeperProperties zookeeper;
+      public ClusterSummaryVO summary;
+      public List<BrokerVO> brokers;
+      public List<TopicVO> topics;
+   }
 
-    @ResponseStatus(HttpStatus.OK)
-    @RequestMapping("/health_check")
-    public void healthCheck()
-    {
-    }
+   @ResponseStatus(HttpStatus.OK)
+   @RequestMapping("/health_check")
+   public void healthCheck()
+   {
+   }
 }
