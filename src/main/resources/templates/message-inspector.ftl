@@ -91,7 +91,7 @@
         </div>
     </#list>
     <#elseif !(spring.status.error) && !(messageForm.empty)>
-        No messages found in partition ${messageForm.partition} at offset ${messageForm.offset}
+        No messages found in partition ${(messageForm.partition)!"PARTITION_NOT_SET"} at offset ${messageForm.offset}
     </#if>
 </div>
 

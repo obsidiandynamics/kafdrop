@@ -68,7 +68,12 @@ public class MessageController
       if (messageForm.isEmpty())
       {
          final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
-         defaultForm.setCount(1l);
+
+         // Set Reasonable Defaults. Ideally last 10 messages.
+         defaultForm.setCount(10l);
+         defaultForm.setOffset(0l);
+         defaultForm.setPartition(0);
+
          model.addAttribute("messageForm", defaultForm);
       }
 

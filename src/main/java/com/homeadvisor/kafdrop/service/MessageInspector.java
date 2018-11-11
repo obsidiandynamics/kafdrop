@@ -29,6 +29,8 @@ import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.javaapi.message.ByteBufferMessageSet;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
+
+import org.apache.avro.generic.GenericRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +40,15 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
+
 
 @Service
 public class MessageInspector
@@ -83,7 +91,7 @@ public class MessageInspector
                StreamSupport.stream(messageSet.spliterator(), false)
                   .limit(count - messages.size())
                   .map(MessageAndOffset::message)
-                  .map(this::createMessage)
+                  .map(m -> createMessage(m, topicName))
                   .forEach(messages::add);
                currentOffset += messages.size() - oldSize;
             }
@@ -92,7 +100,7 @@ public class MessageInspector
          .orElseGet(Collections::emptyList);
    }
 
-   private MessageVO createMessage(Message message)
+   private MessageVO createMessage(Message message, String topicName)
    {
       MessageVO vo = new MessageVO();
       if (message.hasKey())
@@ -101,7 +109,8 @@ public class MessageInspector
       }
       if (!message.isNull())
       {
-         vo.setMessage(readString(message.payload()));
+    	 final String messageString = deserializeMessage(message.payload(), topicName);
+         vo.setMessage(messageString);
       }
 
       vo.setValid(message.isValid());
@@ -110,6 +119,41 @@ public class MessageInspector
       vo.setComputedChecksum(message.computeChecksum());
 
       return vo;
+   }
+
+   // https://www.programcreek.com/java-api-examples/index.php?api=io.confluent.kafka.serializers.KafkaAvroDeserializer
+   private String deserializeMessage(ByteBuffer buffer, String topicName)
+   {
+	  KafkaAvroDeserializer deserializer = getDeserializer();
+
+	  // Convert byte buffer to byte array
+	  byte[] bytes = convertToBytes(buffer);
+
+	  // TODO: use an actual JSON formatter to render results:
+	  String result = deserializer
+			  .deserialize(topicName, bytes)
+			  .toString()
+			  .replaceAll(",", ",\n");
+
+	  return result;
+   }
+
+   private KafkaAvroDeserializer getDeserializer() {
+	  Map<String, Object> config = new HashMap<>();
+	  // TODO: parameterize schema registry URL
+	  config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG,
+				 "http://localhost:8081"); //<----- Run Schema Registry on 8081
+
+	  KafkaAvroDeserializer kafkaAvroDeserializer = new KafkaAvroDeserializer();
+	  kafkaAvroDeserializer.configure(config, false);
+	  return kafkaAvroDeserializer;
+   }
+
+   private byte[] convertToBytes(ByteBuffer buffer)
+   {
+	  byte[] bytes = new byte[buffer.remaining()];
+	  buffer.get(bytes, 0, bytes.length);
+	  return bytes;
    }
 
    private String readString(ByteBuffer buffer)
