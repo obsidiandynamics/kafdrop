@@ -18,6 +18,10 @@
 
 package com.homeadvisor.kafdrop.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicPartitionVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
@@ -29,6 +33,8 @@ import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.javaapi.message.ByteBufferMessageSet;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
+
+import org.apache.avro.generic.GenericRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +42,15 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import javax.annotation.Nullable;
+
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
+
 
 @Service
 public class MessageInspector
@@ -50,7 +60,12 @@ public class MessageInspector
    @Autowired
    private KafkaMonitor kafkaMonitor;
 
-   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count)
+   public List<MessageVO> getMessages(
+           String topicName,
+           int partitionId,
+           long offset,
+           long count,
+           @Nullable String schemaRegistryUrl)
    {
       final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
       final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
@@ -83,7 +98,7 @@ public class MessageInspector
                StreamSupport.stream(messageSet.spliterator(), false)
                   .limit(count - messages.size())
                   .map(MessageAndOffset::message)
-                  .map(this::createMessage)
+                  .map(m -> createMessage(m, topicName, schemaRegistryUrl))
                   .forEach(messages::add);
                currentOffset += messages.size() - oldSize;
             }
@@ -92,7 +107,7 @@ public class MessageInspector
          .orElseGet(Collections::emptyList);
    }
 
-   private MessageVO createMessage(Message message)
+   private MessageVO createMessage(Message message, String topicName, @Nullable String schemaRegistryUrl)
    {
       MessageVO vo = new MessageVO();
       if (message.hasKey())
@@ -101,7 +116,13 @@ public class MessageInspector
       }
       if (!message.isNull())
       {
-         vo.setMessage(readString(message.payload()));
+         final String messageString;
+         if (schemaRegistryUrl == null) {
+            messageString = readString(message.payload());
+         } else {
+            messageString = deserializeMessage(message.payload(), topicName, schemaRegistryUrl);
+         }
+         vo.setMessage(messageString);
       }
 
       vo.setValid(message.isValid());
@@ -110,6 +131,40 @@ public class MessageInspector
       vo.setComputedChecksum(message.computeChecksum());
 
       return vo;
+   }
+
+   // https://www.programcreek.com/java-api-examples/index.php?api=io.confluent.kafka.serializers.KafkaAvroDeserializer
+   private String deserializeMessage(ByteBuffer buffer, String topicName, String schemaRegistryUrl)
+   {
+	  KafkaAvroDeserializer deserializer = getDeserializer(schemaRegistryUrl);
+
+	  // Convert byte buffer to byte array
+	  byte[] bytes = convertToBytes(buffer);
+
+	  return formatJsonMessage(deserializer.deserialize(topicName, bytes).toString());
+   }
+
+   private String formatJsonMessage(String jsonMessage) {
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      JsonParser parser = new JsonParser();
+      JsonElement element = parser.parse(jsonMessage);
+      String formattedJsonMessage = gson.toJson(element);
+      return formattedJsonMessage;
+   }
+
+   private KafkaAvroDeserializer getDeserializer(String schemaRegistryUrl) {
+	  Map<String, Object> config = new HashMap<>();
+	  config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+	  KafkaAvroDeserializer kafkaAvroDeserializer = new KafkaAvroDeserializer();
+	  kafkaAvroDeserializer.configure(config, false);
+	  return kafkaAvroDeserializer;
+   }
+
+   private byte[] convertToBytes(ByteBuffer buffer)
+   {
+	  byte[] bytes = new byte[buffer.remaining()];
+	  buffer.get(bytes, 0, bytes.length);
+	  return bytes;
    }
 
    private String readString(ByteBuffer buffer)
