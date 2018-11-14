@@ -94,33 +94,3 @@ Starting in version 2.0.0, Kafdrop sets CORS headers for all endpoints. You can 
 You can also disable CORS entirely with the following configuration:
 
     cors.enabled=false
-
-## Avro Consumer
-
-References:
-* http://cloudurable.com/blog/kafka-avro-schema-registry/index.html
-* https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html
-* https://github.com/confluentinc/schema-registry/blob/master/avro-serializer/src/main/java/io/confluent/kafka/serializers/KafkaAvroDeserializer.java
-* https://docs.confluent.io/3.0.0/installation.html#maven-repository-for-jars
-
-Java Docs:
-* https://www.javadoc.io/doc/org.apache.kafka/kafka_2.9.2/0.8.0
-* https://www.javadoc.io/doc/org.apache.kafka/kafka-clients/0.8.2.2
-* https://www.javadoc.io/doc/org.apache.kafka/kafka-clients/0.10.2.0
-* https://www.javadoc.io/doc/org.apache.kafka/kafka-clients/0.10.2.2
-
-Sources:
-* https://github.com/apache/kafka/tree/0.8.2/core/src/main/scala/kafka/javaapi
-
-## Development
-
-Project setup for Eclipse:
-```
-mvn dependency:tree
-mvn eclipse:clean
-mvn eclipse:eclipse
-```
-
-For run configurations, add a new Maven run configuration called 'Default Build'
-with the project workspace as the root, and then add `clean package` as the goals
-and hit apply.
