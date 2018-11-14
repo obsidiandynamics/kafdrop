@@ -58,7 +58,7 @@ public class MessageInspector
    @Autowired
    private KafkaMonitor kafkaMonitor;
 
-   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count)
+   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count, String schemaRegistryUrl)
    {
       final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
       final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
@@ -91,7 +91,7 @@ public class MessageInspector
                StreamSupport.stream(messageSet.spliterator(), false)
                   .limit(count - messages.size())
                   .map(MessageAndOffset::message)
-                  .map(m -> createMessage(m, topicName))
+                  .map(m -> createMessage(m, topicName, schemaRegistryUrl))
                   .forEach(messages::add);
                currentOffset += messages.size() - oldSize;
             }
@@ -100,7 +100,7 @@ public class MessageInspector
          .orElseGet(Collections::emptyList);
    }
 
-   private MessageVO createMessage(Message message, String topicName)
+   private MessageVO createMessage(Message message, String topicName, String schemaRegistryUrl)
    {
       MessageVO vo = new MessageVO();
       if (message.hasKey())
@@ -109,7 +109,7 @@ public class MessageInspector
       }
       if (!message.isNull())
       {
-    	 final String messageString = deserializeMessage(message.payload(), topicName);
+    	 final String messageString = deserializeMessage(message.payload(), topicName, schemaRegistryUrl);
          vo.setMessage(messageString);
       }
 
@@ -122,9 +122,9 @@ public class MessageInspector
    }
 
    // https://www.programcreek.com/java-api-examples/index.php?api=io.confluent.kafka.serializers.KafkaAvroDeserializer
-   private String deserializeMessage(ByteBuffer buffer, String topicName)
+   private String deserializeMessage(ByteBuffer buffer, String topicName, String schemaRegistryUrl)
    {
-	  KafkaAvroDeserializer deserializer = getDeserializer();
+	  KafkaAvroDeserializer deserializer = getDeserializer(schemaRegistryUrl);
 
 	  // Convert byte buffer to byte array
 	  byte[] bytes = convertToBytes(buffer);
@@ -138,11 +138,11 @@ public class MessageInspector
 	  return result;
    }
 
-   private KafkaAvroDeserializer getDeserializer() {
+   private KafkaAvroDeserializer getDeserializer(String schemaRegistryUrl) {
 	  Map<String, Object> config = new HashMap<>();
 	  // TODO: parameterize schema registry URL
-	  config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG,
-				 "http://localhost:8081"); //<----- Run Schema Registry on 8081
+	  config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+              //schemaRegistryUrl"http://localhost:8081"); //<----- Run Schema Registry on 8081
 
 	  KafkaAvroDeserializer kafkaAvroDeserializer = new KafkaAvroDeserializer();
 	  kafkaAvroDeserializer.configure(config, false);

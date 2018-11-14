@@ -20,6 +20,7 @@ package com.homeadvisor.kafdrop.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.homeadvisor.kafdrop.config.SchemaRegistryConfiguration;
 import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
 import com.homeadvisor.kafdrop.service.KafkaMonitor;
@@ -51,6 +52,9 @@ public class MessageController
    @Autowired
    private MessageInspector messageInspector;
 
+   @Autowired
+   private SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
+
    /**
     * Human friendly view of reading messages.
     * @param topicName Name of topic
@@ -81,13 +85,16 @@ public class MessageController
          .orElseThrow(() -> new TopicNotFoundException(topicName));
       model.addAttribute("topic", topic);
 
+      final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
+
       if (!messageForm.isEmpty() && !errors.hasErrors())
       {
          model.addAttribute("messages",
                             messageInspector.getMessages(topicName,
                                                          messageForm.getPartition(),
                                                          messageForm.getOffset(),
-                                                         messageForm.getCount()));
+                                                         messageForm.getCount(),
+                                                         schemaRegistryUrl));
       }
 
       return "message-inspector";
@@ -125,12 +132,15 @@ public class MessageController
       }
       else
       {
+         final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
+
          List<Object> messages = new ArrayList<>();
          List<MessageVO> vos = messageInspector.getMessages(
                topicName,
                partition,
                offset,
-               count);
+               count,
+               schemaRegistryUrl);
 
          if(vos != null)
          {
