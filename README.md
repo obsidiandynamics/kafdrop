@@ -30,6 +30,11 @@ Then open a browser and navigate to http://localhost:9000. The port can be overr
     --server.port=<port>
 ```
 
+Additionally, you can configure a schema registry connection with:
+```
+    --schemaregistry.connect=http://localhost:8081
+```
+
 ## Running with Docker
 
 Note for Mac Users: You need to convert newline formatting of the kafdrop.sh file *before* running this command:
