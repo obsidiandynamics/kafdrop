@@ -18,6 +18,10 @@
 
 package com.homeadvisor.kafdrop.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicPartitionVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
@@ -31,7 +35,6 @@ import kafka.message.Message;
 import kafka.message.MessageAndOffset;
 
 import org.apache.avro.generic.GenericRecord;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import javax.annotation.Nullable;
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
@@ -136,21 +141,20 @@ public class MessageInspector
 	  // Convert byte buffer to byte array
 	  byte[] bytes = convertToBytes(buffer);
 
-	  // TODO: use an actual JSON formatter to render results:
-	  String result = deserializer
-			  .deserialize(topicName, bytes)
-			  .toString()
-			  .replaceAll(",", ",\n");
+	  return formatJsonMessage(deserializer.deserialize(topicName, bytes).toString());
+   }
 
-	  return result;
+   private String formatJsonMessage(String jsonMessage) {
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      JsonParser parser = new JsonParser();
+      JsonElement element = parser.parse(jsonMessage);
+      String formattedJsonMessage = gson.toJson(element);
+      return formattedJsonMessage;
    }
 
    private KafkaAvroDeserializer getDeserializer(String schemaRegistryUrl) {
 	  Map<String, Object> config = new HashMap<>();
-	  // TODO: parameterize schema registry URL
 	  config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
-              //schemaRegistryUrl"http://localhost:8081"); //<----- Run Schema Registry on 8081
-
 	  KafkaAvroDeserializer kafkaAvroDeserializer = new KafkaAvroDeserializer();
 	  kafkaAvroDeserializer.configure(config, false);
 	  return kafkaAvroDeserializer;
