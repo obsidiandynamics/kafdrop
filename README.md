@@ -8,6 +8,10 @@ Kafdrop is a UI for monitoring Apache Kafka clusters. The tool displays informat
 * Kafka (0.8.1 or 0.8.2 is known to work)
 * Zookeeper (3.4.5 or later)
 
+Optional, additional integration:
+
+* Schema Registry
+
 ## Building
 
 After cloning the repository, building should just be a matter of running a standard Maven build:

@@ -73,7 +73,6 @@ public class MessageController
       {
          final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
 
-         // Set Reasonable Defaults. Ideally last 10 messages.
          defaultForm.setCount(10l);
          defaultForm.setOffset(0l);
          defaultForm.setPartition(0);
