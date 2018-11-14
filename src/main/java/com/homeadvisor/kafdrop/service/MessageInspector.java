@@ -31,6 +31,7 @@ import kafka.message.Message;
 import kafka.message.MessageAndOffset;
 
 import org.apache.avro.generic.GenericRecord;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -58,7 +55,12 @@ public class MessageInspector
    @Autowired
    private KafkaMonitor kafkaMonitor;
 
-   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count, String schemaRegistryUrl)
+   public List<MessageVO> getMessages(
+           String topicName,
+           int partitionId,
+           long offset,
+           long count,
+           @Nullable String schemaRegistryUrl)
    {
       final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
       final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
@@ -100,7 +102,7 @@ public class MessageInspector
          .orElseGet(Collections::emptyList);
    }
 
-   private MessageVO createMessage(Message message, String topicName, String schemaRegistryUrl)
+   private MessageVO createMessage(Message message, String topicName, @Nullable String schemaRegistryUrl)
    {
       MessageVO vo = new MessageVO();
       if (message.hasKey())
@@ -109,7 +111,12 @@ public class MessageInspector
       }
       if (!message.isNull())
       {
-    	 final String messageString = deserializeMessage(message.payload(), topicName, schemaRegistryUrl);
+         final String messageString;
+         if (schemaRegistryUrl == null) {
+            messageString = readString(message.payload());
+         } else {
+            messageString = deserializeMessage(message.payload(), topicName, schemaRegistryUrl);
+         }
          vo.setMessage(messageString);
       }
 
