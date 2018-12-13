@@ -31,6 +31,7 @@
 <h1>Topic Messages: <a href="/topic/${topic.name}">${topic.name}</a></h1>
 
 <#assign selectedPartition=messageForm.partition!0?number>
+<#assign selectedDeserializer=messageForm.deserializer!defaultDeserializerType>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
@@ -67,6 +68,15 @@
         <#if spring.status.error>
            <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
         </#if>
+    </div>
+
+    <div class="form-group">
+        <label for="deserializer">Deserializer</label>
+        <select id="deserializer" name="deserializer">
+        <#list deserializerTypes as d>
+            <option value="${d}"<#if d == selectedDeserializer>selected="selected"</#if>>${d}</option>
+        </#list>
+        </select>
     </div>
 
     <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> View Messages</button>
