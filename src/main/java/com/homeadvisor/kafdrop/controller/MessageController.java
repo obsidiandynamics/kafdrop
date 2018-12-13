@@ -110,6 +110,7 @@ public class MessageController
                                                          messageForm.getOffset(),
                                                          messageForm.getCount(),
                                                          deserializer));
+
       }
 
       return "message-inspector";
