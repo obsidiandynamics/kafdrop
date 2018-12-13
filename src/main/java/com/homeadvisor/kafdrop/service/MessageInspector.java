@@ -23,6 +23,7 @@ import com.homeadvisor.kafdrop.model.TopicPartitionVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
 import com.homeadvisor.kafdrop.util.BrokerChannel;
 import com.homeadvisor.kafdrop.util.ByteUtils;
+import com.homeadvisor.kafdrop.util.MessageDeserializer;
 
 import kafka.api.FetchRequest;
 import kafka.api.FetchRequestBuilder;

@@ -31,7 +31,7 @@
 <h1>Topic Messages: <a href="/topic/${topic.name}">${topic.name}</a></h1>
 
 <#assign selectedPartition=messageForm.partition!0?number>
-<#assign selectedDeserializer=messageForm.deserializer!defaultDeserializerType>
+<#assign selectedFormat=messageForm.format!defaultFormat>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
@@ -71,10 +71,10 @@
     </div>
 
     <div class="form-group">
-        <label for="deserializer">Deserializer</label>
-        <select id="deserializer" name="deserializer">
-        <#list deserializerTypes as d>
-            <option value="${d}"<#if d == selectedDeserializer>selected="selected"</#if>>${d}</option>
+        <label for="format">Message Format</label>
+        <select id="format" name="format">
+        <#list messageFormats as f>
+            <option value="${f}"<#if f == selectedFormat>selected="selected"</#if>>${f}</option>
         </#list>
         </select>
     </div>

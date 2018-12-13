@@ -1,9 +1,7 @@
-package com.homeadvisor.kafdrop.service;
+package com.homeadvisor.kafdrop.util;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-
-import com.homeadvisor.kafdrop.util.ByteUtils;
 
 public class DefaultMessageDeserializer implements MessageDeserializer {
 

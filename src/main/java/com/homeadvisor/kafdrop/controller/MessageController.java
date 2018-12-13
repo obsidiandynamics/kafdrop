@@ -20,15 +20,18 @@ package com.homeadvisor.kafdrop.controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.homeadvisor.kafdrop.config.MessageFormatConfiguration;
 import com.homeadvisor.kafdrop.config.SchemaRegistryConfiguration;
 import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
-import com.homeadvisor.kafdrop.service.AvroMessageDeserializer;
-import com.homeadvisor.kafdrop.service.DefaultMessageDeserializer;
 import com.homeadvisor.kafdrop.service.KafkaMonitor;
-import com.homeadvisor.kafdrop.service.MessageDeserializer;
 import com.homeadvisor.kafdrop.service.MessageInspector;
 import com.homeadvisor.kafdrop.service.TopicNotFoundException;
+import com.homeadvisor.kafdrop.util.AvroMessageDeserializer;
+import com.homeadvisor.kafdrop.util.DefaultMessageDeserializer;
+import com.homeadvisor.kafdrop.util.MessageDeserializer;
+import com.homeadvisor.kafdrop.util.MessageFormat;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -56,11 +59,10 @@ public class MessageController
    private MessageInspector messageInspector;
 
    @Autowired
-   private SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
+   private MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
 
-   public static enum DeserializerType {
-      DEFAULT, AVRO;
-   }
+   @Autowired
+   private SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
 
    /**
     * Human friendly view of reading messages.
@@ -76,6 +78,8 @@ public class MessageController
                                  BindingResult errors,
                                  Model model)
    {
+      final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+
       if (messageForm.isEmpty())
       {
          final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
@@ -83,7 +87,7 @@ public class MessageController
          defaultForm.setCount(10l);
          defaultForm.setOffset(0l);
          defaultForm.setPartition(0);
-         defaultForm.setDeserializer(DeserializerType.DEFAULT);
+         defaultForm.setFormat(defaultFormat);
 
          model.addAttribute("messageForm", defaultForm);
       }
@@ -92,13 +96,13 @@ public class MessageController
          .orElseThrow(() -> new TopicNotFoundException(topicName));
       model.addAttribute("topic", topic);
 
-      model.addAttribute("defaultDeserializerType", DeserializerType.DEFAULT);
-      model.addAttribute("deserializerTypes", DeserializerType.values());
+      model.addAttribute("defaultFormat", defaultFormat);
+      model.addAttribute("messageFormats", MessageFormat.values());
 
       if (!messageForm.isEmpty() && !errors.hasErrors())
       {
          final MessageDeserializer deserializer = getDeserializer(
-               topicName, messageForm.getDeserializer());
+               topicName, messageForm.getFormat());
 
          model.addAttribute("messages",
                             messageInspector.getMessages(topicName,
@@ -163,10 +167,10 @@ public class MessageController
       }
    }
 
-   private MessageDeserializer getDeserializer(String topicName, DeserializerType deserializerType) {
+   private MessageDeserializer getDeserializer(String topicName, MessageFormat format) {
       final MessageDeserializer deserializer;
 
-      if (deserializerType == DeserializerType.AVRO) {
+      if (format == MessageFormat.AVRO) {
          final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
          deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl);
       } else {
@@ -206,19 +210,19 @@ public class MessageController
       @JsonProperty("lastOffset")
       private Long count;
 
-      private DeserializerType deserializer;
+      private MessageFormat format;
 
-      public PartitionOffsetInfo(int partition, long offset, long count, DeserializerType deserializer)
+      public PartitionOffsetInfo(int partition, long offset, long count, MessageFormat format)
       {
          this.partition = partition;
          this.offset = offset;
          this.count = count;
-         this.deserializer = deserializer;
+         this.format = format;
       }
 
       public PartitionOffsetInfo(int partition, long offset, long count)
       {
-         this(partition, offset, count, DeserializerType.DEFAULT);
+         this(partition, offset, count, MessageFormat.DEFAULT);
       }
 
       public PartitionOffsetInfo()
@@ -262,14 +266,14 @@ public class MessageController
          this.count = count;
       }
 
-      public DeserializerType getDeserializer()
+      public MessageFormat getFormat()
       {
-         return deserializer;
+         return format;
       }
 
-      public void setDeserializer(DeserializerType deserializer)
+      public void setFormat(MessageFormat format)
       {
-         this.deserializer = deserializer;
+         this.format = format;
       }
    }
 }

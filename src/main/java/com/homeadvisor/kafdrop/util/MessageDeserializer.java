@@ -1,4 +1,4 @@
-package com.homeadvisor.kafdrop.service;
+package com.homeadvisor.kafdrop.util;
 
 import java.nio.ByteBuffer;
 
