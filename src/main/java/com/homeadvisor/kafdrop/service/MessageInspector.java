@@ -22,6 +22,9 @@ import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicPartitionVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
 import com.homeadvisor.kafdrop.util.BrokerChannel;
+import com.homeadvisor.kafdrop.util.ByteUtils;
+import com.homeadvisor.kafdrop.util.MessageDeserializer;
+
 import kafka.api.FetchRequest;
 import kafka.api.FetchRequestBuilder;
 import kafka.javaapi.FetchResponse;
@@ -29,6 +32,7 @@ import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.javaapi.message.ByteBufferMessageSet;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
+
+
 @Service
 public class MessageInspector
 {
@@ -50,7 +58,12 @@ public class MessageInspector
    @Autowired
    private KafkaMonitor kafkaMonitor;
 
-   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count)
+   public List<MessageVO> getMessages(
+           String topicName,
+           int partitionId,
+           long offset,
+           long count,
+           MessageDeserializer deserializer)
    {
       final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
       final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
@@ -83,7 +96,7 @@ public class MessageInspector
                StreamSupport.stream(messageSet.spliterator(), false)
                   .limit(count - messages.size())
                   .map(MessageAndOffset::message)
-                  .map(this::createMessage)
+                  .map(m -> createMessage(m, deserializer))
                   .forEach(messages::add);
                currentOffset += messages.size() - oldSize;
             }
@@ -92,16 +105,17 @@ public class MessageInspector
          .orElseGet(Collections::emptyList);
    }
 
-   private MessageVO createMessage(Message message)
+   private MessageVO createMessage(Message message, MessageDeserializer deserializer)
    {
       MessageVO vo = new MessageVO();
       if (message.hasKey())
       {
-         vo.setKey(readString(message.key()));
+         vo.setKey(ByteUtils.readString(message.key()));
       }
       if (!message.isNull())
       {
-         vo.setMessage(readString(message.payload()));
+         final String messageString = deserializer.deserializeMessage(message.payload());
+         vo.setMessage(messageString);
       }
 
       vo.setValid(message.isValid());
@@ -110,39 +124,6 @@ public class MessageInspector
       vo.setComputedChecksum(message.computeChecksum());
 
       return vo;
-   }
-
-   private String readString(ByteBuffer buffer)
-   {
-      try
-      {
-         return new String(readBytes(buffer), "UTF-8");
-      }
-      catch (UnsupportedEncodingException e)
-      {
-         return "<unsupported encoding>";
-      }
-   }
-
-   private byte[] readBytes(ByteBuffer buffer)
-   {
-      return readBytes(buffer, 0, buffer.limit());
-   }
-
-   private byte[] readBytes(ByteBuffer buffer, int offset, int size)
-   {
-      byte[] dest = new byte[size];
-      if (buffer.hasArray())
-      {
-         System.arraycopy(buffer.array(), buffer.arrayOffset() + offset, dest, 0, size);
-      }
-      else
-      {
-         buffer.mark();
-         buffer.get(dest);
-         buffer.reset();
-      }
-      return dest;
    }
 
 }

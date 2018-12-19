@@ -8,6 +8,10 @@ Kafdrop is a UI for monitoring Apache Kafka clusters. The tool displays informat
 * Kafka (0.8.1 or 0.8.2 is known to work)
 * Zookeeper (3.4.5 or later)
 
+Optional, additional integration:
+
+* Schema Registry
+
 ## Building
 
 After cloning the repository, building should just be a matter of running a standard Maven build:
@@ -29,6 +33,17 @@ Then open a browser and navigate to http://localhost:9000. The port can be overr
 ```
     --server.port=<port>
 ```
+
+Additionally, you can optionally configure a schema registry connection with:
+```
+    --schemaregistry.connect=http://localhost:8081
+```
+
+Finally, a default message format (e.g. to deserialize Avro messages) can optionally be configured as follows:
+```
+    --message.format=AVRO
+```
+Valid format values are "DEFAULT" and "AVRO". This setting can also be configured at the topic level via dropdown when viewing messages.
 
 ## Running with Docker
 

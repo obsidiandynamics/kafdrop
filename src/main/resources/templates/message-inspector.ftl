@@ -31,6 +31,7 @@
 <h1>Topic Messages: <a href="/topic/${topic.name}">${topic.name}</a></h1>
 
 <#assign selectedPartition=messageForm.partition!0?number>
+<#assign selectedFormat=messageForm.format!defaultFormat>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
@@ -69,6 +70,15 @@
         </#if>
     </div>
 
+    <div class="form-group">
+        <label for="format">Message Format</label>
+        <select id="format" name="format">
+        <#list messageFormats as f>
+            <option value="${f}"<#if f == selectedFormat>selected="selected"</#if>>${f}</option>
+        </#list>
+        </select>
+    </div>
+
     <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> View Messages</button>
     
 </form>
@@ -91,7 +101,7 @@
         </div>
     </#list>
     <#elseif !(spring.status.error) && !(messageForm.empty)>
-        No messages found in partition ${messageForm.partition} at offset ${messageForm.offset}
+        No messages found in partition ${(messageForm.partition)!"PARTITION_NOT_SET"} at offset ${messageForm.offset}
     </#if>
 </div>
 

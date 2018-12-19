@@ -24,6 +24,17 @@
        <tag>HEAD</tag>
    </scm>
 
+   <repositories>
+     <repository>
+       <id>central</id>
+       <url>http://repo1.maven.org/maven2</url>
+     </repository>
+     <repository>
+       <id>confluent</id>
+       <url>http://packages.confluent.io/maven/</url>
+     </repository>
+   </repositories>
+
    <dependencyManagement>
       <dependencies>
          <dependency>
@@ -72,6 +83,31 @@
          <groupId>org.springframework.retry</groupId>
          <artifactId>spring-retry</artifactId>
          <version>1.1.3.RELEASE</version>
+      </dependency>
+      <dependency>
+         <groupId>io.confluent</groupId>
+         <artifactId>kafka-avro-serializer</artifactId>
+         <version>3.2.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.avro</groupId>
+         <artifactId>avro</artifactId>
+         <version>1.8.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.kafka</groupId>
+         <artifactId>kafka-clients</artifactId>
+         <version>0.10.2.2</version>
+      </dependency>
+      <dependency>
+         <groupId>com.google.code.findbugs</groupId>
+         <artifactId>jsr305</artifactId>
+         <version>3.0.2</version>
+      </dependency>
+      <dependency>
+         <groupId>com.google.code.gson</groupId>
+         <artifactId>gson</artifactId>
+         <version>2.8.5</version>
       </dependency>
 
       <!-- Spring Boot -->
@@ -150,13 +186,6 @@
          <groupId>org.codehaus.groovy.modules.http-builder</groupId>
          <artifactId>http-builder</artifactId>
          <version>0.7.1</version>
-         <scope>test</scope>
-      </dependency>
-      <!-- Right now only needed by integration tests -->
-      <dependency>
-         <groupId>org.apache.kafka</groupId>
-         <artifactId>kafka-clients</artifactId>
-         <version>0.8.2.2</version>
          <scope>test</scope>
       </dependency>
    </dependencies>
@@ -313,7 +342,7 @@
                      <dependency>
                         <groupId>org.apache.kafka</groupId>
                         <artifactId>kafka-clients</artifactId>
-                        <version>0.8.2.2</version>
+                        <version>0.10.2.2</version>
                      </dependency>
                   </dependencies>
 
