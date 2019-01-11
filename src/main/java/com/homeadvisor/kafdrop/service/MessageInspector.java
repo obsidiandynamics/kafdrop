@@ -18,133 +18,130 @@
 
 package com.homeadvisor.kafdrop.service;
 
-import com.homeadvisor.kafdrop.model.*;
-import com.homeadvisor.kafdrop.util.*;
+import com.homeadvisor.kafdrop.model.MessageVO;
+import com.homeadvisor.kafdrop.model.TopicPartitionVO;
+import com.homeadvisor.kafdrop.model.TopicVO;
+import com.homeadvisor.kafdrop.util.Version;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.StreamSupport;
 import kafka.api.FetchRequest;
-import kafka.api.*;
+import kafka.api.FetchRequestBuilder;
 import kafka.javaapi.FetchResponse;
-import kafka.javaapi.consumer.*;
+import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.javaapi.message.ByteBufferMessageSet;
-import kafka.message.*;
-import org.apache.kafka.common.*;
-import org.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.*;
-
-import java.io.*;
-import java.nio.*;
-import java.util.*;
-import java.util.stream.*;
+import kafka.message.Message;
+import kafka.message.MessageAndOffset;
+import org.apache.kafka.common.TopicPartition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
-public class MessageInspector
-{
-   private final Logger LOG = LoggerFactory.getLogger(getClass());
+public class MessageInspector {
 
-   @Autowired
-   private KafkaMonitor kafkaMonitor;
+  private final Logger LOG = LoggerFactory.getLogger(getClass());
 
-   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count)
-   {
-	  if (kafkaMonitor.getKafkaVersion().compareTo(new Version(0, 8, 2)) > 0)
-	  {
-		 final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
-		 final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
+  @Autowired
+  private KafkaMonitor kafkaMonitor;
 
-		 TopicPartition topicPartition = new TopicPartition(topicName, partitionId);
-		 return kafkaMonitor.getMessages(topicPartition, offset, count);
-	  } else
-	  {
-		 final TopicVO topic = kafkaMonitor.getTopic(topicName).orElseThrow(TopicNotFoundException::new);
-		 final TopicPartitionVO partition = topic.getPartition(partitionId).orElseThrow(PartitionNotFoundException::new);
+  public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count) {
+    if (kafkaMonitor.getKafkaVersion().compareTo(new Version(0, 8, 2)) > 0) {
+      final TopicVO topic = kafkaMonitor.getTopic(topicName)
+          .orElseThrow(TopicNotFoundException::new);
+      final TopicPartitionVO partition = topic.getPartition(partitionId)
+          .orElseThrow(PartitionNotFoundException::new);
 
-		 return kafkaMonitor.getBroker(partition.getLeader().getId())
-				 .map(broker -> {
-					SimpleConsumer consumer = new SimpleConsumer(broker.getHost(), broker.getPort(), 10000, 100000, "");
+      TopicPartition topicPartition = new TopicPartition(topicName, partitionId);
+      return kafkaMonitor.getMessages(topicPartition, offset, count);
+    } else {
+      final TopicVO topic = kafkaMonitor.getTopic(topicName)
+          .orElseThrow(TopicNotFoundException::new);
+      final TopicPartitionVO partition = topic.getPartition(partitionId)
+          .orElseThrow(PartitionNotFoundException::new);
 
-					final FetchRequestBuilder fetchRequestBuilder = new FetchRequestBuilder()
-							.clientId("KafDrop")
-							.maxWait(5000) // todo: make configurable
-							.minBytes(1);
+      return kafkaMonitor.getBroker(partition.getLeader().getId())
+          .map(broker -> {
+            SimpleConsumer consumer = new SimpleConsumer(broker.getHost(), broker.getPort(), 10000,
+                100000, "");
 
-					List<MessageVO> messages = new ArrayList<>();
-					long currentOffset = offset;
-					while (messages.size() < count)
-					{
-					   final FetchRequest fetchRequest =
-							   fetchRequestBuilder
-									   .addFetch(topicName, partitionId, currentOffset, 1024 * 1024)
-									   .build();
+            final FetchRequestBuilder fetchRequestBuilder = new FetchRequestBuilder()
+                .clientId("KafDrop")
+                .maxWait(5000) // todo: make configurable
+                .minBytes(1);
 
-					   FetchResponse fetchResponse = consumer.fetch(fetchRequest);
+            List<MessageVO> messages = new ArrayList<>();
+            long currentOffset = offset;
+            while (messages.size() < count) {
+              final FetchRequest fetchRequest =
+                  fetchRequestBuilder
+                      .addFetch(topicName, partitionId, currentOffset, 1024 * 1024)
+                      .build();
 
-					   final ByteBufferMessageSet messageSet = fetchResponse.messageSet(topicName, partitionId);
-					   if (messageSet.validBytes() <= 0)
-					   { break; }
+              FetchResponse fetchResponse = consumer.fetch(fetchRequest);
 
-					   int oldSize = messages.size();
-					   StreamSupport.stream(messageSet.spliterator(), false)
-							   .limit(count - messages.size())
-							   .map(MessageAndOffset::message)
-							   .map(this::createMessage)
-							   .forEach(messages::add);
-					   currentOffset += messages.size() - oldSize;
-					}
-					return messages;
-				 })
-				 .orElseGet(Collections::emptyList);
-	  }
-   }
+              final ByteBufferMessageSet messageSet = fetchResponse
+                  .messageSet(topicName, partitionId);
+              if (messageSet.validBytes() <= 0) {
+                break;
+              }
 
-   private MessageVO createMessage(Message message)
-   {
-	  MessageVO vo = new MessageVO();
-	  if (message.hasKey())
-	  {
-		 vo.setKey(readString(message.key()));
-	  }
-	  if (!message.isNull())
-	  {
-		 vo.setMessage(readString(message.payload()));
-	  }
+              int oldSize = messages.size();
+              StreamSupport.stream(messageSet.spliterator(), false)
+                  .limit(count - messages.size())
+                  .map(MessageAndOffset::message)
+                  .map(this::createMessage)
+                  .forEach(messages::add);
+              currentOffset += messages.size() - oldSize;
+            }
+            return messages;
+          })
+          .orElseGet(Collections::emptyList);
+    }
+  }
 
-	  vo.setValid(message.isValid());
-	  vo.setCompressionCodec(message.compressionCodec().name());
-	  vo.setChecksum(message.checksum());
-	  vo.setComputedChecksum(message.computeChecksum());
+  private MessageVO createMessage(Message message) {
+    MessageVO vo = new MessageVO();
+    if (message.hasKey()) {
+      vo.setKey(readString(message.key()));
+    }
+    if (!message.isNull()) {
+      vo.setMessage(readString(message.payload()));
+    }
 
-	  return vo;
-   }
+    vo.setValid(message.isValid());
+    vo.setCompressionCodec(message.compressionCodec().name());
+    vo.setChecksum(message.checksum());
+    vo.setComputedChecksum(message.computeChecksum());
 
-   private String readString(ByteBuffer buffer)
-   {
-	  try
-	  {
-		 return new String(readBytes(buffer), "UTF-8");
-	  }
-	  catch (UnsupportedEncodingException e)
-	  {
-		 return "<unsupported encoding>";
-	  }
-   }
+    return vo;
+  }
 
-   private byte[] readBytes(ByteBuffer buffer)
-   {
-	  return readBytes(buffer, 0, buffer.limit());
-   }
+  private String readString(ByteBuffer buffer) {
+    try {
+      return new String(readBytes(buffer), "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      return "<unsupported encoding>";
+    }
+  }
 
-   private byte[] readBytes(ByteBuffer buffer, int offset, int size)
-   {
-	  byte[] dest = new byte[size];
-	  if (buffer.hasArray())
-	  {
-		 System.arraycopy(buffer.array(), buffer.arrayOffset() + offset, dest, 0, size);
-	  } else
-	  {
-		 buffer.mark();
-		 buffer.get(dest);
-		 buffer.reset();
-	  }
-	  return dest;
-   }
+  private byte[] readBytes(ByteBuffer buffer) {
+    return readBytes(buffer, 0, buffer.limit());
+  }
+
+  private byte[] readBytes(ByteBuffer buffer, int offset, int size) {
+    byte[] dest = new byte[size];
+    if (buffer.hasArray()) {
+      System.arraycopy(buffer.array(), buffer.arrayOffset() + offset, dest, 0, size);
+    } else {
+      buffer.mark();
+      buffer.get(dest);
+      buffer.reset();
+    }
+    return dest;
+  }
 }
