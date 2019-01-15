@@ -17,4 +17,6 @@ public class KafkaConfiguration
    private Boolean isSecured = false;
    private String keyDeserializer;
    private String valueDeserializer;
+   private String saslMechanism;
+   private String securityProtocol;
 }

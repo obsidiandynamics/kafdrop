@@ -13,6 +13,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +62,8 @@ public class KafkaHighLevelConsumer
             properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getBrokerConnect());
 
             if (kafkaConfiguration.getIsSecured() == true) {
-                properties.put("sasl.mechanism", "PLAIN");
-                properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_PLAINTEXT");
+                properties.put(SaslConfigs.SASL_MECHANISM, kafkaConfiguration.getSaslMechanism());
+                properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaConfiguration.getSecurityProtocol());
             }
 
             kafkaConsumer = new KafkaConsumer<String, String>(properties);

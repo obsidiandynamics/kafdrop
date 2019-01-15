@@ -44,9 +44,11 @@ project:
 kafka:
   env: local
   brokerConnect: localhost:9092
-  isSecured: false
   keyDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
   valueDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
+  isSecured: false
+  saslMechanism: "PLAIN"
+  securityProtocol: "SASL_PLAINTEXT"
 
 zookeeper:
   connect: localhost:2181
