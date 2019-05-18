@@ -108,8 +108,7 @@ public class MessageController
                             messageInspector.getMessages(topicName,
                                                          messageForm.getPartition(),
                                                          messageForm.getOffset(),
-                                                         messageForm.getCount(),
-                                                         deserializer));
+                                                         messageForm.getCount()));
 
       }
 
@@ -156,8 +155,7 @@ public class MessageController
                topicName,
                partition,
                offset,
-               count,
-               deserializer);
+               count);
 
          if(vos != null)
          {
