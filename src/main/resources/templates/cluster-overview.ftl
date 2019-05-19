@@ -95,7 +95,7 @@
                     <td>${b.version}</td>
                     <td>${b.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
                     <td><@template.yn b.controller/></td>
-                    <td>${(clusterSummary.getBrokerLeaderPartitionCount(b.id))!0} (${(((clusterSummary.getBrokerLeaderPartitionCount(b.id))!0)/clusterSummary.partitionCount)?string.percent})</td>
+                    <td>${(clusterSummary.getBrokerLeaderPartitionCount(b.id))!0} (${(clusterSummary.getBrokerLeaderPartitionRatio(b.id))?string.percent})</td>
                 </tr>
                 </#list>
                 </tbody>

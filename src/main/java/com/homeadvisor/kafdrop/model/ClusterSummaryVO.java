@@ -78,6 +78,16 @@ public class ClusterSummaryVO {
         return brokerLeaderPartitionCount.get(brokerId);
     }
 
+    public double getBrokerLeaderPartitionRatio(int brokerId) {
+        final int totalPartitionCount = getPartitionCount();
+        if (totalPartitionCount != 0) {
+            final Integer brokerPartitionCount = getBrokerLeaderPartitionCount(brokerId);
+            return brokerPartitionCount != null ? (double) brokerPartitionCount/totalPartitionCount : 0;
+        } else {
+            return 0;
+        }
+    }
+
     public void addBrokerLeaderPartition(int brokerId) {
         addBrokerLeaderPartition(brokerId, 1);
     }

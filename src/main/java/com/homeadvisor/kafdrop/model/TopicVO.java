@@ -113,10 +113,14 @@ public class TopicVO implements Comparable<TopicVO>
 
    public double getPreferredReplicaPercent()
    {
-	  long preferredLeaderCount = partitions.values().stream()
-			  .filter(TopicPartitionVO::isLeaderPreferred)
-			  .count();
-	  return ((double) preferredLeaderCount) / ((double) partitions.size());
+	  if (partitions.isEmpty()) {
+	    return 0;
+    } else {
+      long preferredLeaderCount = partitions.values().stream()
+          .filter(TopicPartitionVO::isLeaderPreferred)
+          .count();
+      return ((double) preferredLeaderCount) / ((double) partitions.size());
+    }
    }
 
    public void addPartition(TopicPartitionVO partition)
