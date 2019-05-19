@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 @Service
 public class KafkaHighLevelConsumer
 {
+    private static final int POLL_TIMEOUT_MS = 200;
+
     private final Logger LOG = LoggerFactory.getLogger(getClass());
     @Autowired
      private ObjectMapper objectMapper;
@@ -61,12 +63,12 @@ public class KafkaHighLevelConsumer
             properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafka-drop-client");
             properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getBrokerConnect());
 
-            if (kafkaConfiguration.getIsSecured() == true) {
+            if (kafkaConfiguration.getIsSecured()) {
                 properties.put(SaslConfigs.SASL_MECHANISM, kafkaConfiguration.getSaslMechanism());
                 properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaConfiguration.getSecurityProtocol());
             }
 
-            kafkaConsumer = new KafkaConsumer<String, String>(properties);
+            kafkaConsumer = new KafkaConsumer<>(properties);
         }
     }
 
@@ -111,7 +113,7 @@ public class KafkaHighLevelConsumer
 
         ConsumerRecords records = null;
 
-        records = kafkaConsumer.poll(10);
+        records = kafkaConsumer.poll(POLL_TIMEOUT_MS);
         final int numRecords = records.count();
         if (numRecords > 0) {
             return records.records(topicPartition).subList(0, Math.min(count.intValue(), numRecords));
