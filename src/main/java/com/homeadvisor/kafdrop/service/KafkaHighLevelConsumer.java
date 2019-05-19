@@ -112,8 +112,9 @@ public class KafkaHighLevelConsumer
         ConsumerRecords records = null;
 
         records = kafkaConsumer.poll(10);
-        if (records.count() > 0) {
-            return records.records(topicPartition).subList(0, count.intValue());
+        final int numRecords = records.count();
+        if (numRecords > 0) {
+            return records.records(topicPartition).subList(0, Math.min(count.intValue(), numRecords));
         }
         return null;
     }

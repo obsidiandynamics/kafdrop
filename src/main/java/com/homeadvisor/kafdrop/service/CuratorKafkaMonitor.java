@@ -609,21 +609,23 @@ public class CuratorKafkaMonitor implements KafkaMonitor
    @Override
    public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count)
    {
-
 	  List<ConsumerRecord<String, String>> records = kafkaHighLevelConsumer.getLatestRecords(topicPartition, offset, count);
-	  List<MessageVO> messageVOS = Lists.newArrayList();
-	  for (ConsumerRecord<String, String> record : records)
-	  {
-		 MessageVO messageVo = new MessageVO();
-		 messageVo.setKey(record.key());
-		 messageVo.setMessage(record.value());
-		 messageVo.setChecksum(record.checksum());
-		 messageVo.setCompressionCodec(record.headers().toString());
-		 messageVo.setValid(true);
+	  if (records != null) {
+			List<MessageVO> messageVOS = Lists.newArrayList();
+			for (ConsumerRecord<String, String> record : records) {
+				MessageVO messageVo = new MessageVO();
+				messageVo.setKey(record.key());
+				messageVo.setMessage(record.value());
+				messageVo.setChecksum(record.checksum());
+				messageVo.setCompressionCodec(record.headers().toString());
+				messageVo.setValid(true);
 
-		 messageVOS.add(messageVo);
-	  }
-	  return messageVOS;
+				messageVOS.add(messageVo);
+			}
+			return messageVOS;
+		} else {
+	  	return Collections.emptyList();
+		}
    }
 
    private ConsumerRegistrationVO readConsumerRegistration(ZKGroupDirs groupDirs, String id)
