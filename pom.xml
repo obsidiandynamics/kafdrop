@@ -229,7 +229,7 @@
                   <manifest>
                      <addClasspath>true</addClasspath>
                      <classpathPrefix>lib/</classpathPrefix>
-                     <mainClass>com.homeadvisor.kafdrop.KafDrop</mainClass>
+                     <mainClass>com.homeadvisor.kafdrop.Kafdrop</mainClass>
                   </manifest>
                </archive>
             </configuration>

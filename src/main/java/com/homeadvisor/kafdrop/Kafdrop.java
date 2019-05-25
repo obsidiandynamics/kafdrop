@@ -47,13 +47,13 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @SpringBootApplication(exclude = MetricFilterAutoConfiguration.class)
-public class KafDrop
+public class Kafdrop
 {
-   private final static Logger LOG = LoggerFactory.getLogger(KafDrop.class);
+   private final static Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
 
    public static void main(String[] args)
    {
-      new SpringApplicationBuilder(KafDrop.class)
+      new SpringApplicationBuilder(Kafdrop.class)
          .bannerMode(Banner.Mode.OFF)
          .listeners(new EnvironmentSetupListener(),
                     new LoggingConfigurationListener())
@@ -119,7 +119,7 @@ public class KafDrop
             LOG.info("Initializing jaas config");
             String env = environment.getProperty("kafka.env");
             Boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
-            LOG.info("env: {} .Issecured kafka: {}", env, isSecured);
+            LOG.info("env: {} .isSecured kafka: {}", env, isSecured);
             if (isSecured && Strings.isNullOrEmpty(env)) {
                 throw new RuntimeException("'env' cannot be null if connecting to secured kafka.");
             }
