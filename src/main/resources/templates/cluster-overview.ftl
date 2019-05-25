@@ -133,8 +133,7 @@
                            data-toggle="tooltip" data-placement="top" href="#"
                         ><i class="fa fa-question-circle"></i></a>
                     </th>
-                    <th>Custom Config?</th>
-                    <#--<th>Consumers</th>-->
+                    <th>Custom Config</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -150,7 +149,6 @@
                     <td <#if t.preferredReplicaPercent lt 1.0>class="warning"</#if>>${t.preferredReplicaPercent?string.percent}</td>
                     <td <#if t.underReplicatedPartitions?size gt 0>class="warning"</#if>>${t.underReplicatedPartitions?size}</td>
                     <td><@template.yn t.config?size gt 0/></td>
-                    <#--<td>${t.consumers![]?size}</td>-->
                 </tr>
                 </#list>
                 </tbody>
