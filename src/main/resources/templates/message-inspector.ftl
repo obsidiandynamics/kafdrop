@@ -37,12 +37,11 @@
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
     <span class="label label-default">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>
     <span class="label label-default">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>
-    <span class="label label-default">Size:</span> <span id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
+    <span class="label label-default">Size:</span> <span id="partitionSize">${curPartition.size - curPartition.firstOffset + 1}</span>
 </div>
 
 <div id="messageFormPanel" class="panel panel-default">
 <form method="GET" action="/topic/${topic.name}/messages" id="messageForm" class="form-inline panel-body">
-
     <div class="form-group">
         <label for="partition">Partition</label>
         <select id="partition" name="partition">
@@ -51,7 +50,7 @@
         </#list>
         </select>
     </div>
-
+    &nbsp;&nbsp;
     <@spring.bind path="messageForm.offset"/>
     <div class="form-group ${spring.status.error?string("has-error", "")}">
         <label class="control-label" for="offset">Offset</label>
@@ -60,24 +59,25 @@
             <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
         </#if>
     </div>
-
+    &nbsp;&nbsp;
     <@spring.bind path="messageForm.count"/>
     <div class="form-group ${spring.status.error?string("has-error", "")}">
-        <label class=control-label" for="count">Num Messages</label>
+        <label class=control-label" for="count"># messages</label>
         <@spring.formInput path="messageForm.count" attributes='class="form-control ${spring.status.error?string("has-error", "")}"'/>
         <#if spring.status.error>
            <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
         </#if>
     </div>
-
+    &nbsp;&nbsp;
     <div class="form-group">
-        <label for="format">Message Format</label>
+        <label for="format">Message format</label>
         <select id="format" name="format">
         <#list messageFormats as f>
             <option value="${f}"<#if f == selectedFormat>selected="selected"</#if>>${f}</option>
         </#list>
         </select>
     </div>
+    &nbsp;&nbsp;
 
     <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> View Messages</button>
 </form>
@@ -91,8 +91,7 @@
         <div data-offset="${offset}" class="message-detail">
             <span class="label label-default">Offset:</span> ${offset}
             <span class="label label-default">Key:</span> ${msg.key!''}
-            <span class="label label-default">Checksum/Computed:</span> <span <#if !msg.valid>class="text-danger"</#if>>${msg.checksum}/${msg.computedChecksum}</span>
-            <span class="label label-default">Compression:</span> ${msg.compressionCodec}
+            <span class="label label-default">Headers:</span> ${msg.headers}
             <div>
             <a href="#" class="toggle-msg"><i class="fa fa-chevron-circle-right">&nbsp;</i></a>
             <pre class="message-body">${msg.message!''}</pre>

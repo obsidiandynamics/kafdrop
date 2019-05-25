@@ -84,7 +84,7 @@ public class MessageController
       {
          final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
 
-         defaultForm.setCount(10l);
+         defaultForm.setCount(100l);
          defaultForm.setOffset(0l);
          defaultForm.setPartition(0);
          defaultForm.setFormat(defaultFormat);
@@ -141,15 +141,12 @@ public class MessageController
                .orElseThrow(() -> new TopicNotFoundException(topicName));
 
          List<Object> partitionList = new ArrayList<>();
-         topic.getPartitions().stream().forEach(vo -> partitionList.add(new PartitionOffsetInfo(vo.getId(), vo.getFirstOffset(), vo.getSize())));
+         topic.getPartitions().forEach(vo -> partitionList.add(new PartitionOffsetInfo(vo.getId(), vo.getFirstOffset(), vo.getSize())));
 
          return partitionList;
       }
       else
       {
-         // Currently, only default deserialization supported via JSON API.
-         final MessageDeserializer deserializer = new DefaultMessageDeserializer();
-
          List<Object> messages = new ArrayList<>();
          List<MessageVO> vos = messageInspector.getMessages(
                topicName,
@@ -157,9 +154,9 @@ public class MessageController
                offset,
                count);
 
-         if(vos != null)
+         if (vos != null)
          {
-            vos.stream().forEach(vo -> messages.add(vo));
+            messages.addAll(vos);
          }
 
          return messages;

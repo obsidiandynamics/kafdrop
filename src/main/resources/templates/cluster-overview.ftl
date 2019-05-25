@@ -28,23 +28,23 @@
             <table class="table table-bordered">
                 <tbody>
                 <tr>
-                    <td>Zookeeper Host Configuration</td>
+                    <td>ZooKeeper host connection</td>
                     <td><#list zookeeper.connectList as z>${z}<#if z_has_next>, </#if></#list></td>
                 </tr>
                 <tr>
-                    <td>Total Topics</td>
+                    <td>Total topics</td>
                     <td>${clusterSummary.topicCount}</td>
                 </tr>
                 <tr>
-                    <td>Total Partitions</td>
+                    <td>Total partitions</td>
                     <td>${clusterSummary.partitionCount}</td>
                 </tr>
                 <tr>
-                    <td>Total Preferred Partition Leader</td>
+                    <td>Total preferred partition leader</td>
                     <td <#if clusterSummary.preferredReplicaPercent lt 1.0>class="warning"</#if>>${clusterSummary.preferredReplicaPercent?string.percent}</td>
                 </tr>
                 <tr>
-                    <td>Total Under Replicated Partitions</td>
+                    <td>Total under-replicated partitions</td>
                     <td <#if clusterSummary.underReplicatedCount gt 0>class="warning"</#if>>${clusterSummary.underReplicatedCount}</td>
                 </tr>
                 </tbody>
@@ -67,9 +67,9 @@
                            data-toggle="tooltip" data-placement="top" href="#"
                         ><i class="fa fa-question-circle"></i></a>
                     </th>
-                    <th>Controller?</th>
+                    <th>Controller</th>
                     <th>
-                        # Partitions (% of Total)
+                        # Partitions (% of total)
                         <a title="# of partitions this broker is the leader for"
                            data-toggle="tooltip" data-placement="top" href="#"
                         ><i class="fa fa-question-circle"></i></a>
@@ -128,7 +128,7 @@
                         ><i class="fa fa-question-circle"></i></a>
                     </th>
                     <th>
-                        # Under Replicated
+                        # Under-replicated
                         <a title="Number of partition replicas that are not in sync with the primary partition"
                            data-toggle="tooltip" data-placement="top" href="#"
                         ><i class="fa fa-question-circle"></i></a>

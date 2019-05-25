@@ -32,29 +32,29 @@
 <div class="container-fluid">
 <div class="row">
 
-<div id="topic-overview" class="col-md-5">
+<div id="topic-overview" class="col-md-8">
     <h2>Overview</h2>
 
     <table class="table table-bordered">
         <tbody>
         <tr>
-            <td># of Partitions</td>
+            <td># of partitions</td>
             <td>${topic.partitions?size}</td>
         </tr>
         <tr>
-            <td>Preferred Replicas</td>
+            <td>Preferred replicas</td>
             <td <#if topic.preferredReplicaPercent lt 1.0>class="warning"</#if>>${topic.preferredReplicaPercent?string.percent}</td>
         </tr>
         <tr>
-            <td>Under Replicated Partitions</td>
+            <td>Under-replicated partitions</td>
             <td <#if topic.underReplicatedPartitions?size gt 0>class="warning"</#if>>${topic.underReplicatedPartitions?size}</td>
         </tr>
         <tr>
-            <td>Total Size</td>
+            <td>Total size</td>
             <td>${topic.totalSize}</td>
         </tr>
         <tr>
-            <td>Total Available Messages</td>
+            <td>Total available messages</td>
             <td>${topic.availableSize}</td>
         </tr>
         </tbody>
@@ -62,7 +62,7 @@
 </div>
 
 
-<div id="topic-config" class="col-md-7">
+<div id="topic-config" class="col-md-4">
     <h2>Configuration</h2>
 
     <#if topic.config?size == 0>
@@ -84,7 +84,7 @@
 </div>
 
 <div class="row">
-<div id="partition-detail" class="col-md-5">
+<div id="partition-detail" class="col-md-8">
     <h2>Partition Detail</h2>
     <table id="partition-detail-table" class="table table-bordered table-condensed small">
         <thead>
@@ -95,9 +95,9 @@
             <th>Size</th>
             <th>Leader</th>
             <th>Replicas</th>
-            <th>In Sync Replicas</th>
-            <th>Preferred Leader?</th>
-            <th>Under Replicated?</th>
+            <th>In-sync Replicas</th>
+            <th>Preferred Leader</th>
+            <th>Under-replicated</th>
         </tr>
         </thead>
         <tbody>
@@ -118,12 +118,12 @@
     </table>
 </div>
 
-<div id="consumers" class="col-md-7">
+<div id="consumers" class="col-md-4">
     <h2>Consumers</h2>
     <table id="consumers-table" class="table table-bordered table-condensed small">
         <thead>
         <tr>
-            <th>Group Id</th>
+            <th>Group ID</th>
             <th>Lag</th>
             <th>Active Instances</th>
         </tr>

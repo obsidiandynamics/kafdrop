@@ -113,11 +113,6 @@ public class MessageInspector {
       vo.setMessage(readString(message.payload()));
     }
 
-    vo.setValid(message.isValid());
-    vo.setCompressionCodec(message.compressionCodec().name());
-    vo.setChecksum(message.checksum());
-    vo.setComputedChecksum(message.computeChecksum());
-
     return vo;
   }
 

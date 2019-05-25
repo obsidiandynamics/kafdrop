@@ -616,9 +616,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor
 				MessageVO messageVo = new MessageVO();
 				messageVo.setKey(record.key());
 				messageVo.setMessage(record.value());
-				messageVo.setChecksum(record.checksum());
-				messageVo.setCompressionCodec(record.headers().toString());
-				messageVo.setValid(true);
+				messageVo.setHeaders(Arrays.toString(record.headers().toArray()));
 
 				messageVOS.add(messageVo);
 			}
