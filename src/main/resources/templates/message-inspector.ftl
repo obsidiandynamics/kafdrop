@@ -89,7 +89,7 @@
     <#list messages as msg>
         <#assign offset=messageForm.offset + msg_index>
         <div data-offset="${offset}" class="message-detail">
-            <span class="label label-default">Offset:</span> ${offset} &nbsp;d
+            <span class="label label-default">Offset:</span> ${offset} &nbsp;
             <span class="label label-default">Key:</span> ${msg.key!''} &nbsp;
             <span class="label label-default">Headers:</span> ${msg.headers}
             <div>
