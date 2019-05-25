@@ -146,8 +146,10 @@ public class KafkaHighLevelConsumer
         for (PartitionInfo partitionInfo : partitionInfoList) {
             TopicPartitionVO topicPartitionVO = new TopicPartitionVO(partitionInfo.partition());
 
-            Node leader = partitionInfo.leader();
-            topicPartitionVO.addReplica(new TopicPartitionVO.PartitionReplica(leader.id(), true, true));
+            final Node leader = partitionInfo.leader();
+            if (leader != null) {
+                topicPartitionVO.addReplica(new TopicPartitionVO.PartitionReplica(leader.id(), true, true));
+            }
 
             for (Node node : partitionInfo.replicas()) {
                 topicPartitionVO.addReplica(new TopicPartitionVO.PartitionReplica(node.id(), true, false));
