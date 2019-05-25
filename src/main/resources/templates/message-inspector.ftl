@@ -35,8 +35,8 @@
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
-    <span class="label label-default">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>
-    <span class="label label-default">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>
+    <span class="label label-default">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>&nbsp;
+    <span class="label label-default">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>&nbsp;
     <span class="label label-default">Size:</span> <span id="partitionSize">${curPartition.size - curPartition.firstOffset + 1}</span>
 </div>
 
@@ -89,8 +89,8 @@
     <#list messages as msg>
         <#assign offset=messageForm.offset + msg_index>
         <div data-offset="${offset}" class="message-detail">
-            <span class="label label-default">Offset:</span> ${offset}
-            <span class="label label-default">Key:</span> ${msg.key!''}
+            <span class="label label-default">Offset:</span> ${offset} &nbsp;d
+            <span class="label label-default">Key:</span> ${msg.key!''} &nbsp;
             <span class="label label-default">Headers:</span> ${msg.headers}
             <div>
             <a href="#" class="toggle-msg"><i class="fa fa-chevron-circle-right">&nbsp;</i></a>
