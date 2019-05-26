@@ -37,7 +37,7 @@
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
     <span class="label label-default">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>&nbsp;
     <span class="label label-default">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>&nbsp;
-    <span class="label label-default">Size:</span> <span id="partitionSize">${curPartition.size - curPartition.firstOffset + 1}</span>
+    <span class="label label-default">Size:</span> <span id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
 </div>
 
 <div id="messageFormPanel" class="panel panel-default">
