@@ -27,69 +27,56 @@
  */
 
 
-jQuery.expr[':'].contains = function(a,i,m){
-    return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase())>=0;
+jQuery.expr[':'].contains = function (a, i, m) {
+    return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
 };
 
-function prefix(text, pref)
-{
+function prefix(text, pref) {
     return text.trim().length == 0 ? "" : pref;
 }
 
-$(document).ready(function()
-{
+$(document).ready(function () {
     var searchTag = "searchRow";
     $('input[name="searchRow"]').attr('title', "Power Filter: w/space for OR, '!' for exclude");
 
     var counter = "(" + $('.dataRow:visible').length + ")";
     $('#rowCount').text(counter);
 
-    $('input[name="searchRow"]').keyup(function()
-    {
+    $('input[name="searchRow"]').keyup(function () {
         var searchterm = $(this).val();
         var rowTag = "tr.dataRow";
-        if(searchterm.length >= 2)
-        {
-            searchterm = searchterm.replace(/\s+/g,  ' ');
+        if (searchterm.length >= 2) {
+            searchterm = searchterm.replace(/\s+/g, ' ');
             searchterm = searchterm.replace(/!\s+/g, '!');
             searchterm = $.trim(searchterm);
             var bits = searchterm.split(" ");
 
-            var matchExpr   = "";
-            var blockExpr   = "";
-            var andExpr     = "";
+            var matchExpr = "";
+            var blockExpr = "";
+            var andExpr = "";
             var noMatchExpr = rowTag;
             var someFilter = false;
 
-            for (i = 0; i < bits.length; i++)
-            {
+            for (i = 0; i < bits.length; i++) {
                 var bit = bits[i];
 
-                if (bit == "!")
-                {
+                if (bit == "!") {
                     continue;
                 }
 
-                if (bit.slice(0, 1) == '!')
-                {
+                if (bit.slice(0, 1) == '!') {
                     var ignore = bit.substring(1);
-                    if (ignore.length == 1)
-                    {
+                    if (ignore.length == 1) {
                         continue;
                     }
                     blockExpr += prefix(blockExpr, ",") + rowTag + ':contains("' + ignore + '")';
-                }
-                else if (bit.slice(0, 1) == '+')
-                {
+                } else if (bit.slice(0, 1) == '+') {
                     var ignore = bit.substring(1);
-                    if (ignore.length == 1)
-                    {
+                    if (ignore.length == 1) {
                         continue;
                     }
                     andExpr += prefix(andExpr, ",") + rowTag + ':not(:contains("' + ignore + '"))';
-                }
-                else
-                {
+                } else {
                     matchExpr += prefix(matchExpr, ",") + rowTag + ':contains("' + bit + '")';
                     noMatchExpr += ':not(:contains("' + bit + '"))';
                     someFilter = true;
@@ -98,27 +85,23 @@ $(document).ready(function()
 
             //$('#debug').text('blockExpr (' + blockExpr + ')     matchExpr(' + matchExpr + ")"  + '    noMatchExpr(' + noMatchExpr + ")");
 
-            var match   = $(matchExpr);
+            var match = $(matchExpr);
             var nomatch = $(noMatchExpr);
             var blocker = $(blockExpr);
-            var ander   = $(andExpr);
+            var ander = $(andExpr);
 
-            if (someFilter)
-            {
+            if (someFilter) {
                 nomatch.css("display", "none");
             }
 
-            match.css("display",   "");
+            match.css("display", "");
             blocker.css("display", "none");
             ander.css("display", "  none");
 
-            if(searchterm.length >= 10)
-            {
+            if (searchterm.length >= 10) {
                 $(this).css("width", "200px");
             }
-        }
-        else
-        {
+        } else {
             $(rowTag).css("display", "");
             $(rowTag).removeClass('selected');
         }
@@ -130,8 +113,7 @@ $(document).ready(function()
     });
 
     var curr = $('#filter').val();
-    if (curr != '')
-    {
+    if (curr != '') {
         $('#filter').keyup();
     }
 });

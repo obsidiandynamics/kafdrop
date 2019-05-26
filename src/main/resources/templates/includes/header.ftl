@@ -16,6 +16,7 @@
 
 <div class="header page-header">
     <div class="container">
-        <h1 class="app-name brand"><a href="/">Kafdrop</a> <#if profile??><span class="small">${profile}</span></#if></h1>
+        <h1 class="app-name brand"><a href="/">Kafdrop</a> <#if profile??><span class="small">${profile}</span></#if>
+        </h1>
     </div>
 </div>

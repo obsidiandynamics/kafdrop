@@ -18,19 +18,16 @@
 
 package com.homeadvisor.kafdrop.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.context.annotation.*;
+import org.springframework.core.*;
+import org.springframework.core.annotation.*;
+import org.springframework.http.*;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.servlet.http.*;
+import java.io.*;
 
 /**
  * Auto configuration for enabling CORS support. Can override behavior with
@@ -50,57 +47,51 @@ import java.io.IOException;
  */
 @Configuration
 @ConditionalOnProperty(value = "cors.enabled", matchIfMissing = true)
-public class CorsConfiguration
-{
-   @Value("${cors.allowOrigins:*}")
-   private String corsAllowOrigins;
+public class CorsConfiguration {
+  @Value("${cors.allowOrigins:*}")
+  private String corsAllowOrigins;
 
-   @Value("${cors.allowMethods:GET,POST,PUT,DELETE}")
-   private String corsAllowMethods;
+  @Value("${cors.allowMethods:GET,POST,PUT,DELETE}")
+  private String corsAllowMethods;
 
-   @Value("${cors.maxAge:3600}")
-   private String corsMaxAge;
+  @Value("${cors.maxAge:3600}")
+  private String corsMaxAge;
 
-   @Value("${cors.allowCredentials:true}")
-   private String corsAllowCredentials;
+  @Value("${cors.allowCredentials:true}")
+  private String corsAllowCredentials;
 
-   @Value("${cors.allowHeaders:Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization}")
-   private String corsAllowHeaders;
+  @Value("${cors.allowHeaders:Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization}")
+  private String corsAllowHeaders;
 
-   @Bean
-   @Order(Ordered.HIGHEST_PRECEDENCE)
-   public Filter corsFilter()
-   {
-      return new Filter()
-      {
-         @Override
-         public void init(FilterConfig filterConfig) throws ServletException
-         {}
+  @Bean
+  @Order(Ordered.HIGHEST_PRECEDENCE)
+  public Filter corsFilter() {
+    return new Filter() {
+      @Override
+      public void init(FilterConfig filterConfig) throws ServletException {
+      }
 
-         @Override
-         public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException
-         {
-            HttpServletResponse response = (HttpServletResponse) res;
-            HttpServletRequest request = (HttpServletRequest) req;
+      @Override
+      public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        HttpServletResponse response = (HttpServletResponse) res;
+        HttpServletRequest request = (HttpServletRequest) req;
 
-            response.setHeader("Access-Control-Allow-Origin", corsAllowOrigins);
-            response.setHeader("Access-Control-Allow-Methods", corsAllowMethods);
-            response.setHeader("Access-Control-Max-Age", corsMaxAge);
-            response.setHeader("Access-Control-Allow-Credentials", corsAllowCredentials);
-            response.setHeader("Access-Control-Allow-Headers", corsAllowHeaders);
+        response.setHeader("Access-Control-Allow-Origin", corsAllowOrigins);
+        response.setHeader("Access-Control-Allow-Methods", corsAllowMethods);
+        response.setHeader("Access-Control-Max-Age", corsMaxAge);
+        response.setHeader("Access-Control-Allow-Credentials", corsAllowCredentials);
+        response.setHeader("Access-Control-Allow-Headers", corsAllowHeaders);
 
-            if(request.getMethod().equals(HttpMethod.OPTIONS.name()))
-            {
-               response.setStatus(HttpStatus.NO_CONTENT.value());
-            }
-            else
-            {
-               chain.doFilter(req, res);
-            }
-         }
+        if (request.getMethod().equals(HttpMethod.OPTIONS.name())) {
+          response.setStatus(HttpStatus.NO_CONTENT.value());
+        } else {
+          chain.doFilter(req, res);
+        }
+      }
 
-         @Override
-         public void destroy() {}
-      };
-   }
+      @Override
+      public void destroy() {
+      }
+    };
+  }
 }

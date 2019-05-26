@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 <#macro header title>
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
 <head>
     <title>Kafdrop: ${title}</title>
@@ -29,21 +29,22 @@
     <#nested>
 </head>
 <body>
-   <#include "../includes/header.ftl">
+<#include "../includes/header.ftl">
 <div class="container l-container">
-</#macro>
+    </#macro>
 
-<#macro footer>
+    <#macro footer>
 </div>
-   <#nested>
+<#nested>
 </body>
 </html>
 </#macro>
 
 <#macro toggleLink target startVisible=true anchor='#'>
-<a href="<#if !anchor?starts_with('#')>#</#if>${anchor}" class="toggle-link" data-toggle-target="${target}"><i class="fa <#if startVisible>fa-chevron-circle-down<#else>fa-chevron-circle-right</#if>"></i></a>
+    <a href="<#if !anchor?starts_with('#')>#</#if>${anchor}" class="toggle-link" data-toggle-target="${target}"><i
+                class="fa <#if startVisible>fa-chevron-circle-down<#else>fa-chevron-circle-right</#if>"></i></a>
 </#macro>
 
 <#macro yn value>
-   <#if value>Yes<#else>No</#if>
+    <#if value>Yes<#else>No</#if>
 </#macro>

@@ -15,12 +15,16 @@
 -->
 <#import "lib/template.ftl" as template>
 <@template.header "Broker: ${broker.id?string}">
-<style type="text/css">
-    .bs-table.overview td { white-space: nowrap; }
+    <style type="text/css">
+        .bs-table.overview td {
+            white-space: nowrap;
+        }
 
-    td.leader-partitions { word-break: break-all; }
+        td.leader-partitions {
+            word-break: break-all;
+        }
 
-</style>
+    </style>
 </@template.header>
 
 <#setting number_format="0">
@@ -75,12 +79,12 @@
         </thead>
         <tbody>
         <#list topics as t>
-              <tr>
-                  <td><a href="/topic/${t.name}">${t.name}</a></td>
-                  <td>${t.partitions?size}</td>
-                  <td>${t.getLeaderPartitions(broker.id)?size}</td>
-                  <td class="leader-partitions"><#list t.getLeaderPartitions(broker.id) as p>${p.id}<#sep>,</#list></td>
-              </tr>
+            <tr>
+                <td><a href="/topic/${t.name}">${t.name}</a></td>
+                <td>${t.partitions?size}</td>
+                <td>${t.getLeaderPartitions(broker.id)?size}</td>
+                <td class="leader-partitions"><#list t.getLeaderPartitions(broker.id) as p>${p.id}<#sep>,</#list></td>
+            </tr>
         </#list>
         </tbody>
     </table>

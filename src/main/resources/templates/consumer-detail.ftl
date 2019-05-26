@@ -41,34 +41,36 @@
 </div>
 
 <div id="topics">
-<#list consumer.topics as consumerTopic>
-    <#assign tableId='topic-${consumerTopic_index}-table'>
-    <h2><@template.toggleLink target="#${tableId}" anchor='${tableId}' /> Topic: <a href="/topic/${consumerTopic.topic}">${consumerTopic.topic}</a></h2>
-    <div id="${tableId}">
-        <p>
+    <#list consumer.topics as consumerTopic>
+        <#assign tableId='topic-${consumerTopic_index}-table'>
+        <h2><@template.toggleLink target="#${tableId}" anchor='${tableId}' /> Topic: <a
+                    href="/topic/${consumerTopic.topic}">${consumerTopic.topic}</a></h2>
+        <div id="${tableId}">
+            <p>
             <table class="table table-bordered overview">
                 <tbody>
-                    <tr>
-                        <td>Total Threads</td>
-                        <td>${consumerTopic.ownerCount}</td>
-                    </tr>
-                    <tr>
-                        <td>Partition Coverage</td>
-                        <td>${consumerTopic.coveragePercent * 100.0}%
-                            (${consumerTopic.assignedPartitionCount} of ${consumerTopic.partitions?size})</td>
-                    </tr>
-                    <tr>
-                        <td>Total Lag</td>
-                        <td>${consumerTopic.lag}</td>
-                    </tr>
-                    <tr>
-                        <td>Max Lag</td>
-                        <td>${consumerTopic.maxLag}</td>
-                    </tr>
+                <tr>
+                    <td>Total Threads</td>
+                    <td>${consumerTopic.ownerCount}</td>
+                </tr>
+                <tr>
+                    <td>Partition Coverage</td>
+                    <td>${consumerTopic.coveragePercent * 100.0}%
+                        (${consumerTopic.assignedPartitionCount} of ${consumerTopic.partitions?size})
+                    </td>
+                </tr>
+                <tr>
+                    <td>Total Lag</td>
+                    <td>${consumerTopic.lag}</td>
+                </tr>
+                <tr>
+                    <td>Max Lag</td>
+                    <td>${consumerTopic.maxLag}</td>
+                </tr>
                 </tbody>
             </table>
-        </p>
-        <p>
+            </p>
+            <p>
             <table class="table table-bordered table-condensed">
                 <thead>
                 <tr>
@@ -82,20 +84,20 @@
                 </thead>
                 <tbody>
                 <#list consumerTopic.partitions as p>
-                   <tr>
-                       <td>${p.partitionId}</td>
-                       <td>${p.firstOffset}</td>
-                       <td>${p.size}</td>
-                       <td>${p.offset}</td>
-                       <td>${p.lag}</td>
-                       <td>${p.owner!''}</td>
-                   </tr>
+                    <tr>
+                        <td>${p.partitionId}</td>
+                        <td>${p.firstOffset}</td>
+                        <td>${p.size}</td>
+                        <td>${p.offset}</td>
+                        <td>${p.lag}</td>
+                        <td>${p.owner!''}</td>
+                    </tr>
                 </#list>
                 </tbody>
             </table>
-        </p>
-    </div>
-</#list>
+            </p>
+        </div>
+    </#list>
 
 </div>
 

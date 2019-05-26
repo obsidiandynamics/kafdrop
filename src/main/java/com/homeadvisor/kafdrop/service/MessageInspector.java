@@ -18,30 +18,23 @@
 
 package com.homeadvisor.kafdrop.service;
 
-import com.homeadvisor.kafdrop.model.MessageVO;
-import com.homeadvisor.kafdrop.model.TopicPartitionVO;
-import com.homeadvisor.kafdrop.model.TopicVO;
+import com.homeadvisor.kafdrop.model.*;
 import com.homeadvisor.kafdrop.util.*;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.charset.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.StreamSupport;
 import kafka.api.FetchRequest;
-import kafka.api.FetchRequestBuilder;
+import kafka.api.*;
 import kafka.javaapi.FetchResponse;
-import kafka.javaapi.consumer.SimpleConsumer;
+import kafka.javaapi.consumer.*;
 import kafka.javaapi.message.ByteBufferMessageSet;
-import kafka.message.Message;
-import kafka.message.MessageAndOffset;
-import org.apache.kafka.common.TopicPartition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import kafka.message.*;
+import org.apache.kafka.common.*;
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
+
+import java.nio.*;
+import java.nio.charset.*;
+import java.util.*;
+import java.util.stream.*;
 
 @Service
 public class MessageInspector {
@@ -69,7 +62,7 @@ public class MessageInspector {
       return kafkaMonitor.getBroker(partition.getLeader().getId())
           .map(broker -> {
             SimpleConsumer consumer = new SimpleConsumer(broker.getHost(), broker.getPort(), 10000,
-                100000, "");
+                                                         100000, "");
 
             final FetchRequestBuilder fetchRequestBuilder = new FetchRequestBuilder()
                 .clientId("KafDrop")

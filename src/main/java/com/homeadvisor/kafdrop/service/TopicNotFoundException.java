@@ -18,18 +18,15 @@
 
 package com.homeadvisor.kafdrop.service;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class TopicNotFoundException extends RuntimeException
-{
-   public TopicNotFoundException()
-   {
-   }
+public class TopicNotFoundException extends RuntimeException {
+  public TopicNotFoundException() {
+  }
 
-   public TopicNotFoundException(String message)
-   {
-      super(message);
-   }
+  public TopicNotFoundException(String message) {
+    super(message);
+  }
 }

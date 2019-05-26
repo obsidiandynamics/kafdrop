@@ -19,35 +19,31 @@
 package com.homeadvisor.kafdrop.model;
 
 public final class MessageVO {
-   private String message;
-   private String key;
-   private String headers;
+  private String message;
+  private String key;
+  private String headers;
 
-   public String getMessage()
-   {
-      return message;
-   }
+  public String getMessage() {
+    return message;
+  }
 
-   public void setMessage(String message)
-   {
-      this.message = message;
-   }
+  public void setMessage(String message) {
+    this.message = message;
+  }
 
-   public String getKey()
-   {
-      return key;
-   }
+  public String getKey() {
+    return key;
+  }
 
-   public void setKey(String key)
-   {
-      this.key = key;
-   }
+  public void setKey(String key) {
+    this.key = key;
+  }
 
-   public String getHeaders() {
-      return headers;
-   }
+  public String getHeaders() {
+    return headers;
+  }
 
-   public void setHeaders(String headers) {
-      this.headers = headers;
-   }
+  public void setHeaders(String headers) {
+    this.headers = headers;
+  }
 }

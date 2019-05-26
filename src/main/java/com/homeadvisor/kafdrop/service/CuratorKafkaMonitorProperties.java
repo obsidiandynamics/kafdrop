@@ -18,92 +18,78 @@
 
 package com.homeadvisor.kafdrop.service;
 
-import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.hibernate.validator.constraints.*;
+import org.springframework.boot.context.properties.*;
+import org.springframework.stereotype.*;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.*;
 
 @Component
 @ConfigurationProperties(prefix = "kafdrop.monitor")
-public class CuratorKafkaMonitorProperties
-{
-   private String clientId = "Kafdrop";
+public class CuratorKafkaMonitorProperties {
+  private String clientId = "Kafdrop";
 
-   @Min(1)
-   private int threadPoolSize = 10;
+  @Min(1)
+  private int threadPoolSize = 10;
 
-   private RetryProperties retry = new RetryProperties();
+  private RetryProperties retry = new RetryProperties();
 
-   @NotBlank
-   private String kafkaVersion = "0.8.2.2";
+  @NotBlank
+  private String kafkaVersion = "0.8.2.2";
 
-   public String getKafkaVersion()
-   {
-      return kafkaVersion;
-   }
+  public String getKafkaVersion() {
+    return kafkaVersion;
+  }
 
-   public void setKafkaVersion(String kafkaVersion)
-   {
-      this.kafkaVersion = kafkaVersion;
-   }
+  public void setKafkaVersion(String kafkaVersion) {
+    this.kafkaVersion = kafkaVersion;
+  }
 
-   public String getClientId()
-   {
-      return clientId;
-   }
+  public String getClientId() {
+    return clientId;
+  }
 
-   public void setClientId(String clientId)
-   {
-      this.clientId = clientId;
-   }
+  public void setClientId(String clientId) {
+    this.clientId = clientId;
+  }
 
-   public int getThreadPoolSize()
-   {
-      return threadPoolSize;
-   }
+  public int getThreadPoolSize() {
+    return threadPoolSize;
+  }
 
-   public void setThreadPoolSize(int threadPoolSize)
-   {
-      this.threadPoolSize = threadPoolSize;
-   }
+  public void setThreadPoolSize(int threadPoolSize) {
+    this.threadPoolSize = threadPoolSize;
+  }
 
-   public RetryProperties getRetry()
-   {
-      return retry;
-   }
+  public RetryProperties getRetry() {
+    return retry;
+  }
 
-   public void setRetry(RetryProperties retry)
-   {
-      this.retry = retry;
-   }
+  public void setRetry(RetryProperties retry) {
+    this.retry = retry;
+  }
 
-   public static class RetryProperties
-   {
-      @Min(1)
-      private int maxAttempts = 3;
+  public static class RetryProperties {
+    @Min(1)
+    private int maxAttempts = 3;
 
-      @Min(0)
-      private long backoffMillis = 1000;
+    @Min(0)
+    private long backoffMillis = 1000;
 
-      public int getMaxAttempts()
-      {
-         return maxAttempts;
-      }
+    public int getMaxAttempts() {
+      return maxAttempts;
+    }
 
-      public void setMaxAttempts(int maxAttempts)
-      {
-         this.maxAttempts = maxAttempts;
-      }
+    public void setMaxAttempts(int maxAttempts) {
+      this.maxAttempts = maxAttempts;
+    }
 
-      public long getBackoffMillis()
-      {
-         return backoffMillis;
-      }
+    public long getBackoffMillis() {
+      return backoffMillis;
+    }
 
-      public void setBackoffMillis(long backoffMillis)
-      {
-         this.backoffMillis = backoffMillis;
-      }
-   }
+    public void setBackoffMillis(long backoffMillis) {
+      this.backoffMillis = backoffMillis;
+    }
+  }
 }

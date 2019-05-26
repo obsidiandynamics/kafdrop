@@ -1,42 +1,38 @@
 package com.homeadvisor.kafdrop.config;
 
-import javax.annotation.PostConstruct;
+import com.homeadvisor.kafdrop.util.*;
+import org.springframework.boot.context.properties.*;
+import org.springframework.context.annotation.*;
+import org.springframework.stereotype.*;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-
-import com.homeadvisor.kafdrop.util.MessageFormat;
+import javax.annotation.*;
 
 
 @Configuration
 public class MessageFormatConfiguration {
 
-   @Component
-   @ConfigurationProperties(prefix = "message")
-   public static class MessageFormatProperties
-   {
+  @Component
+  @ConfigurationProperties(prefix = "message")
+  public static class MessageFormatProperties {
 
-      private MessageFormat format;
+    private MessageFormat format;
 
-      @PostConstruct
-      public void init() {
-         // Set a default message format if not configured.
-         if (format == null) {
-            format = MessageFormat.DEFAULT;
-         }
+    @PostConstruct
+    public void init() {
+      // Set a default message format if not configured.
+      if (format == null) {
+        format = MessageFormat.DEFAULT;
       }
+    }
 
-      public MessageFormat getFormat()
-      {
-         return format;
-      }
+    public MessageFormat getFormat() {
+      return format;
+    }
 
-      public void setFormat(MessageFormat format)
-      {
-         this.format = format;
-      }
+    public void setFormat(MessageFormat format) {
+      this.format = format;
+    }
 
-   }
+  }
 
 }

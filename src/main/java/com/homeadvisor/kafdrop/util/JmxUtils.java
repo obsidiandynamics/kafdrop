@@ -18,30 +18,25 @@
 
 package com.homeadvisor.kafdrop.util;
 
-import com.google.common.primitives.Ints;
-import org.springframework.core.env.Environment;
+import com.google.common.primitives.*;
+import org.springframework.core.env.*;
 
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
-public abstract class JmxUtils
-{
-   public static final String JMX_PORT_PROPERTY = "com.sun.management.jmxremote.port";
+public abstract class JmxUtils {
+  public static final String JMX_PORT_PROPERTY = "com.sun.management.jmxremote.port";
 
-   public static int getJmxPort(final Environment environment)
-   {
-      Optional<Integer> jmxPort = Optional.empty();
+  public static int getJmxPort(final Environment environment) {
+    Optional<Integer> jmxPort = Optional.empty();
 
-      final Properties managementProperties = jdk.internal.agent.Agent.getManagementProperties();
-      if (managementProperties != null)
-      {
-         final String portProperty = managementProperties.getProperty(JMX_PORT_PROPERTY);
-         if (portProperty != null)
-         {
-            final Optional<Integer> port = Optional.ofNullable(Ints.tryParse(portProperty));
-            jmxPort = port;
-         }
+    final Properties managementProperties = jdk.internal.agent.Agent.getManagementProperties();
+    if (managementProperties != null) {
+      final String portProperty = managementProperties.getProperty(JMX_PORT_PROPERTY);
+      if (portProperty != null) {
+        final Optional<Integer> port = Optional.ofNullable(Ints.tryParse(portProperty));
+        jmxPort = port;
       }
-      return jmxPort.orElse(0);
-   }
+    }
+    return jmxPort.orElse(0);
+  }
 }

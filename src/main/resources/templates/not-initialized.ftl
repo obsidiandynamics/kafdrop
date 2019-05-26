@@ -15,7 +15,7 @@
 -->
 <#import "lib/template.ftl" as template>
 <@template.header "Initializing...">
-   <meta http-equiv="refresh" content="5" >
+    <meta http-equiv="refresh" content="5">
 </@template.header>
 
 <div>

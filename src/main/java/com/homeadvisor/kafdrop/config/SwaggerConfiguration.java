@@ -18,16 +18,15 @@
 
 package com.homeadvisor.kafdrop.config;
 
-import com.google.common.base.Predicate;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
-import springfox.documentation.RequestHandler;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import com.google.common.base.*;
+import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.context.annotation.*;
+import org.springframework.http.*;
+import springfox.documentation.*;
+import springfox.documentation.builders.*;
+import springfox.documentation.spi.*;
+import springfox.documentation.spring.web.plugins.*;
+import springfox.documentation.swagger2.annotations.*;
 
 /**
  * Auto configuration for Swagger. Can be disabled by setting swagger.enabled=false.
@@ -35,44 +34,38 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 @ConditionalOnProperty(value = "swagger.enabled", matchIfMissing = true)
-public class SwaggerConfiguration
-{
-   @Bean
-   public Docket swagger()
-   {
-      return new Docket(DocumentationType.SWAGGER_2)
-            .useDefaultResponseMessages(false)
-            .apiInfo(new ApiInfoBuilder()
-                  .title("Kafdrop API")
-                  .description("JSON APIs for Kafdrop")
-                  .build())
-            .select()
-            .apis(new JsonRequestHandlerPredicate())
-            .paths(new IgnoreDebugPathPredicate())
-            .build();
-   }
+public class SwaggerConfiguration {
+  @Bean
+  public Docket swagger() {
+    return new Docket(DocumentationType.SWAGGER_2)
+        .useDefaultResponseMessages(false)
+        .apiInfo(new ApiInfoBuilder()
+                     .title("Kafdrop API")
+                     .description("JSON APIs for Kafdrop")
+                     .build())
+        .select()
+        .apis(new JsonRequestHandlerPredicate())
+        .paths(new IgnoreDebugPathPredicate())
+        .build();
+  }
 
-   /**
-    * Swagger Predicate for only selecting JSON endpoints.
-    */
-   public class JsonRequestHandlerPredicate implements Predicate<RequestHandler>
-   {
-      @Override
-      public boolean apply(RequestHandler input)
-      {
-         return input.produces().contains(MediaType.APPLICATION_JSON);
-      }
-   }
+  /**
+   * Swagger Predicate for only selecting JSON endpoints.
+   */
+  public class JsonRequestHandlerPredicate implements Predicate<RequestHandler> {
+    @Override
+    public boolean apply(RequestHandler input) {
+      return input.produces().contains(MediaType.APPLICATION_JSON);
+    }
+  }
 
-   /**
-    * Swagger Predicate for ignoring /debug endpoints.
-    */
-   public class IgnoreDebugPathPredicate implements Predicate<String>
-   {
-      @Override
-      public boolean apply(String input)
-      {
-         return !input.startsWith("/debug");
-      }
-   }
+  /**
+   * Swagger Predicate for ignoring /debug endpoints.
+   */
+  public class IgnoreDebugPathPredicate implements Predicate<String> {
+    @Override
+    public boolean apply(String input) {
+      return !input.startsWith("/debug");
+    }
+  }
 }

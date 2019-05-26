@@ -18,39 +18,35 @@
 
 package com.homeadvisor.kafdrop.config;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.core.env.*;
+import org.springframework.stereotype.*;
+import org.springframework.web.servlet.*;
+import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.handler.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
 @Component
 public class InterceptorConfiguration extends WebMvcConfigurerAdapter {
 
-    @Autowired
-    private Environment environment;
+  @Autowired
+  private Environment environment;
 
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(new ProfileHandlerInterceptor());
+  }
+
+
+  public class ProfileHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ProfileHandlerInterceptor());
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+      final String[] activeProfiles = environment.getActiveProfiles();
+      if (modelAndView != null && activeProfiles != null && activeProfiles.length > 0) {
+        modelAndView.addObject("profile", String.join(",", activeProfiles));
+      }
     }
-
-
-    public class ProfileHandlerInterceptor extends HandlerInterceptorAdapter {
-        @Override
-        public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-            final String[] activeProfiles = environment.getActiveProfiles();
-            if (modelAndView != null && activeProfiles != null && activeProfiles.length > 0) {
-                modelAndView.addObject("profile", String.join(",", activeProfiles));
-            }
-        }
-    }
+  }
 
 }

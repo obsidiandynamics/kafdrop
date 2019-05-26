@@ -18,113 +18,92 @@
 
 package com.homeadvisor.kafdrop.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
-import java.util.Date;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BrokerVO
-{
-   private int id;
-   private String host;
-   private String[] endpoints;
-   private int port;
-   private int jmxPort;
-   private int version;
-   private boolean controller;
-   private Date timestamp;
+public class BrokerVO {
+  private int id;
+  private String host;
+  private String[] endpoints;
+  private int port;
+  private int jmxPort;
+  private int version;
+  private boolean controller;
+  private Date timestamp;
 
-   public void setEndpoints(String[] endpoints)
-   {
-	  this.endpoints = endpoints;
-	  if (host == null)
-	  {
-		 String[] hostPort = endpoints[0].split("://")[1].split(":");
-		 this.host = hostPort[0];
-		 this.port = Integer.parseInt(hostPort[1]);
-	  }
-   }
+  public String[] getEndpoints() {
+    return this.endpoints;
+  }
 
-   public String[] getEndpoints()
-   {
-	  return this.endpoints;
-   }
+  public void setEndpoints(String[] endpoints) {
+    this.endpoints = endpoints;
+    if (host == null) {
+      String[] hostPort = endpoints[0].split("://")[1].split(":");
+      this.host = hostPort[0];
+      this.port = Integer.parseInt(hostPort[1]);
+    }
+  }
 
-   public int getId()
-   {
-	  return id;
-   }
+  public int getId() {
+    return id;
+  }
 
-   public void setId(int id)
-   {
-	  this.id = id;
-   }
+  public void setId(int id) {
+    this.id = id;
+  }
 
-   public String getHost()
-   {
-	  return host;
-   }
+  public String getHost() {
+    return host;
+  }
 
-   public void setHost(String host)
-   {
-	  if (host != null)
-	  {
-		 this.host = host;
-	  }
-   }
+  public void setHost(String host) {
+    if (host != null) {
+      this.host = host;
+    }
+  }
 
-   public int getPort()
-   {
-	  return port;
-   }
+  public int getPort() {
+    return port;
+  }
 
-   public void setPort(int port)
-   {
-	  if (port > 0)
-	  {
-		 this.port = port;
-	  }
-   }
+  public void setPort(int port) {
+    if (port > 0) {
+      this.port = port;
+    }
+  }
 
-   public int getJmxPort()
-   {
-	  return jmxPort;
-   }
+  public int getJmxPort() {
+    return jmxPort;
+  }
 
-   @JsonProperty("jmx_port")
-   public void setJmxPort(int jmxPort)
-   {
-	  this.jmxPort = jmxPort;
-   }
+  @JsonProperty("jmx_port")
+  public void setJmxPort(int jmxPort) {
+    this.jmxPort = jmxPort;
+  }
 
-   public int getVersion()
-   {
-	  return version;
-   }
+  public int getVersion() {
+    return version;
+  }
 
-   public void setVersion(int version)
-   {
-	  this.version = version;
-   }
+  public void setVersion(int version) {
+    this.version = version;
+  }
 
-   public Date getTimestamp()
-   {
-	  return timestamp;
-   }
+  public Date getTimestamp() {
+    return timestamp;
+  }
 
-   public void setTimestamp(Date timestamp)
-   {
-	  this.timestamp = timestamp;
-   }
+  public void setTimestamp(Date timestamp) {
+    this.timestamp = timestamp;
+  }
 
-   public boolean isController()
-   {
-	  return controller;
-   }
+  public boolean isController() {
+    return controller;
+  }
 
-   public void setController(boolean controller)
-   {
-	  this.controller = controller;
-   }
+  public void setController(boolean controller) {
+    this.controller = controller;
+  }
 }

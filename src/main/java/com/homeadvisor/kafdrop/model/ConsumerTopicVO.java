@@ -18,70 +18,57 @@
 
 package com.homeadvisor.kafdrop.model;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 
-public class ConsumerTopicVO
-{
-   private final String topic;
-   private final Map<Integer, ConsumerPartitionVO> offsets = new TreeMap<>();
+public class ConsumerTopicVO {
+  private final String topic;
+  private final Map<Integer, ConsumerPartitionVO> offsets = new TreeMap<>();
 
-   public ConsumerTopicVO(String topic)
-   {
-      this.topic = topic;
-   }
+  public ConsumerTopicVO(String topic) {
+    this.topic = topic;
+  }
 
-   public String getTopic()
-   {
-      return topic;
-   }
+  public String getTopic() {
+    return topic;
+  }
 
-   public void addOffset(ConsumerPartitionVO offset)
-   {
-      offsets.put(offset.getPartitionId(), offset);
-   }
+  public void addOffset(ConsumerPartitionVO offset) {
+    offsets.put(offset.getPartitionId(), offset);
+  }
 
-   public long getLag()
-   {
-      return offsets.values().stream()
-         .map(ConsumerPartitionVO::getLag)
-         .filter(lag -> lag >= 0)
-         .reduce(0L, Long::sum);
-   }
+  public long getLag() {
+    return offsets.values().stream()
+        .map(ConsumerPartitionVO::getLag)
+        .filter(lag -> lag >= 0)
+        .reduce(0L, Long::sum);
+  }
 
-   public long getMaxLag()
-   {
-      return offsets.values().stream()
-         .map(ConsumerPartitionVO::getLag)
-         .filter(lag -> lag >= 0)
-         .reduce(0L, Long::max);
-   }
+  public long getMaxLag() {
+    return offsets.values().stream()
+        .map(ConsumerPartitionVO::getLag)
+        .filter(lag -> lag >= 0)
+        .reduce(0L, Long::max);
+  }
 
-   public Collection<ConsumerPartitionVO> getPartitions()
-   {
-      return offsets.values();
-   }
+  public Collection<ConsumerPartitionVO> getPartitions() {
+    return offsets.values();
+  }
 
-   public double getCoveragePercent()
-   {
-      return (offsets.size() > 0) ? ((double)getAssignedPartitionCount()) / offsets.size() : 0.0;
-   }
+  public double getCoveragePercent() {
+    return (offsets.size() > 0) ? ((double) getAssignedPartitionCount()) / offsets.size() : 0.0;
+  }
 
-   public int getAssignedPartitionCount()
-   {
-      return (int) offsets.values().stream()
-         .filter(p -> p.getOwner() != null)
-         .count();
-   }
+  public int getAssignedPartitionCount() {
+    return (int) offsets.values().stream()
+        .filter(p -> p.getOwner() != null)
+        .count();
+  }
 
-   public int getOwnerCount()
-   {
-      return (int)offsets.values().stream()
-         .map(ConsumerPartitionVO::getOwner)
-         .filter(Objects::nonNull)
-         .distinct()
-         .count();
-   }
+  public int getOwnerCount() {
+    return (int) offsets.values().stream()
+        .map(ConsumerPartitionVO::getOwner)
+        .filter(Objects::nonNull)
+        .distinct()
+        .count();
+  }
 }

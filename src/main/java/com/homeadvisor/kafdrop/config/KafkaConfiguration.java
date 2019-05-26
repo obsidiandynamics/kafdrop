@@ -10,13 +10,12 @@ import org.springframework.stereotype.*;
 @Component
 @ConfigurationProperties(prefix = "kafka")
 @Data
-public class KafkaConfiguration
-{
-   private String env = "local";
-   private String brokerConnect;
-   private Boolean isSecured = false;
-   private String keyDeserializer;
-   private String valueDeserializer;
-   private String saslMechanism;
-   private String securityProtocol;
+public class KafkaConfiguration {
+  private String env = "local";
+  private String brokerConnect;
+  private Boolean isSecured = false;
+  private String keyDeserializer;
+  private String valueDeserializer;
+  private String saslMechanism;
+  private String securityProtocol;
 }

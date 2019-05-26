@@ -1,44 +1,44 @@
 server:
-   port: 9000
+  port: 9000
 
 spring:
-   jmx:
-      enabled: true
-      default_domain: Kafdrop
-   jackson:
-      deserialization:
-         fail_on_unknown_properties: false
-         read_unknown_enum_values_as_null: true
+  jmx:
+    enabled: true
+    default_domain: Kafdrop
+  jackson:
+    deserialization:
+      fail_on_unknown_properties: false
+      read_unknown_enum_values_as_null: true
 
 endpoints.jmx.domain: ${spring.jmx.default_domain}
 metrics.jmx.domain: ${spring.jmx.default_domain}-metrics
 management.contextPath: /debug
 
 kafdrop.monitor:
-   kafkaVersion: "0.11.0.2"
-   threadPoolSize: 10
-   retry:
-      maxAttempts: 5
-      backoffMillis: 2000
+  kafkaVersion: "0.11.0.2"
+  threadPoolSize: 10
+  retry:
+    maxAttempts: 5
+    backoffMillis: 2000
 
 
 curator.discovery:
-   enabled: true
-   basePath: /homeadvisor/services
+  enabled: true
+  basePath: /homeadvisor/services
 
 # Properties to expose via the InfoEndpoint & ServiceDiscovery
 info.build:
-   artifact: ${project.artifactId}
-   name: ${project.name}
-   description: ${project.description}
-   version: ${project.version}
+  artifact: ${project.artifactId}
+  name: ${project.name}
+  description: ${project.description}
+  version: ${project.version}
 
 # Default values usually provided by Maven during a build
 project:
-   artifactId: kafdrop-DEV
-   name: KafDropr (DEV)
-   description: ${project.name}
-   version: DEV
+  artifactId: kafdrop-DEV
+  name: KafDropr (DEV)
+  description: ${project.name}
+  version: DEV
 
 # env can be 'local', 'stage', 'prod'
 kafka:

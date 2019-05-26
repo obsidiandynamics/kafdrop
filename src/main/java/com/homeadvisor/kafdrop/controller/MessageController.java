@@ -18,258 +18,223 @@
 
 package com.homeadvisor.kafdrop.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.homeadvisor.kafdrop.config.MessageFormatConfiguration;
-import com.homeadvisor.kafdrop.config.SchemaRegistryConfiguration;
-import com.homeadvisor.kafdrop.model.MessageVO;
-import com.homeadvisor.kafdrop.model.TopicVO;
-import com.homeadvisor.kafdrop.service.KafkaMonitor;
-import com.homeadvisor.kafdrop.service.MessageInspector;
-import com.homeadvisor.kafdrop.service.TopicNotFoundException;
-import com.homeadvisor.kafdrop.util.AvroMessageDeserializer;
-import com.homeadvisor.kafdrop.util.DefaultMessageDeserializer;
-import com.homeadvisor.kafdrop.util.MessageDeserializer;
-import com.homeadvisor.kafdrop.util.MessageFormat;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import com.fasterxml.jackson.annotation.*;
+import com.homeadvisor.kafdrop.config.*;
+import com.homeadvisor.kafdrop.model.*;
+import com.homeadvisor.kafdrop.service.*;
+import com.homeadvisor.kafdrop.util.*;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.*;
+import org.springframework.stereotype.*;
+import org.springframework.ui.*;
+import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.*;
+import javax.validation.constraints.*;
+import java.util.*;
 
 @Controller
-public class MessageController
-{
-   @Autowired
-   private KafkaMonitor kafkaMonitor;
+public class MessageController {
+  @Autowired
+  private KafkaMonitor kafkaMonitor;
 
-   @Autowired
-   private MessageInspector messageInspector;
+  @Autowired
+  private MessageInspector messageInspector;
 
-   @Autowired
-   private MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
+  @Autowired
+  private MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
 
-   @Autowired
-   private SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
+  @Autowired
+  private SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
 
-   /**
-    * Human friendly view of reading messages.
-    * @param topicName Name of topic
-    * @param messageForm Message form for submitting requests to view messages.
-    * @param errors
-    * @param model
-    * @return View for seeing messages in a partition.
-    */
-   @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/messages")
-   public String viewMessageForm(@PathVariable("name") String topicName,
-                                 @Valid @ModelAttribute("messageForm") PartitionOffsetInfo messageForm,
-                                 BindingResult errors,
-                                 Model model)
-   {
-      final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+  /**
+   * Human friendly view of reading messages.
+   * @param topicName Name of topic
+   * @param messageForm Message form for submitting requests to view messages.
+   * @param errors
+   * @param model
+   * @return View for seeing messages in a partition.
+   */
+  @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/messages")
+  public String viewMessageForm(@PathVariable("name") String topicName,
+                                @Valid @ModelAttribute("messageForm") PartitionOffsetInfo messageForm,
+                                BindingResult errors,
+                                Model model) {
+    final MessageFormat defaultFormat = messageFormatProperties.getFormat();
 
-      if (messageForm.isEmpty())
-      {
-         final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
+    if (messageForm.isEmpty()) {
+      final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
 
-         defaultForm.setCount(100l);
-         defaultForm.setOffset(0l);
-         defaultForm.setPartition(0);
-         defaultForm.setFormat(defaultFormat);
+      defaultForm.setCount(100l);
+      defaultForm.setOffset(0l);
+      defaultForm.setPartition(0);
+      defaultForm.setFormat(defaultFormat);
 
-         model.addAttribute("messageForm", defaultForm);
-      }
+      model.addAttribute("messageForm", defaultForm);
+    }
 
+    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+        .orElseThrow(() -> new TopicNotFoundException(topicName));
+    model.addAttribute("topic", topic);
+
+    model.addAttribute("defaultFormat", defaultFormat);
+    model.addAttribute("messageFormats", MessageFormat.values());
+
+    if (!messageForm.isEmpty() && !errors.hasErrors()) {
+      final MessageDeserializer deserializer = getDeserializer(
+          topicName, messageForm.getFormat());
+
+      model.addAttribute("messages",
+                         messageInspector.getMessages(topicName,
+                                                      messageForm.getPartition(),
+                                                      messageForm.getOffset(),
+                                                      messageForm.getCount()));
+
+    }
+
+    return "message-inspector";
+  }
+
+  /**
+   * Return a JSON list of all partition offset info for the given topic. If specific partition
+   * and offset parameters are given, then this returns actual kafka messages from that partition
+   * (if the offsets are valid; if invalid offsets are passed then the message list is empty).
+   * @param topicName Name of topic.
+   * @return Offset or message data.
+   */
+  @ApiOperation(value = "getPartitionOrMessages", notes = "Get offset or message data for a topic. Without query params returns all partitions with offset data. With query params, returns actual messages (if valid offsets are provided).")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Success", response = List.class),
+      @ApiResponse(code = 404, message = "Invalid topic name")
+  })
+  @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
+  public @ResponseBody
+  List<Object> getPartitionOrMessages(
+      @PathVariable("name") String topicName,
+      @RequestParam(name = "partition", required = false) Integer partition,
+      @RequestParam(name = "offset", required = false) Long offset,
+      @RequestParam(name = "count", required = false) Long count
+  ) {
+    if (partition == null || offset == null || count == null) {
       final TopicVO topic = kafkaMonitor.getTopic(topicName)
-         .orElseThrow(() -> new TopicNotFoundException(topicName));
-      model.addAttribute("topic", topic);
+          .orElseThrow(() -> new TopicNotFoundException(topicName));
 
-      model.addAttribute("defaultFormat", defaultFormat);
-      model.addAttribute("messageFormats", MessageFormat.values());
+      List<Object> partitionList = new ArrayList<>();
+      topic.getPartitions().forEach(vo -> partitionList.add(new PartitionOffsetInfo(vo.getId(), vo.getFirstOffset(), vo.getSize())));
 
-      if (!messageForm.isEmpty() && !errors.hasErrors())
-      {
-         final MessageDeserializer deserializer = getDeserializer(
-               topicName, messageForm.getFormat());
+      return partitionList;
+    } else {
+      List<Object> messages = new ArrayList<>();
+      List<MessageVO> vos = messageInspector.getMessages(
+          topicName,
+          partition,
+          offset,
+          count);
 
-         model.addAttribute("messages",
-                            messageInspector.getMessages(topicName,
-                                                         messageForm.getPartition(),
-                                                         messageForm.getOffset(),
-                                                         messageForm.getCount()));
-
+      if (vos != null) {
+        messages.addAll(vos);
       }
 
-      return "message-inspector";
-   }
+      return messages;
+    }
+  }
 
-   /**
-    * Return a JSON list of all partition offset info for the given topic. If specific partition
-    * and offset parameters are given, then this returns actual kafka messages from that partition
-    * (if the offsets are valid; if invalid offsets are passed then the message list is empty).
-    * @param topicName Name of topic.
-    * @return Offset or message data.
-    */
-   @ApiOperation(value = "getPartitionOrMessages", notes = "Get offset or message data for a topic. Without query params returns all partitions with offset data. With query params, returns actual messages (if valid offsets are provided).")
-   @ApiResponses(value = {
-         @ApiResponse(code = 200, message = "Success", response = List.class),
-         @ApiResponse(code = 404, message = "Invalid topic name")
-   })
-   @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
-   public @ResponseBody List<Object> getPartitionOrMessages(
-         @PathVariable("name") String topicName,
-         @RequestParam(name = "partition", required = false) Integer partition,
-         @RequestParam(name = "offset", required = false)    Long offset,
-         @RequestParam(name = "count", required = false)     Long count
-   )
-   {
-      if(partition == null || offset == null || count == null)
-      {
-         final TopicVO topic = kafkaMonitor.getTopic(topicName)
-               .orElseThrow(() -> new TopicNotFoundException(topicName));
+  private MessageDeserializer getDeserializer(String topicName, MessageFormat format) {
+    final MessageDeserializer deserializer;
 
-         List<Object> partitionList = new ArrayList<>();
-         topic.getPartitions().forEach(vo -> partitionList.add(new PartitionOffsetInfo(vo.getId(), vo.getFirstOffset(), vo.getSize())));
+    if (format == MessageFormat.AVRO) {
+      final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
+      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl);
+    } else {
+      deserializer = new DefaultMessageDeserializer();
+    }
 
-         return partitionList;
-      }
-      else
-      {
-         List<Object> messages = new ArrayList<>();
-         List<MessageVO> vos = messageInspector.getMessages(
-               topicName,
-               partition,
-               offset,
-               count);
+    return deserializer;
+  }
 
-         if (vos != null)
-         {
-            messages.addAll(vos);
-         }
+  /**
+   * Encapsulates offset data for a single partition.
+   */
+  public static class PartitionOffsetInfo {
+    @NotNull
+    @Min(0)
+    private Integer partition;
 
-         return messages;
-      }
-   }
+    /**
+     * Need to clean this up. We're re-using this form for the JSON message API
+     * and it's a bit confusing to have the Java variable and JSON field named
+     * differently.
+     */
+    @NotNull
+    @Min(0)
+    @JsonProperty("firstOffset")
+    private Long offset;
 
-   private MessageDeserializer getDeserializer(String topicName, MessageFormat format) {
-      final MessageDeserializer deserializer;
+    /**
+     * Need to clean this up. We're re-using this form for the JSON message API
+     * and it's a bit confusing to have the Java variable and JSON field named
+     * differently.
+     */
+    @NotNull
+    @Min(1)
+    @Max(100)
+    @JsonProperty("lastOffset")
+    private Long count;
 
-      if (format == MessageFormat.AVRO) {
-         final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
-         deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl);
-      } else {
-         deserializer = new DefaultMessageDeserializer();
-      }
+    private MessageFormat format;
 
-      return deserializer;
-   }
+    public PartitionOffsetInfo(int partition, long offset, long count, MessageFormat format) {
+      this.partition = partition;
+      this.offset = offset;
+      this.count = count;
+      this.format = format;
+    }
 
-   /**
-    * Encapsulates offset data for a single partition.
-    */
-   public static class PartitionOffsetInfo
-   {
-      @NotNull
-      @Min(0)
-      private Integer partition;
+    public PartitionOffsetInfo(int partition, long offset, long count) {
+      this(partition, offset, count, MessageFormat.DEFAULT);
+    }
 
-      /**
-       * Need to clean this up. We're re-using this form for the JSON message API
-       * and it's a bit confusing to have the Java variable and JSON field named
-       * differently.
-       */
-      @NotNull
-      @Min(0)
-      @JsonProperty("firstOffset")
-      private Long offset;
+    public PartitionOffsetInfo() {
 
-      /**
-       * Need to clean this up. We're re-using this form for the JSON message API
-       * and it's a bit confusing to have the Java variable and JSON field named
-       * differently.
-       */
-      @NotNull
-      @Min(1)
-      @Max(100)
-      @JsonProperty("lastOffset")
-      private Long count;
+    }
 
-      private MessageFormat format;
+    @JsonIgnore
+    public boolean isEmpty() {
+      return partition == null && offset == null && (count == null || count == 1);
+    }
 
-      public PartitionOffsetInfo(int partition, long offset, long count, MessageFormat format)
-      {
-         this.partition = partition;
-         this.offset = offset;
-         this.count = count;
-         this.format = format;
-      }
+    public Integer getPartition() {
+      return partition;
+    }
 
-      public PartitionOffsetInfo(int partition, long offset, long count)
-      {
-         this(partition, offset, count, MessageFormat.DEFAULT);
-      }
+    public void setPartition(Integer partition) {
+      this.partition = partition;
+    }
 
-      public PartitionOffsetInfo()
-      {
+    public Long getOffset() {
+      return offset;
+    }
 
-      }
+    public void setOffset(Long offset) {
+      this.offset = offset;
+    }
 
-      @JsonIgnore
-      public boolean isEmpty()
-      {
-         return partition == null && offset == null && (count == null || count == 1);
-      }
+    public Long getCount() {
+      return count;
+    }
 
-      public Integer getPartition()
-      {
-         return partition;
-      }
+    public void setCount(Long count) {
+      this.count = count;
+    }
 
-      public void setPartition(Integer partition)
-      {
-         this.partition = partition;
-      }
+    public MessageFormat getFormat() {
+      return format;
+    }
 
-      public Long getOffset()
-      {
-         return offset;
-      }
-
-      public void setOffset(Long offset)
-      {
-         this.offset = offset;
-      }
-
-      public Long getCount()
-      {
-         return count;
-      }
-
-      public void setCount(Long count)
-      {
-         this.count = count;
-      }
-
-      public MessageFormat getFormat()
-      {
-         return format;
-      }
-
-      public void setFormat(MessageFormat format)
-      {
-         this.format = format;
-      }
-   }
+    public void setFormat(MessageFormat format) {
+      this.format = format;
+    }
+  }
 }

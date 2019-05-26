@@ -18,51 +18,38 @@
 
 package com.homeadvisor.kafdrop.util;
 
-import com.homeadvisor.kafdrop.model.BrokerVO;
-import kafka.network.BlockingChannel;
+import kafka.network.*;
 
-import java.util.function.Supplier;
+public final class BrokerChannel {
+  final BlockingChannel channel;
 
-public final class BrokerChannel
-{
-   final BlockingChannel channel;
+  private BrokerChannel(BlockingChannel channel) {
+    this.channel = channel;
+  }
 
-   private BrokerChannel(BlockingChannel channel)
-   {
-      this.channel = channel;
-   }
+  public static BrokerChannel forBroker(String host, int port) {
+    BlockingChannel channel = new BlockingChannel(host, port,
+                                                  BlockingChannel.UseDefaultBufferSize(),
+                                                  BlockingChannel.UseDefaultBufferSize(),
+                                                  5000); // todo: make this configurable
+    return new BrokerChannel(channel);
+  }
 
-   public static BrokerChannel forBroker(String host, int port)
-   {
-      BlockingChannel channel = new BlockingChannel(host, port,
-                                                    BlockingChannel.UseDefaultBufferSize(),
-                                                    BlockingChannel.UseDefaultBufferSize(),
-                                                    5000); // todo: make this configurable
-      return new BrokerChannel(channel);
-   }
-
-   public <T> T execute(Callback<T> callback)
-   {
-      try
-      {
-         if (!channel.isConnected())
-         {
-            channel.connect();
-         }
-         return callback.doWithChannel(channel);
+  public <T> T execute(Callback<T> callback) {
+    try {
+      if (!channel.isConnected()) {
+        channel.connect();
       }
-      finally
-      {
-         if (channel.isConnected())
-         {
-            channel.disconnect();
-         }
+      return callback.doWithChannel(channel);
+    } finally {
+      if (channel.isConnected()) {
+        channel.disconnect();
       }
-   }
+    }
+  }
 
-   @FunctionalInterface
-   public interface Callback<T>
-   {
-      T doWithChannel(BlockingChannel channel);
-   }
+  @FunctionalInterface
+  public interface Callback<T> {
+    T doWithChannel(BlockingChannel channel);
+  }
 }

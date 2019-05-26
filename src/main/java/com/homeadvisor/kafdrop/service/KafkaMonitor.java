@@ -18,45 +18,39 @@
 
 package com.homeadvisor.kafdrop.service;
 
-import com.homeadvisor.kafdrop.model.BrokerVO;
-import com.homeadvisor.kafdrop.model.ClusterSummaryVO;
-import com.homeadvisor.kafdrop.model.ConsumerVO;
-import com.homeadvisor.kafdrop.model.MessageVO;
-import com.homeadvisor.kafdrop.model.TopicVO;
+import com.homeadvisor.kafdrop.model.*;
 import com.homeadvisor.kafdrop.util.*;
-import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-public interface KafkaMonitor
-{
+public interface KafkaMonitor {
 
-   List<BrokerVO> getBrokers();
+  List<BrokerVO> getBrokers();
 
-   Optional<BrokerVO> getBroker(int id);
+  Optional<BrokerVO> getBroker(int id);
 
-   Version getKafkaVersion();
+  Version getKafkaVersion();
 
-   List<TopicVO> getTopics();
+  List<TopicVO> getTopics();
 
-    List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count);
-    Optional<TopicVO> getTopic(String topic);
+  List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count);
 
-   ClusterSummaryVO getClusterSummary();
+  Optional<TopicVO> getTopic(String topic);
 
-   ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
+  ClusterSummaryVO getClusterSummary();
 
-   List<ConsumerVO> getConsumers();
+  ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
 
-   List<ConsumerVO> getConsumers(TopicVO topic);
+  List<ConsumerVO> getConsumers();
 
-   List<ConsumerVO> getConsumers(String topic);
+  List<ConsumerVO> getConsumers(TopicVO topic);
 
-   Optional<ConsumerVO> getConsumer(String groupId);
+  List<ConsumerVO> getConsumers(String topic);
 
-   Optional<ConsumerVO> getConsumerByTopicName(String groupId, String topic);
+  Optional<ConsumerVO> getConsumer(String groupId);
 
-   Optional<ConsumerVO> getConsumerByTopic(String groupId, TopicVO topic);
+  Optional<ConsumerVO> getConsumerByTopicName(String groupId, String topic);
+
+  Optional<ConsumerVO> getConsumerByTopic(String groupId, TopicVO topic);
 }
