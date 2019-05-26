@@ -98,9 +98,7 @@ public class ConsumerVO implements Comparable<ConsumerVO>
 
       ConsumerVO vo = (ConsumerVO) o;
 
-      if (!groupId.equals(vo.groupId)) return false;
-
-      return true;
+      return groupId.equals(vo.groupId);
    }
 
    @Override

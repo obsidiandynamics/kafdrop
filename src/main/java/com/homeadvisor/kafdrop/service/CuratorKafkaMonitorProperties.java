@@ -40,7 +40,7 @@ public class CuratorKafkaMonitorProperties
 
    public String getKafkaVersion()
    {
-      return kafkaVersion.toString();
+      return kafkaVersion;
    }
 
    public void setKafkaVersion(String kafkaVersion)

@@ -2,19 +2,13 @@ package com.homeadvisor.kafdrop.util;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.*;
 
 public class ByteUtils {
 
    public static String readString(ByteBuffer buffer)
    {
-      try
-      {
-         return new String(readBytes(buffer), "UTF-8");
-      }
-      catch (UnsupportedEncodingException e)
-      {
-         return "<unsupported encoding>";
-      }
+     return new String(readBytes(buffer), StandardCharsets.UTF_8);
    }
 
    private static byte[] readBytes(ByteBuffer buffer)

@@ -144,10 +144,7 @@ public class TopicVO implements Comparable<TopicVO>
 
 	  TopicVO that = (TopicVO) o;
 
-	  if (!name.equals(that.name))
-	  { return false; }
-
-	  return true;
+     return name.equals(that.name);
    }
 
    @Override

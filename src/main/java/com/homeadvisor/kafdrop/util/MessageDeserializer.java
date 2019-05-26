@@ -5,6 +5,6 @@ import java.nio.ByteBuffer;
 
 public interface MessageDeserializer {
 
-   public String deserializeMessage(ByteBuffer buffer);
+   String deserializeMessage(ByteBuffer buffer);
 
 }

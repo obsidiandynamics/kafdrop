@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.*;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -153,7 +154,7 @@ public class Kafdrop
          if (file.exists() && file.canRead())
          {
             try (InputStream in = new FileInputStream(file);
-                 Reader reader = new InputStreamReader(in, "UTF-8"))
+                 Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8))
             {
                return new IniFilePropertySource(name, new IniFileReader().read(reader), environment.getActiveProfiles());
             }

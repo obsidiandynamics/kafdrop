@@ -24,7 +24,7 @@ jQuery(document).ready(function() {
 
         e.preventDefault();
 
-        linkIcon.toggleClass('fa-chevron-circle-right fa-chevron-circle-down')
+        linkIcon.toggleClass('fa-chevron-circle-right fa-chevron-circle-down');
         if (true == body.data('expanded')) {
             body.text(JSON.stringify(JSON.parse(body.text())));
             body.data('expanded', false);
@@ -43,4 +43,4 @@ jQuery(document).ready(function() {
         jQuery('#lastOffset').text(lastOffset);
         jQuery('#partitionSize').text(lastOffset - firstOffset)
     });
-})
+});
