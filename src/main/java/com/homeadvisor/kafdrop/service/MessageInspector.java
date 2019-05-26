@@ -21,7 +21,8 @@ package com.homeadvisor.kafdrop.service;
 import com.homeadvisor.kafdrop.model.MessageVO;
 import com.homeadvisor.kafdrop.model.TopicPartitionVO;
 import com.homeadvisor.kafdrop.model.TopicVO;
-import com.homeadvisor.kafdrop.util.Version;
+import com.homeadvisor.kafdrop.util.*;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
@@ -126,14 +127,6 @@ public class MessageInspector {
   }
 
   private byte[] readBytes(ByteBuffer buffer, int offset, int size) {
-    byte[] dest = new byte[size];
-    if (buffer.hasArray()) {
-      System.arraycopy(buffer.array(), buffer.arrayOffset() + offset, dest, 0, size);
-    } else {
-      buffer.mark();
-      buffer.get(dest);
-      buffer.reset();
-    }
-    return dest;
+    return ByteUtils.readBytes(buffer, offset, size);
   }
 }

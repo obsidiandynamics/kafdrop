@@ -16,7 +16,7 @@ public class ByteUtils {
       return readBytes(buffer, 0, buffer.limit());
    }
 
-   private static byte[] readBytes(ByteBuffer buffer, int offset, int size)
+   public static byte[] readBytes(ByteBuffer buffer, int offset, int size)
    {
       byte[] dest = new byte[size];
       if (buffer.hasArray())
