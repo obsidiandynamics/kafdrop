@@ -1,4 +1,4 @@
-FROM java:8
+FROM openjdk:12.0.1-jdk-oraclelinux7
 MAINTAINER homeadvisor
 
 ADD kafdrop.sh /

@@ -18,7 +18,7 @@
 
 package com.homeadvisor.kafdrop.model;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.util.*;
 import java.util.stream.Collectors;

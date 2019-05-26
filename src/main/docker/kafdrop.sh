@@ -25,5 +25,11 @@ if [ $JMX_PORT ]; then
     -Djava.rmi.server.hostname=$HOST"
 fi
 
-java $JMX_ARGS $HEAP_ARGS -jar /kafdrop*/kafdrop*jar
+ARGS="--add-exports=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED \
+     -Xss256K \
+     $JMX_ARGS \
+     $HEAP_ARGS \
+     $JVM_ARGS"
+
+java $ARGS -jar /kafdrop*/kafdrop*jar
 

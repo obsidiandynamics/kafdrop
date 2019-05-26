@@ -36,7 +36,7 @@ import kafka.javaapi.PartitionMetadata;
 import kafka.javaapi.TopicMetadata;
 import kafka.network.*;
 import kafka.utils.*;
-import org.apache.commons.lang.*;
+import org.apache.commons.lang3.*;
 import org.apache.curator.framework.*;
 import org.apache.curator.framework.recipes.cache.*;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache.*;

@@ -20,7 +20,6 @@ package com.homeadvisor.kafdrop.util;
 
 import com.google.common.primitives.Ints;
 import org.springframework.core.env.Environment;
-import sun.management.Agent;
 
 import java.util.Optional;
 import java.util.Properties;
@@ -33,7 +32,7 @@ public abstract class JmxUtils
    {
       Optional<Integer> jmxPort = Optional.empty();
 
-      final Properties managementProperties = Agent.getManagementProperties();
+      final Properties managementProperties = jdk.internal.agent.Agent.getManagementProperties();
       if (managementProperties != null)
       {
          final String portProperty = managementProperties.getProperty(JMX_PORT_PROPERTY);
