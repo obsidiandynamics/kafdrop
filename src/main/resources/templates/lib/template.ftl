@@ -29,7 +29,7 @@
     <#nested>
 </head>
 <body>
-   <#include "/includes/header.ftl">
+   <#include "../includes/header.ftl">
 <div class="container l-container">
 </#macro>
 
