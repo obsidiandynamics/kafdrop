@@ -83,14 +83,14 @@ public class MessageController {
     model.addAttribute("messageFormats", MessageFormat.values());
 
     if (!messageForm.isEmpty() && !errors.hasErrors()) {
-      final MessageDeserializer deserializer = getDeserializer(
-          topicName, messageForm.getFormat());
+      final var deserializer = getDeserializer(topicName, messageForm.getFormat());
 
       model.addAttribute("messages",
                          messageInspector.getMessages(topicName,
                                                       messageForm.getPartition(),
                                                       messageForm.getOffset(),
-                                                      messageForm.getCount()));
+                                                      messageForm.getCount(),
+                                                      deserializer));
 
     }
 
@@ -126,12 +126,14 @@ public class MessageController {
 
       return partitionList;
     } else {
+      final var deserializer = getDeserializer(topicName, MessageFormat.DEFAULT);
       List<Object> messages = new ArrayList<>();
       List<MessageVO> vos = messageInspector.getMessages(
           topicName,
           partition,
           offset,
-          count);
+          count,
+          deserializer);
 
       if (vos != null) {
         messages.addAll(vos);

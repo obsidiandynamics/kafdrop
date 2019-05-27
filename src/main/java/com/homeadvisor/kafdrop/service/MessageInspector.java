@@ -44,7 +44,8 @@ public class MessageInspector {
   @Autowired
   private KafkaMonitor kafkaMonitor;
 
-  public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count) {
+  public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count,
+                                     MessageDeserializer deserializer) {
     if (kafkaMonitor.getKafkaVersion().compareTo(new Version(0, 8, 2)) > 0) {
       final TopicVO topic = kafkaMonitor.getTopic(topicName)
           .orElseThrow(TopicNotFoundException::new);
@@ -89,7 +90,7 @@ public class MessageInspector {
               StreamSupport.stream(messageSet.spliterator(), false)
                   .limit(count - messages.size())
                   .map(MessageAndOffset::message)
-                  .map(this::createMessage)
+                  .map(m -> createMessage(m, deserializer))
                   .forEach(messages::add);
               currentOffset += messages.size() - oldSize;
             }
@@ -99,13 +100,13 @@ public class MessageInspector {
     }
   }
 
-  private MessageVO createMessage(Message message) {
+  private MessageVO createMessage(Message message, MessageDeserializer deserializer) {
     MessageVO vo = new MessageVO();
     if (message.hasKey()) {
       vo.setKey(readString(message.key()));
     }
     if (!message.isNull()) {
-      vo.setMessage(readString(message.payload()));
+      vo.setMessage(deserializer.deserializeMessage(message.payload()));
     }
 
     return vo;
