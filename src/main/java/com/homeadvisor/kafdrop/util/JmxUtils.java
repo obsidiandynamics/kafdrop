@@ -19,24 +19,25 @@
 package com.homeadvisor.kafdrop.util;
 
 import com.google.common.primitives.*;
-import org.springframework.core.env.*;
 
-import java.util.*;
+@SuppressWarnings("UnstableApiUsage")
+public final class JmxUtils {
+  private static final String JMX_PORT_PROPERTY = "com.sun.management.jmxremote.port";
 
-public abstract class JmxUtils {
-  public static final String JMX_PORT_PROPERTY = "com.sun.management.jmxremote.port";
+  private JmxUtils() {
+  }
 
-  public static int getJmxPort(final Environment environment) {
-    Optional<Integer> jmxPort = Optional.empty();
-
-    final Properties managementProperties = jdk.internal.agent.Agent.getManagementProperties();
+  public static int getJmxPort() {
+    final var managementProperties = jdk.internal.agent.Agent.getManagementProperties();
     if (managementProperties != null) {
-      final String portProperty = managementProperties.getProperty(JMX_PORT_PROPERTY);
+      final var portProperty = managementProperties.getProperty(JMX_PORT_PROPERTY);
       if (portProperty != null) {
-        final Optional<Integer> port = Optional.ofNullable(Ints.tryParse(portProperty));
-        jmxPort = port;
+        return Ints.tryParse(portProperty);
+      } else {
+        return 0;
       }
+    } else {
+      return 0;
     }
-    return jmxPort.orElse(0);
   }
 }

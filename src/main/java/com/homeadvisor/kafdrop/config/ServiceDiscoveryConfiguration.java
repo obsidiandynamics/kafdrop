@@ -85,7 +85,7 @@ public class ServiceDiscoveryConfiguration {
     details.put("id", Stream.of(name, host, UUID.randomUUID().toString()).collect(Collectors.joining("_")));
     details.put("name", name);
     details.put("host", host);
-    details.put("jmxPort", JmxUtils.getJmxPort(environment));
+    details.put("jmxPort", JmxUtils.getJmxPort());
     details.put("jmxHealthMBean",
                 jmxDomain + ":name=" + healthCheckBeanName() + ",type=" + ClassUtils.getShortName(HealthCheckConfiguration.HealthCheck.class));
     details.put("port", serverPort);
