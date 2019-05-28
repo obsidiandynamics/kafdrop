@@ -29,7 +29,7 @@ ARGS="--add-exports=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED \
      -Xss256K \
      $JMX_ARGS \
      $HEAP_ARGS \
-     $JVM_ARGS"
+     $JVM_OPTS"
 
 java $ARGS -jar /kafdrop*/kafdrop*jar
 

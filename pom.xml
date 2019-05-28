@@ -5,7 +5,7 @@
 
     <groupId>com.homeadvisor.kafka</groupId>
     <artifactId>kafdrop</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 
     <description>For when you have a Kaf(ka) cluster to monitor</description>
 
