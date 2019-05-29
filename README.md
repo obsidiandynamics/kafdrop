@@ -1,7 +1,7 @@
 Kafdrop 3
 ===
 
-Kafdrop 3 is a UI for monitoring Apache Kafka clusters. The tool displays information such as brokers, topics, partitions, and lets you view messages. 
+Kafdrop 3 is a UI for monitoring Apache Kafka clusters. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
 
 The project is a continuation of the original [HomeAdvisor/Kafdrop](https://github.com/HomeAdvisor/Kafdrop), which has now been dragged kicking and screaming into the JDK 11 world. It's a lightweight application that runs on Spring Boot and requires very little configuration.
 
@@ -15,12 +15,7 @@ Optional, additional integration:
 * Schema Registry
 
 # Getting Started
-## Maven build
-After cloning the repository, building should just be a matter of running a standard Maven build:
-
-```sh
-$ mvn clean package
-```
+You can run the Kafdrop JAR directly, via Docker, or in Kubernetes.
 
 ## Running from JAR
 ```sh
@@ -43,22 +38,39 @@ Finally, a default message format (e.g. to deserialize Avro messages) can option
 ```
 --message.format=AVRO
 ```
-Valid format values are `DEFAULT` and `AVRO`. This setting can also be configured at the topic level via dropdown when viewing messages.
+Valid format values are `DEFAULT` and `AVRO`. This can also be configured at the topic level via dropdown when viewing messages.
 
 ## Running with Docker
-The following maven command will generate a Docker image:
-
 ```sh
-mvn clean package assembly:single docker:build
-```
-
-Once the build finishes you can launch the image:
-
-```sh
-docker run -d -p 9000:9000 -e ZOOKEEPER_CONNECT=<host:port,host:port> obsidiandynamics/kafdrop
+docker run -d --rm -p 9000:9000 \
+    -e ZOOKEEPER_CONNECT=<host:port,host:port> \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e JVM_OPTS="-Xms32M -Xmx64M" \
+    obsidiandynamics/kafdrop
 ```
 
 And access the UI at [http://localhost:9000](http://localhost:9000).
+
+## Running in Kubernetes (with Helm)
+```sh
+helm upgrade -i kafdrop chart --set image.tag=3.0.0 \
+    --set zkConnect=<host:port,host:port> \
+    --set kafkaBrokerConnect=<host:port,host:port> \
+    --set jvm.opts="-Xms32M -Xmx64M"
+```
+
+Replace `3.0.0` with the image tag of `obsidiandynamics/kafdrop`. Services will be bound on port 9000 by default (node port 30900).
+
+## Building
+After cloning the repository, building is just a matter of running a standard Maven build:
+```sh
+$ mvn clean package
+```
+
+The following command will generate a Docker image:
+```sh
+mvn assembly:single docker:build
+```
 
 # APIs
 ## JSON endpoints
