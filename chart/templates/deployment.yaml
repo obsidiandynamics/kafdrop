@@ -28,8 +28,6 @@ spec:
             value: "{{ .Values.zkConnect }}"
           - name: KAFKA_BROKERCONNECT
             value: "{{ .Values.kafkaBrokerConnect }}"
-          - name: MARATHON_APP_RESOURCE_MEM
-            value: "{{ .Values.jvm.heapSize }}"
           - name: JVM_OPTS
             value: "{{ .Values.jvm.opts }}"
           ports:

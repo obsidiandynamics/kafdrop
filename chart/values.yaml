@@ -9,7 +9,6 @@ zkConnect: localhost:2181
 kafkaBrokerConnect: localhost:9092
 
 jvm:
-  heapSize: 64
   opts: ""
 
 nameOverride: ""
