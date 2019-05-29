@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: obsidiandynamics/kafdrop
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 zkConnect: localhost:2181
 kafkaBrokerConnect: localhost:9092
