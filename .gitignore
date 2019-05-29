@@ -9,3 +9,5 @@ target
 *.ipr
 .idea/
 .DS_Store
+.factorypath
+.vscode
