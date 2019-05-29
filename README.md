@@ -3,7 +3,7 @@ Kafdrop 3
 
 Kafdrop 3 is a UI for monitoring Apache Kafka clusters. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
 
-The project is a continuation of the original [HomeAdvisor/Kafdrop](https://github.com/HomeAdvisor/Kafdrop), which has now been dragged kicking and screaming into the JDK 11 world. It's a lightweight application that runs on Spring Boot and requires very little configuration.
+The project is a continuation of the original [HomeAdvisor/Kafdrop](https://github.com/HomeAdvisor/Kafdrop), which has now been dragged kicking and screaming into the world of JDK 11+ and Kubernetes. It's a lightweight application that runs on Spring Boot and requires very little configuration.
 
 # Requirements
 
@@ -41,6 +41,9 @@ Finally, a default message format (e.g. to deserialize Avro messages) can option
 Valid format values are `DEFAULT` and `AVRO`. This can also be configured at the topic level via dropdown when viewing messages.
 
 ## Running with Docker
+Images are hosted at [hub.docker.com/r/obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop).
+
+Launch container in background:
 ```sh
 docker run -d --rm -p 9000:9000 \
     -e ZOOKEEPER_CONNECT=<host:port,host:port> \
@@ -49,17 +52,25 @@ docker run -d --rm -p 9000:9000 \
     obsidiandynamics/kafdrop
 ```
 
-And access the UI at [http://localhost:9000](http://localhost:9000).
+Then access the UI at [http://localhost:9000](http://localhost:9000).
 
-## Running in Kubernetes (with Helm)
+## Running in Kubernetes (using a Helm Chart)
 ```sh
-helm upgrade -i kafdrop chart --set image.tag=3.0.0 \
+git clone https://github.com/obsidiandynamics/kafdrop
+helm upgrade -i kafdrop kafdrop/chart --set image.tag=3.0.0 \
     --set zkConnect=<host:port,host:port> \
     --set kafkaBrokerConnect=<host:port,host:port> \
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
 
-Replace `3.0.0` with the image tag of `obsidiandynamics/kafdrop`. Services will be bound on port 9000 by default (node port 30900).
+Replace `3.0.0` with the image tag of [obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop). Services will be bound on port 9000 by default (node port 30900).
+
+Proxy to the Kubernetes cluster:
+```sh
+kubectl proxy
+```
+
+Navigate to [http://localhost:8001/api/v1/namespaces/default/services/http:kafdrop:9000/proxy](http://localhost:8001/api/v1/namespaces/default/services/http:kafdrop:9000/proxy).
 
 ## Building
 After cloning the repository, building is just a matter of running a standard Maven build:
