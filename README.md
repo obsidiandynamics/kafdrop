@@ -55,9 +55,14 @@ docker run -d --rm -p 9000:9000 \
 Then access the UI at [http://localhost:9000](http://localhost:9000).
 
 ## Running in Kubernetes (using a Helm Chart)
+Clone the repository (if necessary):
 ```sh
-git clone https://github.com/obsidiandynamics/kafdrop
-helm upgrade -i kafdrop kafdrop/chart --set image.tag=3.0.0 \
+git clone https://github.com/obsidiandynamics/kafdrop && cd kafdrop
+```
+
+Apply the chart:
+```sh
+helm upgrade -i kafdrop chart --set image.tag=3.0.0 \
     --set zkConnect=<host:port,host:port> \
     --set kafkaBrokerConnect=<host:port,host:port> \
     --set jvm.opts="-Xms32M -Xmx64M"
