@@ -23,10 +23,9 @@ import org.apache.curator.framework.*;
 import org.apache.curator.x.discovery.*;
 import org.apache.curator.x.discovery.details.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.actuate.endpoint.*;
+import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.autoconfigure.condition.*;
-import org.springframework.boot.context.embedded.*;
-import org.springframework.boot.context.embedded.tomcat.*;
+import org.springframework.boot.web.servlet.context.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.*;
 import org.springframework.util.*;
@@ -65,7 +64,7 @@ public class ServiceDiscoveryConfiguration {
   public Map<String, Object> serviceDetails(Integer serverPort) {
     Map<String, Object> details = new LinkedHashMap<>();
 
-    Optional.ofNullable(infoEndpoint.invoke())
+    Optional.ofNullable(infoEndpoint.info())
         .ifPresent(infoMap -> Optional.ofNullable((Map<String, Object>) infoMap.get("build"))
             .ifPresent(buildInfo -> {
               details.put("serviceName", buildInfo.get("artifact"));
@@ -101,10 +100,10 @@ public class ServiceDiscoveryConfiguration {
   @Bean
   @ConditionalOnMissingBean
   @ConditionalOnWebApplication
-  public ServiceInstance serviceInstance(EmbeddedWebApplicationContext webContext,
+  public ServiceInstance serviceInstance(ServletWebServerApplicationContext webContext,
                                          ServiceDiscovery serviceDiscovery)
   throws Exception {
-    final Map<String, Object> details = serviceDetails(getServicePort(webContext));
+    final Map<String, Object> details = serviceDetails(webContext.getWebServer().getPort());
 
     final ServiceInstanceBuilder<Map<String, Object>> builder = ServiceInstance.builder();
     Optional.ofNullable(details.get("port")).ifPresent(port -> builder.port((Integer) port));
@@ -119,21 +118,5 @@ public class ServiceDiscoveryConfiguration {
     serviceDiscovery.registerService(serviceInstance);
 
     return serviceInstance;
-  }
-
-  private Integer getServicePort(EmbeddedWebApplicationContext webContext) {
-    Integer port = null;
-    if (webContext != null) {
-      final EmbeddedServletContainer container = webContext.getEmbeddedServletContainer();
-
-      if (container instanceof TomcatEmbeddedServletContainer) {
-        // Work around an issue with the tomcat container, which uses the local port
-        // as the port (-1) instead of the registered port
-        port = ((TomcatEmbeddedServletContainer) container).getTomcat().getConnector().getPort();
-      } else {
-        port = container.getPort();
-      }
-    }
-    return port;
   }
 }

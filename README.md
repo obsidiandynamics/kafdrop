@@ -127,3 +127,11 @@ You can also disable CORS entirely with the following configuration:
 ```
 cors.enabled=false
 ```
+
+## Actuator
+Health and info endpoints are available at the following path: /debug
+
+This can be overridden with the following configuration:
+```
+management.endpoints.web.base-path=<path>
+```

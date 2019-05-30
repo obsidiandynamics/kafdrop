@@ -23,7 +23,6 @@ import com.homeadvisor.kafdrop.config.ini.*;
 import joptsimple.internal.Strings;
 import org.slf4j.*;
 import org.springframework.boot.*;
-import org.springframework.boot.actuate.autoconfigure.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.builder.*;
 import org.springframework.boot.context.event.*;
@@ -38,7 +37,7 @@ import java.nio.charset.*;
 import java.util.Objects;
 import java.util.stream.*;
 
-@SpringBootApplication(exclude = MetricFilterAutoConfiguration.class)
+@SpringBootApplication
 public class Kafdrop {
   private final static Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
 

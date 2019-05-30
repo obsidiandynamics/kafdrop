@@ -10,9 +10,16 @@ spring:
       fail_on_unknown_properties: false
       read_unknown_enum_values_as_null: true
 
-endpoints.jmx.domain: ${spring.jmx.default_domain}
-metrics.jmx.domain: ${spring.jmx.default_domain}-metrics
-management.contextPath: /debug
+management:
+  metrics:
+    export:
+      jmx:
+        domain:${spring.jmx.default_domain}.metrics
+  endpoints:
+    jmx:
+      domain: ${spring.jmx.default_domain}
+    web:
+      base-path: /debug
 
 kafdrop.monitor:
   kafkaVersion: "0.11.0.2"
@@ -20,7 +27,6 @@ kafdrop.monitor:
   retry:
     maxAttempts: 5
     backoffMillis: 2000
-
 
 curator.discovery:
   enabled: true
