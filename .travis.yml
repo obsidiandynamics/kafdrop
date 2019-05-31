@@ -20,6 +20,15 @@ script:
       get_release_tag=$(curl -s -o /dev/null -w "%{http_code}" $repo_url/tags/$APP_VER)
       if [ $get_release_tag == "404" ]; then
         echo "Publishing release"
+        release_json="{ \
+          \"tag_name\": \"$APP_VER\", \
+          \"target_commitish\": \"master\", \
+          \"name\": \"$APP_VER\", \
+          \"body\": \"Release $APP_VER\", \
+          \"draft\": false, \
+          \"prerelease\": false \
+        }"
+
       else
         echo "Release already exists; skipping"
       fi
