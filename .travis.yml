@@ -1,0 +1,15 @@
+language: java
+os:
+  - linux
+services:
+  - docker
+jdk:
+  - openjdk11
+
+install:
+  - travis_retry mvn dependency:resolve
+
+script:
+  - mvn clean integration-test package assembly:single docker:build
+
+after_success: []
