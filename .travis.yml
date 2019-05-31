@@ -1,3 +1,9 @@
+# Required environment variables
+# GITHUB_USER: GitHub username
+# GITHUB_PASS: GitHub password
+# REG_USER: Docker registry username
+# REG_PASS: Docker registry password
+
 language: java
 os:
   - linux
@@ -12,15 +18,18 @@ branches:
 
 install:
   - travis_retry mvn dependency:resolve
+  - docker login -u $REG_USER -p $REG_PASS registry.hub.docker.com
 
 script:
   - APP_VER=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
   - echo Kafdrop version $APP_VER
   - mvn clean integration-test package assembly:single docker:build
+  - docker push obsidiandynamics/kafdrop:$APP_VER
   - |
     repo_url=https://api.github.com/repos/obsidiandynamics/kafdrop
     if [[ ! $APP_VER =~ ".*-SNAPSHOT" ]]; then
       echo "Release version"
+      docker push obsidiandynamics/kafdrop:latest
       get_release_tag=$(curl -s -o /dev/null -w "%{http_code}" $repo_url/tags/$APP_VER)
       if [ $get_release_tag == "404" ]; then
         echo "Publishing release"
