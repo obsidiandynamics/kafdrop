@@ -10,6 +10,19 @@ install:
   - travis_retry mvn dependency:resolve
 
 script:
+  - APP_VER=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+  - echo Kafdrop version $APP_VER
   - mvn clean integration-test package assembly:single docker:build
+  - |
+    repo_url=https://api.github.com/repos/obsidiandynamics/kafdrop
+    if [[ ! $APP_VER =~ ".*-SNAPSHOT" ]]; then
+      echo "Release version"
+      get_release_tag=$(curl -s -o /dev/null -w "%{http_code}" $repo_url/tags/$APP_VER)
+      if [ $get_release_tag == "404" ]; then
+        echo Publishing release
+      else
+        echo Release already exists; skipping
+      fi
+    done
 
 after_success: []
