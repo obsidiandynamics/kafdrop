@@ -6,6 +6,10 @@ services:
 jdk:
   - openjdk11
 
+branches:
+  only:
+  - master
+
 install:
   - travis_retry mvn dependency:resolve
 
@@ -28,6 +32,7 @@ script:
           \"draft\": false, \
           \"prerelease\": false \
         }"
+        curl -u $GITHUB_USER:$GITHUB_PASS -X POST $repo_url/releases -d "$release_json"
       else
         echo "Release already exists; skipping"
       fi
