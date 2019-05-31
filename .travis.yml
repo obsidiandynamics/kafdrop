@@ -18,9 +18,9 @@ branches:
 
 install:
   - travis_retry mvn dependency:resolve
-  - docker login -u $REG_USER -p $REG_PASS registry.hub.docker.com
 
 script:
+  - docker login -u $REG_USER -p $REG_PASS registry.hub.docker.com
   - APP_VER=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
   - echo Kafdrop version $APP_VER
   - mvn clean integration-test package assembly:single docker:build
