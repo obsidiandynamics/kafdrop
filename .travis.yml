@@ -19,10 +19,19 @@ script:
       echo "Release version"
       get_release_tag=$(curl -s -o /dev/null -w "%{http_code}" $repo_url/tags/$APP_VER)
       if [ $get_release_tag == "404" ]; then
-        echo Publishing release
+        echo "Publishing release"
       else
-        echo Release already exists; skipping
+        echo "Release already exists; skipping"
       fi
-    done
+    fi
 
 after_success: []
+
+{
+  "tag_name": "v1.0.0",
+  "target_commitish": "master",
+  "name": "v1.0.0",
+  "body": "Description of the release",
+  "draft": false,
+  "prerelease": false
+}
