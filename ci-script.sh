@@ -12,12 +12,12 @@ set -x
 app_ver=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 echo Kafdrop version $app_ver
 mvn clean integration-test package assembly:single docker:build
-docker push obsidiandynamics/kafdrop:$app_ver
+docker push docker.io/obsidiandynamics/kafdrop:$app_ver
 
 repo_url=https://api.github.com/repos/obsidiandynamics/kafdrop
 if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
   echo "Release version"
-  docker push obsidiandynamics/kafdrop:latest
+  docker push docker.io/obsidiandynamics/kafdrop:latest
   get_release_tag=$(curl -s -o /dev/null -w "%{http_code}" $repo_url/tags/$app_ver)
   echo "Release tag $get_release_tag"
   if [ $get_release_tag == "404" ]; then
