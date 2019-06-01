@@ -20,4 +20,4 @@ install:
   - travis_retry mvn dependency:resolve
 
 script:
-  - ./ci-script-sh
+  - ./ci-script.sh
