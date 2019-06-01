@@ -6,7 +6,7 @@ if [ -z $GITHUB_USER ]; then echo "GITHUB_USER not set"; exit 1; fi
 if [ -z $GITHUB_PASS ]; then echo "GITHUB_PASS not set"; exit 1; fi
 
 set -e
-docker login -u $REG_USER -p $REG_PASS docker.io/obsidiandynamics/kafdrop
+echo "$REG_PASS" | docker login -u $REG_USER --password-stdin
 
 set -x
 app_ver=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
