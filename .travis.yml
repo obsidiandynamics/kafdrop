@@ -3,6 +3,8 @@
 # GITHUB_PASS: GitHub password
 # REG_USER: Docker registry username
 # REG_PASS: Docker registry password
+# BINTRAY_USER: Bintray username
+# BINTRAY_KEY: Bintray API key
 
 language: java
 os:
