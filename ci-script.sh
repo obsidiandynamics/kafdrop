@@ -39,8 +39,8 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
       release_json="{ \
         \"tag_name\": \"$app_ver\", \
         \"target_commitish\": \"master\", \
-        \"name\": \"Download from [Bintray](https://bintray.com/obsidiandynamics/kafdrop/main/${app_ver}#files)\", \
-        \"body\": \"Release $app_ver\", \
+        \"name\": \"$app_ver\", \
+        \"body\": \"Download from [Bintray](https://bintray.com/obsidiandynamics/kafdrop/main/${app_ver}#files)\", \
         \"draft\": false, \
         \"prerelease\": false \
       }"
