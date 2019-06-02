@@ -1,5 +1,8 @@
 Kafdrop 3
 ===
+[![Download](https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/images/download.svg)](https://bintray.com/obsidiandynamics/kafdrop/main/_latestVersion)
+[![Build](https://travis-ci.org/obsidiandynamics/kafdrop.svg?branch=master)](https://travis-ci.org/obsidiandynamics/kafdrop#)
+
 
 Kafdrop 3 is a UI for monitoring Apache Kafka clusters. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
 
@@ -41,7 +44,7 @@ Finally, a default message format (e.g. to deserialize Avro messages) can option
 Valid format values are `DEFAULT` and `AVRO`. This can also be configured at the topic level via dropdown when viewing messages.
 
 ## Running with Docker
-Images are hosted at [hub.docker.com/r/obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop).
+Images are hosted on [hub.docker.com/r/obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop).
 
 Launch container in background:
 ```sh

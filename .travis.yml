@@ -1,0 +1,25 @@
+# Required environment variables
+# GITHUB_USER: GitHub username
+# GITHUB_PASS: GitHub password
+# REG_USER: Docker registry username
+# REG_PASS: Docker registry password
+# BINTRAY_USER: Bintray username
+# BINTRAY_KEY: Bintray API key
+
+language: java
+os:
+  - linux
+services:
+  - docker
+jdk:
+  - openjdk11
+
+branches:
+  only:
+  - master
+
+install:
+  - travis_retry mvn dependency:resolve
+
+script:
+  - ./ci-script.sh

@@ -5,7 +5,7 @@
 
     <groupId>com.homeadvisor.kafka</groupId>
     <artifactId>kafdrop</artifactId>
-    <version>3.0.1</version>
+    <version>3.2.0-SNAPSHOT</version>
 
     <description>For when you have a Kaf(ka) cluster to monitor</description>
 
@@ -16,7 +16,6 @@
 
         <!-- name of parameter changed in latest mvn javadoc plugin version-->
         <additionalOptions>-Xdoclint:none</additionalOptions>
-
     </properties>
 
     <scm>
@@ -24,6 +23,14 @@
         <developerConnection>scm:git:git@github.com:obsidiandynamics/kafdrop.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-obsidiandynamics-kafdrop</id>
+            <name>obsidiandynamics-kafdrop</name>
+            <url>https://api.bintray.com/maven/obsidiandynamics/kafdrop/main/;publish=1</url>
+        </repository>
+    </distributionManagement>
 
     <repositories>
         <repository>
