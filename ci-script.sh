@@ -4,6 +4,8 @@ if [ -z $REG_USER ]; then echo "REG_USER not set"; exit 1; fi
 if [ -z $REG_PASS ]; then echo "REG_PASS not set"; exit 1; fi
 if [ -z $GITHUB_USER ]; then echo "GITHUB_USER not set"; exit 1; fi
 if [ -z $GITHUB_PASS ]; then echo "GITHUB_PASS not set"; exit 1; fi
+if [ -z $BINTRAY_USER ]; then echo "BINTRAY_USER not set"; exit 1; fi
+if [ -z $BINTRAY_KEY ]; then echo "BINTRAY_KEY not set"; exit 1; fi
 
 set -e
 echo "$REG_PASS" | docker login -u $REG_USER --password-stdin
@@ -36,6 +38,11 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
   else
     echo "Release already exists; skipping"
   fi
+
+  set +x
+  cat settings.xml.template | sed "s/{{BINTRAY_USER}}/${BINTRAY_USER}/g" | sed "s/{{BINTRAY_KEY}}/${BINTRAY_KEY}/g" > settings.xml
+  set -x
+  mvn deploy -s settings.xml
 else
   echo "Snapshot version"
 fi
