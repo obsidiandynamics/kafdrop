@@ -33,8 +33,11 @@ import java.util.stream.*;
 @Controller
 @RequestMapping("/topic")
 public class TopicController {
-  @Autowired
-  private KafkaMonitor kafkaMonitor;
+  private final KafkaMonitor kafkaMonitor;
+
+  public TopicController(KafkaMonitor kafkaMonitor) {
+    this.kafkaMonitor = kafkaMonitor;
+  }
 
   @RequestMapping("/{name:.+}")
   public String topicDetails(@PathVariable("name") String topicName, Model model) {

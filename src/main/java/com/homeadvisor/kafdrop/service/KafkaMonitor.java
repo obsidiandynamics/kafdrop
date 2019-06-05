@@ -25,7 +25,6 @@ import org.apache.kafka.common.*;
 import java.util.*;
 
 public interface KafkaMonitor {
-
   List<BrokerVO> getBrokers();
 
   Optional<BrokerVO> getBroker(int id);
@@ -38,19 +37,11 @@ public interface KafkaMonitor {
 
   Optional<TopicVO> getTopic(String topic);
 
-  ClusterSummaryVO getClusterSummary();
-
   ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
-
-  List<ConsumerVO> getConsumers();
 
   List<ConsumerVO> getConsumers(TopicVO topic);
 
-  List<ConsumerVO> getConsumers(String topic);
-
   Optional<ConsumerVO> getConsumer(String groupId);
-
-  Optional<ConsumerVO> getConsumerByTopicName(String groupId, String topic);
 
   Optional<ConsumerVO> getConsumerByTopic(String groupId, TopicVO topic);
 }

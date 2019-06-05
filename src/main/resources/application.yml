@@ -20,6 +20,8 @@ management:
       domain: ${spring.jmx.default_domain}
     web:
       base-path: /debug
+  server:
+    port: 9000
 
 kafdrop.monitor:
   kafkaVersion: "0.11.0.2"

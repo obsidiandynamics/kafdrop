@@ -454,22 +454,11 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   }
 
   @Override
-  public List<ConsumerVO> getConsumers() {
-    validateInitialized();
-    return getConsumerStream(null).collect(Collectors.toList());
-  }
-
-  @Override
   public List<ConsumerVO> getConsumers(final TopicVO topic) {
     validateInitialized();
     return getConsumerStream(topic)
         .filter(consumer -> consumer.getTopic(topic.getName()) != null)
         .collect(Collectors.toList());
-  }
-
-  @Override
-  public List<ConsumerVO> getConsumers(final String topic) {
-    return getConsumers(getTopic(topic).get());
   }
 
   private Stream<ConsumerVO> getConsumerStream(TopicVO topic) {
@@ -484,11 +473,6 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   public Optional<ConsumerVO> getConsumer(String groupId) {
     validateInitialized();
     return getConsumerByTopic(groupId, null);
-  }
-
-  @Override
-  public Optional<ConsumerVO> getConsumerByTopicName(String groupId, String topicName) {
-    return getConsumerByTopic(groupId, Optional.of(topicName).flatMap(this::getTopic).orElse(null));
   }
 
   @Override
