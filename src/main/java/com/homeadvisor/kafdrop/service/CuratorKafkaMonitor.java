@@ -85,6 +85,9 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   private CuratorKafkaMonitorProperties properties;
   @Autowired
   private KafkaHighLevelConsumer kafkaHighLevelConsumer;
+  @Autowired
+  private KafkaHighLevelAdminClient kafkaHighLevelAdminClient;
+
   private Version kafkaVersion;
 
   private RetryTemplate retryTemplate;
@@ -462,7 +465,15 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   }
 
   private Stream<ConsumerVO> getConsumerStream(TopicVO topic) {
-    return consumerTreeCache.getCurrentChildren(ZkUtils.ConsumersPath()).keySet().stream()
+    final Set<String> consumerGroups;
+    final var consumerGroupsFromZk = consumerTreeCache.getCurrentChildren(ZkUtils.ConsumersPath()).keySet();
+    if (! consumerGroupsFromZk.isEmpty()) {
+      consumerGroups = consumerGroupsFromZk;
+    } else {
+      consumerGroups = kafkaHighLevelAdminClient.getConsumerGroups();
+    }
+
+    return consumerGroups.stream()
         .map(g -> getConsumerByTopic(g, topic))
         .filter(Optional::isPresent)
         .map(Optional::get)
