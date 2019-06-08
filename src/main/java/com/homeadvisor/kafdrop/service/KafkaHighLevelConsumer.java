@@ -67,7 +67,7 @@ public final class KafkaHighLevelConsumer {
                                                                       partitionInfo.partition()))
                              .collect(Collectors.toList()));
 
-    kafkaConsumer.poll(0);
+    kafkaConsumer.poll(Duration.ofMillis(0));
     Set<TopicPartition> assignedPartitionList = kafkaConsumer.assignment();
     TopicVO topicVO = getTopicInfo(topic);
     Map<Integer, TopicPartitionVO> partitionsVo = topicVO.getPartitionMap();

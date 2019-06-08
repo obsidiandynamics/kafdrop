@@ -86,8 +86,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   private RetryTemplate retryTemplate;
 
   @PostConstruct
-  public void start()
-  throws Exception {
+  public void start() throws Exception {
     threadPool = new ForkJoinPool(properties.getThreadPoolSize());
 
     FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
