@@ -86,4 +86,17 @@ public class ConsumerPartitionVO {
   public void setOwner(String owner) {
     this.owner = owner;
   }
+
+  @Override
+  public String toString() {
+    return ConsumerPartitionVO.class.getSimpleName() + " [" +
+        "groupId=" + groupId +
+        ", topic=" + topic +
+        ", partitionId=" + partitionId +
+        ", offset=" + offset +
+        ", size=" + size +
+        ", firstOffset=" + firstOffset +
+        ", owner=" + owner +
+        "]";
+  }
 }

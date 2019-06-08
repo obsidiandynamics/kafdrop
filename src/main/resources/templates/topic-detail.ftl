@@ -71,7 +71,7 @@
             <h2>Configuration</h2>
 
             <#if topic.config?size == 0>
-                <div>No topic specific configuration</div>
+                <div>No topic-specific configuration</div>
             <#else>
                 <table class="table table-bordered">
                     <tbody>
@@ -129,8 +129,7 @@
                 <thead>
                 <tr>
                     <th>Group ID</th>
-                    <th>Lag</th>
-                    <th>Active Instances</th>
+                    <th>Combined Lag</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -138,13 +137,6 @@
                     <tr>
                         <td><a href="/consumer/${c.groupId}">${c.groupId}</a></td>
                         <td>${c.getTopic(topic.name).lag}</td>
-                        <td>
-                            <ul class="list-unstyled">
-                                <#list c.getActiveInstancesForTopic(topic.name) as i>
-                                    <li>${i.id}</li>
-                                </#list>
-                            </ul>
-                        </td>
                     </tr>
                 </#list>
                 </tbody>

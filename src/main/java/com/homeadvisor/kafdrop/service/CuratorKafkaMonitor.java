@@ -470,7 +470,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
     if (! consumerGroupsFromZk.isEmpty()) {
       consumerGroups = consumerGroupsFromZk;
     } else {
-      consumerGroups = kafkaHighLevelAdminClient.getConsumerGroups();
+      consumerGroups = kafkaHighLevelAdminClient.listConsumerGroups();
     }
 
     return consumerGroups.stream()

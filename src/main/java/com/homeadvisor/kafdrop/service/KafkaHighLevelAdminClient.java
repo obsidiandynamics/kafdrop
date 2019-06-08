@@ -3,7 +3,8 @@ package com.homeadvisor.kafdrop.service;
 import com.homeadvisor.kafdrop.config.*;
 import org.apache.kafka.clients.*;
 import org.apache.kafka.clients.admin.*;
-import org.slf4j.*;
+import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.common.*;
 import org.springframework.stereotype.*;
 
 import javax.annotation.*;
@@ -13,8 +14,6 @@ import java.util.stream.*;
 
 @Service
 public final class KafkaHighLevelAdminClient {
-  private static final Logger LOG = LoggerFactory.getLogger(KafkaHighLevelAdminClient.class);
-
   private final KafkaConfiguration kafkaConfiguration;
 
   private AdminClient adminClient;
@@ -30,13 +29,22 @@ public final class KafkaHighLevelAdminClient {
     adminClient = AdminClient.create(props);
   }
 
-  public Set<String> getConsumerGroups() {
+  Set<String> listConsumerGroups() {
+    final Collection<ConsumerGroupListing> groupListing;
     try {
-      final var groupListing = adminClient.listConsumerGroups().all().get();
-      return groupListing.stream().map(ConsumerGroupListing::groupId).collect(Collectors.toSet());
+      groupListing = adminClient.listConsumerGroups().all().get();
     } catch (InterruptedException | ExecutionException e) {
-      LOG.warn("Error fetching consumer groups", e);
-      return Collections.emptySet();
+      throw new KafkaAdminClientException(e);
+    }
+    return groupListing.stream().map(ConsumerGroupListing::groupId).collect(Collectors.toSet());
+  }
+
+  Map<TopicPartition, OffsetAndMetadata> listConsumerGroupOffsets(String groupId) {
+    final var offsets = adminClient.listConsumerGroupOffsets(groupId);
+    try {
+      return offsets.partitionsToOffsetAndMetadata().get();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new KafkaAdminClientException(e);
     }
   }
 }

@@ -21,7 +21,6 @@ package com.homeadvisor.kafdrop.controller;
 import com.homeadvisor.kafdrop.model.*;
 import com.homeadvisor.kafdrop.service.*;
 import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.ui.*;
@@ -34,17 +33,19 @@ import java.util.stream.*;
 @RequestMapping("/topic")
 public class TopicController {
   private final KafkaMonitor kafkaMonitor;
+  private final ConsumerMonitor consumerMonitor;
 
-  public TopicController(KafkaMonitor kafkaMonitor) {
+  public TopicController(KafkaMonitor kafkaMonitor, ConsumerMonitor consumerMonitor) {
     this.kafkaMonitor = kafkaMonitor;
+    this.consumerMonitor = consumerMonitor;
   }
 
   @RequestMapping("/{name:.+}")
   public String topicDetails(@PathVariable("name") String topicName, Model model) {
-    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+    final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
-    model.addAttribute("consumers", kafkaMonitor.getConsumers(topic));
+    model.addAttribute("consumers", consumerMonitor.getConsumers(topic));
 
     return "topic-detail";
   }
