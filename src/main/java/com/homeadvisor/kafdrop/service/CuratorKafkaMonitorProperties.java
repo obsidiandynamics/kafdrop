@@ -33,17 +33,6 @@ public class CuratorKafkaMonitorProperties {
 
   private RetryProperties retry = new RetryProperties();
 
-  @NotBlank
-  private String kafkaVersion = "0.8.2.2";
-
-  public String getKafkaVersion() {
-    return kafkaVersion;
-  }
-
-  public void setKafkaVersion(String kafkaVersion) {
-    this.kafkaVersion = kafkaVersion;
-  }
-
   public String getClientId() {
     return clientId;
   }

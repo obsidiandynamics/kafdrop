@@ -29,11 +29,10 @@ public interface KafkaMonitor {
 
   Optional<BrokerVO> getBroker(int id);
 
-  Version getKafkaVersion();
-
   List<TopicVO> getTopics();
 
-  List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count);
+  List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count,
+                              MessageDeserializer deserializer);
 
   Optional<TopicVO> getTopic(String topic);
 

@@ -135,7 +135,7 @@
                 <tbody>
                 <#list consumers![] as c>
                     <tr>
-                        <td><a href="/consumer/${c.groupId}">${c.groupId}</a></td>
+                        <td>${c.groupId}</td>
                         <td>${c.getTopic(topic.name).lag}</td>
                     </tr>
                 </#list>

@@ -61,7 +61,6 @@ public class Kafdrop {
   }
 
   private static class LoggingConfigurationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
-    private static final String PROP_LOGGING_CONFIG = "logging.config";
     private static final String PROP_LOGGING_FILE = "logging.file";
     private static final String PROP_LOGGER = "LOGGER";
     private static final String PROP_SPRING_BOOT_LOG_LEVEL = "logging.level.org.springframework.boot";
@@ -107,7 +106,7 @@ public class Kafdrop {
 
       LOG.info("Initializing jaas config");
       String env = environment.getProperty("kafka.env");
-      Boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
+      boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
       LOG.info("env: {} .isSecured kafka: {}", env, isSecured);
       if (isSecured && Strings.isNullOrEmpty(env)) {
         throw new RuntimeException("'env' cannot be null if connecting to secured kafka.");

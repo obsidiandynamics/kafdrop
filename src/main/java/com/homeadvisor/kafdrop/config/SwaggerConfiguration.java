@@ -29,7 +29,7 @@ import springfox.documentation.spring.web.plugins.*;
 import springfox.documentation.swagger2.annotations.*;
 
 /**
- * Auto configuration for Swagger. Can be disabled by setting swagger.enabled=false.
+ *  Auto configuration for Swagger. Can be disabled by setting {@code swagger.enabled=false}.
  */
 @Configuration
 @EnableSwagger2
@@ -50,7 +50,7 @@ public class SwaggerConfiguration {
   }
 
   /**
-   * Swagger Predicate for only selecting JSON endpoints.
+   *  Swagger Predicate for only selecting JSON endpoints.
    */
   public class JsonRequestHandlerPredicate implements Predicate<RequestHandler> {
     @Override
@@ -60,7 +60,7 @@ public class SwaggerConfiguration {
   }
 
   /**
-   * Swagger Predicate for ignoring /debug endpoints.
+   *  Swagger Predicate for ignoring {@code /debug} endpoints.
    */
   public class IgnoreDebugPathPredicate implements Predicate<String> {
     @Override

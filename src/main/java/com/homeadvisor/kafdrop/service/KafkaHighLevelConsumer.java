@@ -4,30 +4,31 @@ import com.fasterxml.jackson.databind.*;
 import com.google.common.collect.*;
 import com.homeadvisor.kafdrop.config.*;
 import com.homeadvisor.kafdrop.model.*;
+import com.homeadvisor.kafdrop.util.*;
 import org.apache.kafka.clients.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.*;
 import org.apache.kafka.common.config.*;
+import org.apache.kafka.common.serialization.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
 import javax.annotation.*;
+import java.nio.*;
+import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
-/**
- * Created by Satendra Sahu on 9/20/18
- */
 @Service
-public class KafkaHighLevelConsumer {
+public final class KafkaHighLevelConsumer {
   private static final int POLL_TIMEOUT_MS = 200;
 
   private final Logger LOG = LoggerFactory.getLogger(getClass());
   @Autowired
   private ObjectMapper objectMapper;
-  private KafkaConsumer<String, String> kafkaConsumer;
+  private KafkaConsumer<String, byte[]> kafkaConsumer;
 
   @Autowired
   private KafkaConfiguration kafkaConfiguration;
@@ -38,15 +39,14 @@ public class KafkaHighLevelConsumer {
   @PostConstruct
   private void initializeClient() {
     if (kafkaConsumer == null) {
-
-      Properties properties = new Properties();
+      final var properties = new Properties();
       properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-      properties.put(ConsumerConfig.GROUP_ID_CONFIG, "kafka-drop-consumer-group");
-      properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, kafkaConfiguration.getKeyDeserializer());
-      properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, kafkaConfiguration.getValueDeserializer());
+      properties.put(ConsumerConfig.GROUP_ID_CONFIG, "kafdrop-consumer-group");
+      properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+      properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
       properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
       properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-      properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafka-drop-client");
+      properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafdrop-client");
       properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getBrokerConnect());
 
       if (kafkaConfiguration.getIsSecured()) {
@@ -58,14 +58,14 @@ public class KafkaHighLevelConsumer {
     }
   }
 
-  public synchronized Map<Integer, TopicPartitionVO> getPartitionSize(String topic) {
+  synchronized Map<Integer, TopicPartitionVO> getPartitionSize(String topic) {
     initializeClient();
 
-    List<PartitionInfo> partitionInfoSet = kafkaConsumer.partitionsFor(topic);
-    kafkaConsumer.assign(partitionInfoSet.stream().map(partitionInfo -> {
-                           return new TopicPartition(partitionInfo.topic(), partitionInfo.partition());
-                         }).collect(Collectors.toList())
-    );
+    final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
+    kafkaConsumer.assign(partitionInfoSet.stream()
+                             .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+                                                                      partitionInfo.partition()))
+                             .collect(Collectors.toList()));
 
     kafkaConsumer.poll(0);
     Set<TopicPartition> assignedPartitionList = kafkaConsumer.assignment();
@@ -90,34 +90,45 @@ public class KafkaHighLevelConsumer {
     return partitionsVo;
   }
 
-  public synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition topicPartition, long offset, Long count) {
+  synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition topicPartition, long offset, Long count,
+                                                                     MessageDeserializer deserializer) {
     initializeClient();
-    kafkaConsumer.assign(Arrays.asList(topicPartition));
+    kafkaConsumer.assign(Collections.singletonList(topicPartition));
     kafkaConsumer.seek(topicPartition, offset);
 
-    ConsumerRecords records = null;
-
-    records = kafkaConsumer.poll(POLL_TIMEOUT_MS);
-    final int numRecords = records.count();
-    if (numRecords > 0) {
-      return records.records(topicPartition).subList(0, Math.min(count.intValue(), numRecords));
-    }
-    return null;
+    final var rawRecords = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS));
+    final var numRecords = rawRecords.count();
+    return rawRecords.records(topicPartition)
+        .subList(0, Math.min(count.intValue(), numRecords))
+        .stream()
+        .map(rec -> new ConsumerRecord<>(rec.topic(),
+                                         rec.partition(),
+                                         rec.offset(),
+                                         rec.timestamp(),
+                                         rec.timestampType(),
+                                         0L,
+                                         rec.serializedKeySize(),
+                                         rec.serializedValueSize(),
+                                         rec.key(),
+                                         deserializer.deserializeMessage(ByteBuffer.wrap(rec.value())),
+                                         rec.headers(),
+                                         rec.leaderEpoch()))
+        .collect(Collectors.toList());
   }
 
-  public synchronized Map<String, TopicVO> getTopicsInfo(String[] topics) {
+  synchronized Map<String, TopicVO> getTopicsInfo(String[] topics) {
     initializeClient();
     if (topics.length == 0) {
-      Set<String> topicSet = kafkaConsumer.listTopics().keySet();
+      final var topicSet = kafkaConsumer.listTopics().keySet();
       topics = Arrays.copyOf(topicSet.toArray(), topicSet.size(), String[].class);
     }
-    Map<String, TopicVO> topicVOMap = Maps.newHashMap();
+    final var topicVos = new HashMap<String, TopicVO>();
 
-    for (String topic : topics) {
-      topicVOMap.put(topic, getTopicInfo(topic));
+    for (var topic : topics) {
+      topicVos.put(topic, getTopicInfo(topic));
     }
 
-    return topicVOMap;
+    return topicVos;
   }
 
   private TopicVO getTopicInfo(String topic) {

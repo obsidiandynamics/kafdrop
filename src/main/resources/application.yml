@@ -24,7 +24,6 @@ management:
     port: 9000
 
 kafdrop.monitor:
-  kafkaVersion: "0.11.0.2"
   threadPoolSize: 10
   retry:
     maxAttempts: 5
@@ -52,8 +51,6 @@ project:
 kafka:
   env: local
   brokerConnect: localhost:9092
-  keyDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
-  valueDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
   isSecured: false
   saslMechanism: "PLAIN"
   securityProtocol: "SASL_PLAINTEXT"
