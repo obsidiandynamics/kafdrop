@@ -22,7 +22,7 @@ import org.junit.*;
 
 import static org.junit.Assert.*;
 
-public class ConsumerPartitionVOTest {
+public final class ConsumerPartitionVOTest {
   private void doLagTest(long first, long last, long offset, long expectedLag) {
     final ConsumerPartitionVO partition = new ConsumerPartitionVO("test", "test", 0);
     partition.setFirstOffset(first);
@@ -32,7 +32,7 @@ public class ConsumerPartitionVOTest {
   }
 
   @Test
-  public void testGetLag() throws Exception {
+  public void testGetLag() {
     doLagTest(0, 0, 0, 0);
     doLagTest(-1, -1, -1, 0);
     doLagTest(5, 10, 8, 2);

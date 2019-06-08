@@ -24,9 +24,8 @@ import java.util.*;
 import java.util.stream.*;
 
 public class ConsumerVO implements Comparable<ConsumerVO> {
-  private String groupId;
-  private Map<String, ConsumerTopicVO> topics = new TreeMap<>();
-  private List<ConsumerRegistrationVO> activeInstances = new ArrayList<>();
+  private final String groupId;
+  private final Map<String, ConsumerTopicVO> topics = new TreeMap<>();
 
   public ConsumerVO(String groupId) {
     Validate.notEmpty("groupId is required");
@@ -35,24 +34,6 @@ public class ConsumerVO implements Comparable<ConsumerVO> {
 
   public String getGroupId() {
     return groupId;
-  }
-
-  public void setGroupId(String groupId) {
-    this.groupId = groupId;
-  }
-
-  public void addActiveInstance(ConsumerRegistrationVO id) {
-    activeInstances.add(id);
-  }
-
-  public List<ConsumerRegistrationVO> getActiveInstances() {
-    return activeInstances;
-  }
-
-  public List<ConsumerRegistrationVO> getActiveInstancesForTopic(String topic) {
-    return activeInstances.stream()
-        .filter(reg -> reg.getSubscriptions().containsKey(topic))
-        .collect(Collectors.toList());
   }
 
   public void addTopic(ConsumerTopicVO topic) {
@@ -65,12 +46,6 @@ public class ConsumerVO implements Comparable<ConsumerVO> {
 
   public Collection<ConsumerTopicVO> getTopics() {
     return topics.values();
-  }
-
-  public int getActiveTopicCount() {
-    return topics.values().stream()
-        .map(t -> t.getAssignedPartitionCount() > 0 ? 1 : 0)
-        .reduce(0, Integer::sum);
   }
 
   @Override
@@ -92,5 +67,4 @@ public class ConsumerVO implements Comparable<ConsumerVO> {
   public int hashCode() {
     return groupId.hashCode();
   }
-
 }
