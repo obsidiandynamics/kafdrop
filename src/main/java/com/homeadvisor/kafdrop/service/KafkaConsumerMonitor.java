@@ -13,13 +13,9 @@ import java.util.stream.*;
 public final class KafkaConsumerMonitor implements ConsumerMonitor {
   private static final Logger LOG = LoggerFactory.getLogger(KafkaConsumerMonitor.class);
 
-  private final KafkaHighLevelConsumer highLevelConsumer;
-
   private final KafkaHighLevelAdminClient highLevelAdminClient;
 
-  public KafkaConsumerMonitor(KafkaHighLevelConsumer highLevelConsumer,
-                              KafkaHighLevelAdminClient highLevelAdminClient) {
-    this.highLevelConsumer = highLevelConsumer;
+  public KafkaConsumerMonitor(KafkaHighLevelAdminClient highLevelAdminClient) {
     this.highLevelAdminClient = highLevelAdminClient;
   }
 
@@ -42,7 +38,6 @@ public final class KafkaConsumerMonitor implements ConsumerMonitor {
         final var topicPartitionVo = topic.getPartition(partition);
         offsetVo.setSize(topicPartitionVo.map(TopicPartitionVO::getSize).orElse(-1L));
         offsetVo.setFirstOffset(topicPartitionVo.map(TopicPartitionVO::getFirstOffset).orElse(-1L));
-        System.out.println("offsetVo: " + offsetVo + ", lag: " + offsetVo.getLag());
       }
     }
 

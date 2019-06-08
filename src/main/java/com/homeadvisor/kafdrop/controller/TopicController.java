@@ -57,31 +57,9 @@ public class TopicController {
   })
   @RequestMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody
-  TopicVO getTopic(@PathVariable("name") String topicName) throws Exception {
-    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+  TopicVO getTopic(@PathVariable("name") String topicName) {
+    return kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
-
-    return topic;
-  }
-
-  @ApiOperation(value = "getTopicAndConsumer", notes = "Get partition details for a topic and consumer group")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = ConsumerVO.class),
-      @ApiResponse(code = 404, message = "Invalid topic name or consumer group")
-  })
-  @RequestMapping(path = "/{name:.+}/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-  public @ResponseBody
-  ConsumerVO getTopicAndConsumer(
-      @PathVariable("name") String topicName,
-      @PathVariable("groupId") String groupId)
-  throws Exception {
-    final TopicVO topic = kafkaMonitor.getTopic(topicName)
-        .orElseThrow(() -> new TopicNotFoundException(topicName));
-
-    final ConsumerVO consumer = kafkaMonitor.getConsumerByTopic(groupId, topic)
-        .orElseThrow(() -> new ConsumerNotFoundException(topicName));
-
-    return consumer;
   }
 
   @ApiOperation(value = "getAllTopics", notes = "Get list of all topics")
@@ -90,7 +68,7 @@ public class TopicController {
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody
-  List<String> getAllTopics() throws Exception {
+  List<String> getAllTopics() {
     return kafkaMonitor.getTopics().stream().map(TopicVO::getName).collect(Collectors.toList());
   }
 }

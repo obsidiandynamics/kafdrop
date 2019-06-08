@@ -38,10 +38,4 @@ public interface KafkaMonitor {
   Optional<TopicVO> getTopic(String topic);
 
   ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
-
-  List<ConsumerVO> getConsumers(TopicVO topic);
-
-  Optional<ConsumerVO> getConsumer(String groupId);
-
-  Optional<ConsumerVO> getConsumerByTopic(String groupId, TopicVO topic);
 }
