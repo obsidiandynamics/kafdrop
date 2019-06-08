@@ -3,20 +3,19 @@ package com.homeadvisor.kafdrop.util;
 import java.nio.*;
 import java.nio.charset.*;
 
-public class ByteUtils {
-
-  public static String readString(ByteBuffer buffer) {
+final class ByteUtils {
+  static String readString(ByteBuffer buffer) {
     return new String(readBytes(buffer), StandardCharsets.UTF_8);
   }
 
   private static byte[] readBytes(ByteBuffer buffer) {
-    return readBytes(buffer, 0, buffer.limit());
+    return readBytes(buffer, buffer.limit());
   }
 
-  public static byte[] readBytes(ByteBuffer buffer, int offset, int size) {
-    byte[] dest = new byte[size];
+  private static byte[] readBytes(ByteBuffer buffer, int size) {
+    final var dest = new byte[size];
     if (buffer.hasArray()) {
-      System.arraycopy(buffer.array(), buffer.arrayOffset() + offset, dest, 0, size);
+      System.arraycopy(buffer.array(), buffer.arrayOffset(), dest, 0, size);
     } else {
       buffer.mark();
       buffer.get(dest);
@@ -25,10 +24,9 @@ public class ByteUtils {
     return dest;
   }
 
-  public static byte[] convertToByteArray(ByteBuffer buffer) {
-    byte[] bytes = new byte[buffer.remaining()];
+  static byte[] convertToByteArray(ByteBuffer buffer) {
+    final var bytes = new byte[buffer.remaining()];
     buffer.get(bytes, 0, bytes.length);
     return bytes;
   }
-
 }
