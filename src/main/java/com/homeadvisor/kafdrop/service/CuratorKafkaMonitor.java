@@ -23,17 +23,6 @@ import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.homeadvisor.kafdrop.model.*;
 import com.homeadvisor.kafdrop.util.*;
-import kafka.api.*;
-import kafka.cluster.*;
-import kafka.common.*;
-import kafka.javaapi.ConsumerMetadataResponse;
-import kafka.javaapi.OffsetFetchRequest;
-import kafka.javaapi.OffsetFetchResponse;
-import kafka.javaapi.OffsetRequest;
-import kafka.javaapi.OffsetResponse;
-import kafka.javaapi.PartitionMetadata;
-import kafka.javaapi.TopicMetadata;
-import kafka.network.*;
 import kafka.utils.*;
 import org.apache.commons.lang3.*;
 import org.apache.curator.framework.*;
@@ -42,18 +31,12 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCache.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
 import org.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.retry.backoff.*;
-import org.springframework.retry.policy.*;
-import org.springframework.retry.support.*;
 import org.springframework.stereotype.*;
 
 import javax.annotation.*;
 import java.io.*;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.util.stream.*;
 
@@ -61,46 +44,29 @@ import java.util.stream.*;
 public class CuratorKafkaMonitor implements KafkaMonitor {
   private static final Logger LOG = LoggerFactory.getLogger(CuratorKafkaMonitor.class);
 
-  @Autowired
-  private CuratorFramework curatorFramework;
+  private final CuratorFramework curatorFramework;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   private PathChildrenCache brokerPathCache;
   private PathChildrenCache topicConfigPathCache;
   private TreeCache consumerTreeCache;
   private NodeCache controllerNodeCache;
 
-  private Map<Integer, BrokerVO> brokerCache = new TreeMap<>();
+  private final Map<Integer, BrokerVO> brokerCache = new TreeMap<>();
 
-  private AtomicInteger cacheInitCounter = new AtomicInteger();
+  private final AtomicInteger cacheInitCounter = new AtomicInteger();
 
-  private ForkJoinPool threadPool;
+  private final KafkaHighLevelConsumer kafkaHighLevelConsumer;
 
-  @Autowired
-  private CuratorKafkaMonitorProperties properties;
-  @Autowired
-  private KafkaHighLevelConsumer kafkaHighLevelConsumer;
-
-  private RetryTemplate retryTemplate;
+  public CuratorKafkaMonitor(CuratorFramework curatorFramework, ObjectMapper objectMapper, CuratorKafkaMonitorProperties properties, KafkaHighLevelConsumer kafkaHighLevelConsumer) {
+    this.curatorFramework = curatorFramework;
+    this.objectMapper = objectMapper;
+    this.kafkaHighLevelConsumer = kafkaHighLevelConsumer;
+  }
 
   @PostConstruct
   public void start() throws Exception {
-    threadPool = new ForkJoinPool(properties.getThreadPoolSize());
-
-    FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
-    backOffPolicy.setBackOffPeriod(properties.getRetry().getBackoffMillis());
-
-    final SimpleRetryPolicy retryPolicy =
-        new SimpleRetryPolicy(properties.getRetry().getMaxAttempts(),
-                              ImmutableMap.of(InterruptedException.class, false,
-                                              Exception.class, true));
-
-    retryTemplate = new RetryTemplate();
-    retryTemplate.setBackOffPolicy(backOffPolicy);
-    retryTemplate.setRetryPolicy(retryPolicy);
-
     cacheInitCounter.set(4);
 
     brokerPathCache = new PathChildrenCache(curatorFramework, ZkUtils.BrokerIdsPath(), true);
@@ -146,15 +112,11 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
     updateController();
   }
 
-  private String clientId() {
-    return properties.getClientId();
-  }
-
   private void updateController() {
     Optional.ofNullable(controllerNodeCache.getCurrentData())
         .map(data -> {
           try {
-            Map controllerData = objectMapper.reader(Map.class).readValue(data.getData());
+            final Map controllerData = objectMapper.readerFor(Map.class).readValue(data.getData());
             return (Integer) controllerData.get("brokerid");
           } catch (IOException e) {
             LOG.error("Unable to read controller data", e);
@@ -176,28 +138,21 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   }
 
   @PreDestroy
-  public void stop()
-  throws IOException {
+  public void stop() throws IOException {
     consumerTreeCache.close();
     topicConfigPathCache.close();
     brokerPathCache.close();
     controllerNodeCache.close();
   }
 
-  private int brokerId(ChildData input) {
-    return Integer.parseInt(StringUtils.substringAfter(input.getPath(), ZkUtils.BrokerIdsPath() + "/"));
-  }
-
-  private BrokerVO addBroker(BrokerVO broker) {
+  private void addBroker(BrokerVO broker) {
     final BrokerVO oldBroker = brokerCache.put(broker.getId(), broker);
     LOG.info("Kafka broker {} was {}", broker.getId(), oldBroker == null ? "added" : "updated");
-    return oldBroker;
   }
 
-  private BrokerVO removeBroker(int brokerId) {
+  private void removeBroker(int brokerId) {
     final BrokerVO broker = brokerCache.remove(brokerId);
     LOG.info("Kafka broker {} was removed", broker.getId());
-    return broker;
   }
 
   @Override
@@ -212,36 +167,11 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
     return Optional.ofNullable(brokerCache.get(id));
   }
 
-  private BrokerChannel brokerChannel(Integer brokerId) {
-    if (brokerId == null) {
-      brokerId = randomBroker();
-      if (brokerId == null) {
-        throw new BrokerNotFoundException("No brokers available to select from");
-      }
-    }
-
-    Integer finalBrokerId = brokerId;
-    BrokerVO broker = getBroker(brokerId)
-        .orElseThrow(() -> new BrokerNotFoundException("Broker " + finalBrokerId + " is not available"));
-
-    return BrokerChannel.forBroker(broker.getHost(), broker.getPort());
-  }
-
-  private Integer randomBroker() {
-    if (brokerCache.size() > 0) {
-      List<Integer> brokerIds = new ArrayList<>(brokerCache.keySet());
-      Collections.shuffle(brokerIds);
-      return brokerIds.get(0);
-    } else {
-      return null;
-    }
-  }
-
   @Override
   public ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics) {
     final ClusterSummaryVO topicSummary = topics.stream()
         .map(topic -> {
-          ClusterSummaryVO summary = new ClusterSummaryVO();
+          final ClusterSummaryVO summary = new ClusterSummaryVO();
           summary.setPartitionCount(topic.getPartitions().size());
           summary.setUnderReplicatedCount(topic.getUnderReplicatedPartitions().size());
           summary.setPreferredReplicaPercent(topic.getPreferredReplicaPercent());
@@ -283,33 +213,27 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   @Override
   public Optional<TopicVO> getTopic(String topic) {
     validateInitialized();
-    final Optional<TopicVO> topicVO = Optional.ofNullable(getTopicMetadata(topic).get(topic));
-    topicVO.ifPresent(vo -> vo.setPartitions(getTopicPartitionSizes(vo)));
-    return topicVO;
+    final Optional<TopicVO> topicVo = Optional.ofNullable(getTopicMetadata(topic).get(topic));
+    topicVo.ifPresent(vo -> vo.setPartitions(getTopicPartitionSizes(vo)));
+    return topicVo;
   }
 
   private Map<String, TopicVO> getTopicMetadata(String... topics) {
-    return retryTemplate.execute(
-        context -> brokerChannel(null)
-            .execute(channel -> getTopicMetadata(channel, topics)));
-  }
-
-  private Map<String, TopicVO> getTopicMetadata(BlockingChannel channel, String... topics) {
     return kafkaHighLevelConsumer.getTopicsInfo(topics);
   }
 
   @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count,
                                      MessageDeserializer deserializer) {
-    List<ConsumerRecord<String, String>> records = kafkaHighLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);
+    final List<ConsumerRecord<String, String>> records =
+        kafkaHighLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);
     if (records != null) {
-      List<MessageVO> messageVos = Lists.newArrayList();
+      final List<MessageVO> messageVos = Lists.newArrayList();
       for (ConsumerRecord<String, String> record : records) {
-        MessageVO messageVo = new MessageVO();
+        final MessageVO messageVo = new MessageVO();
         messageVo.setKey(record.key());
         messageVo.setMessage(record.value());
         messageVo.setHeaders(Arrays.toString(record.headers().toArray()));
-
         messageVos.add(messageVo);
       }
       return messageVos;
@@ -322,7 +246,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
     return kafkaHighLevelConsumer.getPartitionSize(topic.getName());
   }
 
-  private class BrokerListener implements PathChildrenCacheListener {
+  private final class BrokerListener implements PathChildrenCacheListener {
     @Override
     public void childEvent(CuratorFramework framework, PathChildrenCacheEvent event) {
       switch (event.getType()) {
@@ -353,7 +277,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
     private BrokerVO parseBroker(ChildData input) {
       try {
-        final BrokerVO broker = objectMapper.reader(BrokerVO.class).readValue(input.getData());
+        final BrokerVO broker = objectMapper.readerFor(BrokerVO.class).readValue(input.getData());
         broker.setId(brokerId(input));
         return broker;
       } catch (IOException e) {
