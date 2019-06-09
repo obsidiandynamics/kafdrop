@@ -7,7 +7,6 @@
         <format>zip</format>
     </formats>
     <dependencySets>
-
         <dependencySet>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>

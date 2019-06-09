@@ -20,20 +20,10 @@ package com.homeadvisor.kafdrop.service;
 
 import com.homeadvisor.kafdrop.model.*;
 import com.homeadvisor.kafdrop.util.*;
-import kafka.api.FetchRequest;
-import kafka.api.*;
-import kafka.javaapi.FetchResponse;
-import kafka.javaapi.consumer.*;
-import kafka.javaapi.message.ByteBufferMessageSet;
-import kafka.message.*;
 import org.apache.kafka.common.*;
-import org.slf4j.*;
 import org.springframework.stereotype.*;
 
-import java.nio.*;
-import java.nio.charset.*;
 import java.util.*;
-import java.util.stream.*;
 
 @Service
 public class MessageInspector {

@@ -203,7 +203,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   @Override
   public List<BrokerVO> getBrokers() {
     validateInitialized();
-    return brokerCache.values().stream().collect(Collectors.toList());
+    return new ArrayList<>(brokerCache.values());
   }
 
   @Override
@@ -229,16 +229,12 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
   private Integer randomBroker() {
     if (brokerCache.size() > 0) {
-      List<Integer> brokerIds = brokerCache.keySet().stream().collect(Collectors.toList());
+      List<Integer> brokerIds = new ArrayList<>(brokerCache.keySet());
       Collections.shuffle(brokerIds);
       return brokerIds.get(0);
     } else {
       return null;
     }
-  }
-
-  public ClusterSummaryVO getClusterSummary() {
-    return getClusterSummary(getTopics());
   }
 
   @Override
@@ -326,91 +322,12 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
     return kafkaHighLevelConsumer.getPartitionSize(topic.getName());
   }
 
-  private Map<Integer, Long> getTopicPartitionSizes(TopicVO topic, long time) {
-    try {
-      PartitionOffsetRequestInfo requestInfo = new PartitionOffsetRequestInfo(time, 1);
-
-      return threadPool.submit(() ->
-                                   topic.getPartitions().parallelStream()
-                                       .filter(p -> p.getLeader() != null)
-                                       .collect(Collectors.groupingBy(p -> p.getLeader().getId())) // Group partitions by leader broker id
-                                       .entrySet().parallelStream()
-                                       .map(entry -> {
-                                         final Integer brokerId = entry.getKey();
-                                         final List<TopicPartitionVO> brokerPartitions = entry.getValue();
-                                         try {
-                                           // Get the size of the partitions for a topic from the leader.
-                                           final OffsetResponse offsetResponse =
-                                               sendOffsetRequest(brokerId, topic, requestInfo, brokerPartitions);
-
-                                           // Build a map of partitionId -> topic size from the response
-                                           return brokerPartitions.stream()
-                                               .collect(Collectors.toMap(TopicPartitionVO::getId,
-                                                                         partition -> Optional.ofNullable(
-                                                                             offsetResponse.offsets(topic.getName(), partition.getId()))
-                                                                             .map(Arrays::stream)
-                                                                             .orElse(LongStream.empty())
-                                                                             .findFirst()
-                                                                             .orElse(-1L)));
-                                         } catch (Exception ex) {
-                                           LOG.error("Unable to get partition log size for topic {} partitions ({})",
-                                                     topic.getName(),
-                                                     brokerPartitions.stream()
-                                                         .map(TopicPartitionVO::getId)
-                                                         .map(String::valueOf)
-                                                         .collect(Collectors.joining(",")),
-                                                     ex);
-
-                                           // Map each partition to -1, indicating we got an error
-                                           return brokerPartitions.stream().collect(Collectors.toMap(TopicPartitionVO::getId, tp -> -1L));
-                                         }
-                                       })
-                                       .map(Map::entrySet)
-                                       .flatMap(Collection::stream)
-                                       .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-          .get();
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw Throwables.propagate(e);
-    } catch (ExecutionException e) {
-      throw Throwables.propagate(e.getCause());
-    }
-  }
-
-  private OffsetResponse sendOffsetRequest(Integer brokerId, TopicVO topic,
-                                           PartitionOffsetRequestInfo requestInfo,
-                                           List<TopicPartitionVO> brokerPartitions) {
-    final OffsetRequest offsetRequest = new OffsetRequest(
-        brokerPartitions.stream()
-            .collect(Collectors.toMap(
-                partition -> new TopicAndPartition(topic.getName(), partition.getId()),
-                partition -> requestInfo)),
-        (short) 0, clientId());
-
-    LOG.debug("Sending offset request: {}", offsetRequest);
-
-    return retryTemplate.execute(
-        context ->
-            brokerChannel(brokerId)
-                .execute(channel ->
-                         {
-                           channel.send(offsetRequest.underlying());
-                           final kafka.api.OffsetResponse underlyingResponse =
-                               kafka.api.OffsetResponse.readFrom(channel.receive().buffer());
-
-                           LOG.debug("Received offset response: {}", underlyingResponse);
-
-                           return new OffsetResponse(underlyingResponse);
-                         }));
-  }
-
   private class BrokerListener implements PathChildrenCacheListener {
     @Override
-    public void childEvent(CuratorFramework framework, PathChildrenCacheEvent event)
-    throws Exception {
+    public void childEvent(CuratorFramework framework, PathChildrenCacheEvent event) {
       switch (event.getType()) {
         case CHILD_REMOVED: {
-          BrokerVO broker = removeBroker(brokerId(event.getData()));
+          removeBroker(brokerId(event.getData()));
           break;
         }
 
