@@ -25,15 +25,14 @@ import java.util.stream.*;
 public final class KafkaHighLevelConsumer {
   private static final int POLL_TIMEOUT_MS = 200;
 
-  private final Logger LOG = LoggerFactory.getLogger(getClass());
-  @Autowired
-  private ObjectMapper objectMapper;
+  private static final Logger LOG = LoggerFactory.getLogger(KafkaHighLevelConsumer.class);
+
   private KafkaConsumer<String, byte[]> kafkaConsumer;
 
-  @Autowired
-  private KafkaConfiguration kafkaConfiguration;
+  private final KafkaConfiguration kafkaConfiguration;
 
-  public KafkaHighLevelConsumer() {
+  public KafkaHighLevelConsumer(KafkaConfiguration kafkaConfiguration) {
+    this.kafkaConfiguration = kafkaConfiguration;
   }
 
   @PostConstruct
@@ -68,24 +67,24 @@ public final class KafkaHighLevelConsumer {
                              .collect(Collectors.toList()));
 
     kafkaConsumer.poll(Duration.ofMillis(0));
-    Set<TopicPartition> assignedPartitionList = kafkaConsumer.assignment();
-    TopicVO topicVO = getTopicInfo(topic);
-    Map<Integer, TopicPartitionVO> partitionsVo = topicVO.getPartitionMap();
+    final Set<TopicPartition> assignedPartitionList = kafkaConsumer.assignment();
+    final TopicVO topicVO = getTopicInfo(topic);
+    final Map<Integer, TopicPartitionVO> partitionsVo = topicVO.getPartitionMap();
 
     kafkaConsumer.seekToBeginning(assignedPartitionList);
-    assignedPartitionList.stream().forEach(topicPartition -> {
-      TopicPartitionVO topicPartitionVO = partitionsVo.get(topicPartition.partition());
-      long startOffset = kafkaConsumer.position(topicPartition);
+    assignedPartitionList.forEach(topicPartition -> {
+      final TopicPartitionVO topicPartitionVo = partitionsVo.get(topicPartition.partition());
+      final long startOffset = kafkaConsumer.position(topicPartition);
       LOG.debug("topic: {}, partition: {}, startOffset: {}", topicPartition.topic(), topicPartition.partition(), startOffset);
-      topicPartitionVO.setFirstOffset(startOffset);
+      topicPartitionVo.setFirstOffset(startOffset);
     });
 
     kafkaConsumer.seekToEnd(assignedPartitionList);
-    assignedPartitionList.stream().forEach(topicPartition -> {
-      long latestOffset = kafkaConsumer.position(topicPartition);
+    assignedPartitionList.forEach(topicPartition -> {
+      final long latestOffset = kafkaConsumer.position(topicPartition);
       LOG.debug("topic: {}, partition: {}, latestOffset: {}", topicPartition.topic(), topicPartition.partition(), latestOffset);
-      TopicPartitionVO partitionVO = partitionsVo.get(topicPartition.partition());
-      partitionVO.setSize(latestOffset);
+      final TopicPartitionVO partitionVo = partitionsVo.get(topicPartition.partition());
+      partitionVo.setSize(latestOffset);
     });
     return partitionsVo;
   }
@@ -132,25 +131,25 @@ public final class KafkaHighLevelConsumer {
   }
 
   private TopicVO getTopicInfo(String topic) {
-    List<PartitionInfo> partitionInfoList = kafkaConsumer.partitionsFor(topic);
-    TopicVO topicVO = new TopicVO(topic);
-    Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
+    final List<PartitionInfo> partitionInfoList = kafkaConsumer.partitionsFor(topic);
+    final TopicVO topicVo = new TopicVO(topic);
+    final Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
 
     for (PartitionInfo partitionInfo : partitionInfoList) {
-      TopicPartitionVO topicPartitionVO = new TopicPartitionVO(partitionInfo.partition());
+      final TopicPartitionVO topicPartitionVo = new TopicPartitionVO(partitionInfo.partition());
 
       final Node leader = partitionInfo.leader();
       if (leader != null) {
-        topicPartitionVO.addReplica(new TopicPartitionVO.PartitionReplica(leader.id(), true, true));
+        topicPartitionVo.addReplica(new TopicPartitionVO.PartitionReplica(leader.id(), true, true));
       }
 
       for (Node node : partitionInfo.replicas()) {
-        topicPartitionVO.addReplica(new TopicPartitionVO.PartitionReplica(node.id(), true, false));
+        topicPartitionVo.addReplica(new TopicPartitionVO.PartitionReplica(node.id(), true, false));
       }
-      partitions.put(partitionInfo.partition(), topicPartitionVO);
+      partitions.put(partitionInfo.partition(), topicPartitionVo);
     }
 
-    topicVO.setPartitions(partitions);
-    return topicVO;
+    topicVo.setPartitions(partitions);
+    return topicVo;
   }
 }

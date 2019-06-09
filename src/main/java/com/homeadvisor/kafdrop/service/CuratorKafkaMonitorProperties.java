@@ -28,56 +28,11 @@ import javax.validation.constraints.*;
 public class CuratorKafkaMonitorProperties {
   private String clientId = "Kafdrop";
 
-  @Min(1)
-  private int threadPoolSize = 10;
-
-  private RetryProperties retry = new RetryProperties();
-
   public String getClientId() {
     return clientId;
   }
 
   public void setClientId(String clientId) {
     this.clientId = clientId;
-  }
-
-  public int getThreadPoolSize() {
-    return threadPoolSize;
-  }
-
-  public void setThreadPoolSize(int threadPoolSize) {
-    this.threadPoolSize = threadPoolSize;
-  }
-
-  public RetryProperties getRetry() {
-    return retry;
-  }
-
-  public void setRetry(RetryProperties retry) {
-    this.retry = retry;
-  }
-
-  public static class RetryProperties {
-    @Min(1)
-    private int maxAttempts = 3;
-
-    @Min(0)
-    private long backoffMillis = 1000;
-
-    public int getMaxAttempts() {
-      return maxAttempts;
-    }
-
-    public void setMaxAttempts(int maxAttempts) {
-      this.maxAttempts = maxAttempts;
-    }
-
-    public long getBackoffMillis() {
-      return backoffMillis;
-    }
-
-    public void setBackoffMillis(long backoffMillis) {
-      this.backoffMillis = backoffMillis;
-    }
   }
 }

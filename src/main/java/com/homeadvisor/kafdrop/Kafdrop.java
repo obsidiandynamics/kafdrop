@@ -20,7 +20,6 @@ package com.homeadvisor.kafdrop;
 
 import com.google.common.base.*;
 import com.homeadvisor.kafdrop.config.ini.*;
-import joptsimple.internal.Strings;
 import org.slf4j.*;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;

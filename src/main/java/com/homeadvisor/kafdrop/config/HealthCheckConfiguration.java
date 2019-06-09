@@ -18,7 +18,6 @@
 
 package com.homeadvisor.kafdrop.config;
 
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.actuate.health.*;
 import org.springframework.context.annotation.*;
 import org.springframework.jmx.export.annotation.*;
@@ -32,13 +31,16 @@ public class HealthCheckConfiguration {
   @Component
   @ManagedResource
   public static class HealthCheck {
-    @Autowired
-    private HealthEndpoint healthEndpoint;
+    private final HealthEndpoint healthEndpoint;
+
+    public HealthCheck(HealthEndpoint healthEndpoint) {
+      this.healthEndpoint = healthEndpoint;
+    }
 
     @ManagedAttribute
     public Map getHealth() {
-      Health health = healthEndpoint.health();
-      Map healthMap = new LinkedHashMap();
+      final var health = healthEndpoint.health();
+      final var healthMap = new LinkedHashMap<String, Object>();
       healthMap.put("status", getStatus(health));
       healthMap.put("detail", getDetails(health.getDetails()));
       return healthMap;
@@ -58,7 +60,7 @@ public class HealthCheckConfiguration {
     }
 
     private String getStatus(Health health) {
-      final Status status = health.getStatus();
+      final var status = health.getStatus();
       if (Status.UP.equals(status) || Status.DOWN.equals(status)) {
         return status.toString();
       } else {

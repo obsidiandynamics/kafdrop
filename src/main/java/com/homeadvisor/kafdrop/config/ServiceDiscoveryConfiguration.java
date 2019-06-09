@@ -38,30 +38,29 @@ import java.util.stream.*;
 @Configuration
 @ConditionalOnProperty("curator.discovery.enabled")
 public class ServiceDiscoveryConfiguration {
-  @Autowired
-  private Environment environment;
-
-  @Autowired
-  private InfoEndpoint infoEndpoint;
+  private final InfoEndpoint infoEndpoint;
 
   @Value("${spring.jmx.default_domain}")
   private String jmxDomain;
+
+  public ServiceDiscoveryConfiguration(InfoEndpoint infoEndpoint) {
+    this.infoEndpoint = infoEndpoint;
+  }
 
   @Bean(initMethod = "start", destroyMethod = "close")
   public ServiceDiscovery curatorServiceDiscovery(
       CuratorFramework curatorFramework,
       @Value("${curator.discovery.basePath:/homeadvisor/services}") String basePath) throws Exception {
-    final Class payloadClass = Object.class;
+    final Class<Object> payloadClass = Object.class;
     curatorFramework.createContainers(basePath);
     return ServiceDiscoveryBuilder.builder(payloadClass)
         .client(curatorFramework)
         .basePath(basePath)
-        .serializer(new JsonInstanceSerializer(payloadClass))
+        .serializer(new JsonInstanceSerializer<>(payloadClass))
         .build();
   }
 
-
-  public Map<String, Object> serviceDetails(Integer serverPort) {
+  private Map<String, Object> serviceDetails(Integer serverPort) {
     Map<String, Object> details = new LinkedHashMap<>();
 
     Optional.ofNullable(infoEndpoint.info())
@@ -74,14 +73,14 @@ public class ServiceDiscoveryConfiguration {
 
     final String name = (String) details.getOrDefault("serviceName", "kafdrop");
 
-    String host = null;
+    String host;
     try {
       host = InetAddress.getLocalHost().getHostName();
     } catch (UnknownHostException e) {
       host = "<unknown>";
     }
 
-    details.put("id", Stream.of(name, host, UUID.randomUUID().toString()).collect(Collectors.joining("_")));
+    details.put("id", String.join("_", name, host, UUID.randomUUID().toString()));
     details.put("name", name);
     details.put("host", host);
     details.put("jmxPort", JmxUtils.getJmxPort());
@@ -93,7 +92,7 @@ public class ServiceDiscoveryConfiguration {
   }
 
   private String healthCheckBeanName() {
-    String shortClassName = ClassUtils.getShortName(HealthCheckConfiguration.HealthCheck.class);
+    final String shortClassName = ClassUtils.getShortName(HealthCheckConfiguration.HealthCheck.class);
     return Introspector.decapitalize(shortClassName);
   }
 
@@ -101,7 +100,7 @@ public class ServiceDiscoveryConfiguration {
   @ConditionalOnMissingBean
   @ConditionalOnWebApplication
   public ServiceInstance serviceInstance(ServletWebServerApplicationContext webContext,
-                                         ServiceDiscovery serviceDiscovery)
+                                         ServiceDiscovery<Map<String, Object>> serviceDiscovery)
   throws Exception {
     final Map<String, Object> details = serviceDetails(webContext.getWebServer().getPort());
 

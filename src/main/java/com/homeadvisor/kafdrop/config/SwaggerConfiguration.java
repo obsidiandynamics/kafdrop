@@ -52,7 +52,7 @@ public class SwaggerConfiguration {
   /**
    *  Swagger Predicate for only selecting JSON endpoints.
    */
-  public class JsonRequestHandlerPredicate implements Predicate<RequestHandler> {
+  public final class JsonRequestHandlerPredicate implements Predicate<RequestHandler> {
     @Override
     public boolean apply(RequestHandler input) {
       return input.produces().contains(MediaType.APPLICATION_JSON);
@@ -62,7 +62,7 @@ public class SwaggerConfiguration {
   /**
    *  Swagger Predicate for ignoring {@code /debug} endpoints.
    */
-  public class IgnoreDebugPathPredicate implements Predicate<String> {
+  public final class IgnoreDebugPathPredicate implements Predicate<String> {
     @Override
     public boolean apply(String input) {
       return !input.startsWith("/debug");

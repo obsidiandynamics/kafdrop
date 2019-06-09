@@ -10,11 +10,9 @@ import javax.annotation.*;
 
 @Configuration
 public class MessageFormatConfiguration {
-
   @Component
   @ConfigurationProperties(prefix = "message")
   public static class MessageFormatProperties {
-
     private MessageFormat format;
 
     @PostConstruct
@@ -32,7 +30,5 @@ public class MessageFormatConfiguration {
     public void setFormat(MessageFormat format) {
       this.format = format;
     }
-
   }
-
 }

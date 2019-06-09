@@ -68,7 +68,7 @@ public class CorsConfiguration {
   public Filter corsFilter() {
     return new Filter() {
       @Override
-      public void init(FilterConfig filterConfig) throws ServletException {
+      public void init(FilterConfig filterConfig) {
       }
 
       @Override

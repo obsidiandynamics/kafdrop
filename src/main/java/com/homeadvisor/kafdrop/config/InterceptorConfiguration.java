@@ -18,7 +18,6 @@
 
 package com.homeadvisor.kafdrop.config;
 
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.core.env.*;
 import org.springframework.stereotype.*;
 import org.springframework.web.servlet.*;
@@ -28,16 +27,17 @@ import org.springframework.web.servlet.handler.*;
 import javax.servlet.http.*;
 
 @Component
-public class InterceptorConfiguration extends WebMvcConfigurerAdapter {
+public class InterceptorConfiguration implements WebMvcConfigurer {
+  private final Environment environment;
 
-  @Autowired
-  private Environment environment;
+  public InterceptorConfiguration(Environment environment) {
+    this.environment = environment;
+  }
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new ProfileHandlerInterceptor());
   }
-
 
   public class ProfileHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
@@ -48,5 +48,4 @@ public class InterceptorConfiguration extends WebMvcConfigurerAdapter {
       }
     }
   }
-
 }

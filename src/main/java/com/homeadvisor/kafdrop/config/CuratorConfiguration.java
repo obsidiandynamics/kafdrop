@@ -20,16 +20,16 @@ package com.homeadvisor.kafdrop.config;
 
 import org.apache.curator.framework.*;
 import org.apache.curator.retry.*;
-import org.hibernate.validator.constraints.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.actuate.health.*;
 import org.springframework.boot.context.properties.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 
+import javax.validation.constraints.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.regex.*;
+import java.util.regex.Pattern;
 import java.util.stream.*;
 
 @Configuration
@@ -47,7 +47,7 @@ public class CuratorConfiguration {
   @Component
   @ConfigurationProperties(prefix = "zookeeper")
   public static class ZookeeperProperties {
-    public static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
+    static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
     @NotBlank
     private String connect;
 
@@ -107,7 +107,7 @@ public class CuratorConfiguration {
   }
 
   @Component(value = "curatorConnection")
-  private static class CuratorHealthIndicator extends AbstractHealthIndicator {
+  public static final class CuratorHealthIndicator extends AbstractHealthIndicator {
     private final CuratorFramework framework;
 
     @Autowired
@@ -116,7 +116,7 @@ public class CuratorConfiguration {
     }
 
     @Override
-    protected void doHealthCheck(Health.Builder builder) throws Exception {
+    protected void doHealthCheck(Health.Builder builder) {
       if (framework.getZookeeperClient().isConnected()) {
         builder.up();
       } else {

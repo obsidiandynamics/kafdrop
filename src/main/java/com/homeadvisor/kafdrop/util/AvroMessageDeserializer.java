@@ -1,6 +1,5 @@
 package com.homeadvisor.kafdrop.util;
 
-import com.google.gson.*;
 import io.confluent.kafka.serializers.*;
 
 import java.nio.*;
@@ -20,14 +19,7 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
   public String deserializeMessage(ByteBuffer buffer) {
     // Convert byte buffer to byte array
     final var bytes = ByteUtils.convertToByteArray(buffer);
-    return formatJsonMessage(deserializer.deserialize(topicName, bytes).toString());
-  }
-
-  private static String formatJsonMessage(String jsonMessage) {
-    final var gson = new GsonBuilder().setPrettyPrinting().create();
-    final var parser = new JsonParser();
-    final var element = parser.parse(jsonMessage);
-    return gson.toJson(element);
+    return deserializer.deserialize(topicName, bytes).toString();
   }
 
   private static KafkaAvroDeserializer getDeserializer(String schemaRegistryUrl) {

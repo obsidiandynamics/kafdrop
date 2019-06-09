@@ -11,12 +11,10 @@ import java.util.stream.*;
 
 @Configuration
 public class SchemaRegistryConfiguration {
-
   @Component
   @ConfigurationProperties(prefix = "schemaregistry")
   public static class SchemaRegistryProperties {
-
-    public static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
+    static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
 
     private String connect;
 
@@ -34,7 +32,5 @@ public class SchemaRegistryConfiguration {
           .filter(s -> s.length() > 0)
           .collect(Collectors.toList());
     }
-
   }
-
 }

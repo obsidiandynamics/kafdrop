@@ -24,10 +24,7 @@ management:
     port: 9000
 
 kafdrop.monitor:
-  threadPoolSize: 10
-  retry:
-    maxAttempts: 5
-    backoffMillis: 2000
+  clientId: Kafdrop
 
 curator.discovery:
   enabled: true
