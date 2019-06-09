@@ -26,25 +26,10 @@ import java.util.*;
 public class BrokerVO {
   private int id;
   private String host;
-  private String[] endpoints;
   private int port;
-  private int jmxPort;
   private int version;
   private boolean controller;
   private Date timestamp;
-
-  public String[] getEndpoints() {
-    return this.endpoints;
-  }
-
-  public void setEndpoints(String[] endpoints) {
-    this.endpoints = endpoints;
-    if (host == null) {
-      String[] hostPort = endpoints[0].split("://")[1].split(":");
-      this.host = hostPort[0];
-      this.port = Integer.parseInt(hostPort[1]);
-    }
-  }
 
   public int getId() {
     return id;
@@ -74,15 +59,6 @@ public class BrokerVO {
     }
   }
 
-  public int getJmxPort() {
-    return jmxPort;
-  }
-
-  @JsonProperty("jmx_port")
-  public void setJmxPort(int jmxPort) {
-    this.jmxPort = jmxPort;
-  }
-
   public int getVersion() {
     return version;
   }
@@ -93,10 +69,6 @@ public class BrokerVO {
 
   public Date getTimestamp() {
     return timestamp;
-  }
-
-  public void setTimestamp(Date timestamp) {
-    this.timestamp = timestamp;
   }
 
   public boolean isController() {

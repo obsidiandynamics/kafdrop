@@ -58,7 +58,6 @@
                 <th>ID</th>
                 <th>Host</th>
                 <th>Port</th>
-                <th>JMX Port</th>
                 <th>Version</th>
                 <th>
                     Start Time
@@ -91,7 +90,6 @@
                     <td><a href="/broker/${b.id}"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
                     <td>${b.host}</td>
                     <td>${b.port?string}</td>
-                    <td>${b.jmxPort?string}</td>
                     <td>${b.version}</td>
                     <td>${b.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
                     <td><@template.yn b.controller/></td>
