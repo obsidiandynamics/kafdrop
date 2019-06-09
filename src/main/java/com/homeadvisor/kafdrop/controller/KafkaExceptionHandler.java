@@ -22,10 +22,9 @@ import com.homeadvisor.kafdrop.service.*;
 import org.springframework.web.bind.annotation.*;
 
 @ControllerAdvice
-public class KafkaExceptionHandler {
+public final class KafkaExceptionHandler {
   @ExceptionHandler(NotInitializedException.class)
   public String notInitialized() {
     return "not-initialized";
   }
-
 }

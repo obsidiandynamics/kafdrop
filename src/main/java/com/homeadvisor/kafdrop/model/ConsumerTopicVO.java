@@ -43,32 +43,7 @@ public class ConsumerTopicVO {
         .reduce(0L, Long::sum);
   }
 
-  public long getMaxLag() {
-    return offsets.values().stream()
-        .map(ConsumerPartitionVO::getLag)
-        .filter(lag -> lag >= 0)
-        .reduce(0L, Long::max);
-  }
-
   public Collection<ConsumerPartitionVO> getPartitions() {
     return offsets.values();
-  }
-
-  public double getCoveragePercent() {
-    return (offsets.size() > 0) ? ((double) getAssignedPartitionCount()) / offsets.size() : 0.0;
-  }
-
-  public int getAssignedPartitionCount() {
-    return (int) offsets.values().stream()
-        .filter(p -> p.getOwner() != null)
-        .count();
-  }
-
-  public int getOwnerCount() {
-    return (int) offsets.values().stream()
-        .map(ConsumerPartitionVO::getOwner)
-        .filter(Objects::nonNull)
-        .distinct()
-        .count();
   }
 }

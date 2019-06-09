@@ -21,8 +21,8 @@ package com.homeadvisor.kafdrop.model;
 import java.util.*;
 import java.util.stream.*;
 
-public class TopicPartitionVO {
-  private int id;
+public final class TopicPartitionVO {
+  private final int id;
   private Map<Integer, PartitionReplica> replicas = new LinkedHashMap<>();
   private Integer leaderId;
   private Integer preferredLeaderId;
@@ -35,10 +35,6 @@ public class TopicPartitionVO {
 
   public int getId() {
     return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
   }
 
   public Collection<PartitionReplica> getReplicas() {
@@ -64,7 +60,7 @@ public class TopicPartitionVO {
   }
 
   public boolean isLeaderPreferred() {
-    return leaderId == preferredLeaderId;
+    return Objects.equals(leaderId, preferredLeaderId);
   }
 
   public List<PartitionReplica> getInSyncReplicas() {
@@ -99,12 +95,9 @@ public class TopicPartitionVO {
   }
 
   public static class PartitionReplica {
-    private Integer id;
-    private boolean inService;
-    private boolean leader;
-
-    public PartitionReplica() {
-    }
+    private final Integer id;
+    private final boolean inService;
+    private final boolean leader;
 
     public PartitionReplica(Integer id, boolean inService, boolean leader) {
       this.id = id;
@@ -116,24 +109,12 @@ public class TopicPartitionVO {
       return id;
     }
 
-    public void setId(Integer id) {
-      this.id = id;
-    }
-
-    public boolean isInService() {
+    boolean isInService() {
       return inService;
     }
 
-    public void setInService(boolean inService) {
-      this.inService = inService;
-    }
-
-    public boolean isLeader() {
+    boolean isLeader() {
       return leader;
-    }
-
-    public void setLeader(boolean leader) {
-      this.leader = leader;
     }
   }
 }

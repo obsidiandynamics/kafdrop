@@ -22,12 +22,9 @@ import java.util.*;
 import java.util.stream.*;
 
 public class TopicVO implements Comparable<TopicVO> {
-  private String name;
+  private final String name;
   private Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
-  private Map<String, Object> config = new TreeMap<>();
-  // description?
-  // partition state
-  // delete supported?
+  private final Map<String, Object> config = new TreeMap<>();
 
   public TopicVO(String name) {
     this.name = name;
@@ -37,24 +34,16 @@ public class TopicVO implements Comparable<TopicVO> {
     return name;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
   public Map<String, Object> getConfig() {
     return config;
   }
 
-  public void setConfig(Map<String, Object> config) {
-    this.config = config;
-  }
-
   public Map<Integer, TopicPartitionVO> getPartitionMap() {
-    return partitions;
+    return Collections.unmodifiableMap(partitions);
   }
 
   public Collection<TopicPartitionVO> getPartitions() {
-    return partitions.values();
+    return Collections.unmodifiableCollection(partitions.values());
   }
 
   public void setPartitions(Map<Integer, TopicPartitionVO> partitions) {
@@ -106,10 +95,6 @@ public class TopicVO implements Comparable<TopicVO> {
           .count();
       return ((double) preferredLeaderCount) / ((double) partitions.size());
     }
-  }
-
-  public void addPartition(TopicPartitionVO partition) {
-    partitions.put(partition.getId(), partition);
   }
 
   @Override

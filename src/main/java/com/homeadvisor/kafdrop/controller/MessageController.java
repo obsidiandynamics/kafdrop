@@ -20,6 +20,8 @@ package com.homeadvisor.kafdrop.controller;
 
 import com.fasterxml.jackson.annotation.*;
 import com.homeadvisor.kafdrop.config.*;
+import com.homeadvisor.kafdrop.config.MessageFormatConfiguration.*;
+import com.homeadvisor.kafdrop.config.SchemaRegistryConfiguration.*;
 import com.homeadvisor.kafdrop.model.*;
 import com.homeadvisor.kafdrop.service.*;
 import com.homeadvisor.kafdrop.util.*;
@@ -36,18 +38,21 @@ import javax.validation.constraints.*;
 import java.util.*;
 
 @Controller
-public class MessageController {
-  @Autowired
-  private KafkaMonitor kafkaMonitor;
+public final class MessageController {
+  private final KafkaMonitor kafkaMonitor;
 
-  @Autowired
-  private MessageInspector messageInspector;
+  private final MessageInspector messageInspector;
 
-  @Autowired
-  private MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
+  private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
 
-  @Autowired
-  private SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
+  private final SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
+
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, SchemaRegistryProperties schemaRegistryProperties) {
+    this.kafkaMonitor = kafkaMonitor;
+    this.messageInspector = messageInspector;
+    this.messageFormatProperties = messageFormatProperties;
+    this.schemaRegistryProperties = schemaRegistryProperties;
+  }
 
   /**
    * Human friendly view of reading messages.

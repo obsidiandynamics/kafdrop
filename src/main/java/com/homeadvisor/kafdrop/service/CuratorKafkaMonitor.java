@@ -183,8 +183,6 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
                 if (partition.getPreferredLeader() != null) {
                   summary.addBrokerPreferredLeaderPartition(partition.getPreferredLeader().getId());
                 }
-                partition.getReplicas()
-                    .forEach(replica -> summary.addExpectedBrokerId(replica.getId()));
               });
           return summary;
         })

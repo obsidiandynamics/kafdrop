@@ -36,8 +36,6 @@ public class ClusterSummaryVO {
    */
   private Map<Integer, Integer> brokerPreferredLeaderPartitionCount = new HashMap<>();
 
-  private Set<Integer> expectedBrokerIds = new HashSet<>();
-
   public int getTopicCount() {
     return topicCount;
   }
@@ -100,10 +98,6 @@ public class ClusterSummaryVO {
     return brokerPreferredLeaderPartitionCount;
   }
 
-  public Integer getBrokerPreferredLeaderPartitionCount(int brokerId) {
-    return brokerPreferredLeaderPartitionCount.get(brokerId);
-  }
-
   public void addBrokerPreferredLeaderPartition(int brokerId) {
     addBrokerPreferredLeaderPartition(brokerId, 1);
   }
@@ -114,9 +108,5 @@ public class ClusterSummaryVO {
 
   public Collection<Integer> getExpectedBrokerIds() {
     return brokerPreferredLeaderPartitionCount.keySet();
-  }
-
-  public void addExpectedBrokerId(int brokerId) {
-    expectedBrokerIds.add(brokerId);
   }
 }

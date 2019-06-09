@@ -49,11 +49,10 @@ public class Kafdrop {
   }
 
   @Bean
-  public WebMvcConfigurerAdapter webConfig() {
-    return new WebMvcConfigurerAdapter() {
+  public WebMvcConfigurer webConfig() {
+    return new WebMvcConfigurer() {
       @Override
       public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        super.configureContentNegotiation(configurer);
         configurer.favorPathExtension(false);
       }
     };
@@ -72,7 +71,7 @@ public class Kafdrop {
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-      Environment environment = event.getEnvironment();
+      final Environment environment = event.getEnvironment();
       final String loggingFile = environment.getProperty(PROP_LOGGING_FILE);
       if (loggingFile != null) {
         System.setProperty(PROP_LOGGER, "FILE");
@@ -104,8 +103,8 @@ public class Kafdrop {
       final ConfigurableEnvironment environment = event.getEnvironment();
 
       LOG.info("Initializing jaas config");
-      String env = environment.getProperty("kafka.env");
-      boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
+      final String env = environment.getProperty("kafka.env");
+      final boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
       LOG.info("env: {} .isSecured kafka: {}", env, isSecured);
       if (isSecured && Strings.isNullOrEmpty(env)) {
         throw new RuntimeException("'env' cannot be null if connecting to secured kafka.");
@@ -140,7 +139,7 @@ public class Kafdrop {
              Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
           return new IniFilePropertySource(name, new IniFileReader().read(reader), environment.getActiveProfiles());
         } catch (IOException ex) {
-          LOG.error("Unable to read configuration file {}", file, ex);
+          LOG.error("Unable to read configuration file {}: {}", file, ex);
         }
       }
       return null;

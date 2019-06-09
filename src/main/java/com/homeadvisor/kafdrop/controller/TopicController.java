@@ -31,7 +31,7 @@ import java.util.stream.*;
 
 @Controller
 @RequestMapping("/topic")
-public class TopicController {
+public final class TopicController {
   private final KafkaMonitor kafkaMonitor;
   private final ConsumerMonitor consumerMonitor;
 

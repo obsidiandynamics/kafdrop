@@ -19,6 +19,7 @@
 package com.homeadvisor.kafdrop.controller;
 
 import com.homeadvisor.kafdrop.config.*;
+import com.homeadvisor.kafdrop.config.CuratorConfiguration.*;
 import com.homeadvisor.kafdrop.model.*;
 import com.homeadvisor.kafdrop.service.*;
 import io.swagger.annotations.*;
@@ -32,12 +33,15 @@ import java.util.*;
 import java.util.stream.*;
 
 @Controller
-public class ClusterController {
-  @Autowired
-  private KafkaMonitor kafkaMonitor;
+public final class ClusterController {
+  private final KafkaMonitor kafkaMonitor;
 
-  @Autowired
-  private CuratorConfiguration.ZookeeperProperties zookeeperProperties;
+  private final CuratorConfiguration.ZookeeperProperties zookeeperProperties;
+
+  public ClusterController(KafkaMonitor kafkaMonitor, ZookeeperProperties zookeeperProperties) {
+    this.kafkaMonitor = kafkaMonitor;
+    this.zookeeperProperties = zookeeperProperties;
+  }
 
   @RequestMapping("/")
   public String clusterInfo(Model model,
@@ -69,25 +73,21 @@ public class ClusterController {
       @ApiResponse(code = 200, message = "Success", response = ClusterInfoVO.class)
   })
   @RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-  public @ResponseBody
-  ClusterInfoVO getCluster() throws Exception {
-    ClusterInfoVO vo = new ClusterInfoVO();
-
+  public @ResponseBody ClusterInfoVO getCluster() {
+    final ClusterInfoVO vo = new ClusterInfoVO();
     vo.zookeeper = zookeeperProperties;
     vo.brokers = kafkaMonitor.getBrokers();
     vo.topics = kafkaMonitor.getTopics();
     vo.summary = kafkaMonitor.getClusterSummary(vo.topics);
-
     return vo;
   }
 
   @ExceptionHandler(BrokerNotFoundException.class)
-  private String brokerNotFound(Model model) {
+  public String brokerNotFound(Model model) {
     model.addAttribute("zookeeper", zookeeperProperties);
     model.addAttribute("brokers", Collections.emptyList());
     model.addAttribute("topics", Collections.emptyList());
     return "cluster-overview";
-
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -99,10 +99,10 @@ public class ClusterController {
    * Simple DTO to encapsulate the cluster state: ZK properties, broker list,
    * and topic list.
    */
-  public static class ClusterInfoVO {
-    public CuratorConfiguration.ZookeeperProperties zookeeper;
-    public ClusterSummaryVO summary;
-    public List<BrokerVO> brokers;
-    public List<TopicVO> topics;
+  public static final class ClusterInfoVO {
+    CuratorConfiguration.ZookeeperProperties zookeeper;
+    ClusterSummaryVO summary;
+    List<BrokerVO> brokers;
+    List<TopicVO> topics;
   }
 }
