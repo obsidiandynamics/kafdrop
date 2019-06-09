@@ -8,7 +8,6 @@ import org.springframework.stereotype.*;
 @ConfigurationProperties(prefix = "kafka")
 @Data
 public class KafkaConfiguration {
-  private String env = "local";
   private String brokerConnect;
   private Boolean isSecured = false;
   private String saslMechanism;

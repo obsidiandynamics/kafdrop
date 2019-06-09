@@ -13,7 +13,7 @@ import java.util.stream.*;
 public class SchemaRegistryConfiguration {
   @Component
   @ConfigurationProperties(prefix = "schemaregistry")
-  public static class SchemaRegistryProperties {
+  public static final class SchemaRegistryProperties {
     static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
 
     private String connect;

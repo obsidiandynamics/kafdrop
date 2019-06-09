@@ -26,10 +26,6 @@ management:
 kafdrop.monitor:
   clientId: Kafdrop
 
-curator.discovery:
-  enabled: true
-  basePath: /homeadvisor/services
-
 # Properties to expose via the InfoEndpoint & ServiceDiscovery
 info.build:
   artifact: ${project.artifactId}
@@ -44,9 +40,7 @@ project:
   description: ${project.name}
   version: DEV
 
-# env can be 'local', 'stage', 'prod'
 kafka:
-  env: local
   brokerConnect: localhost:9092
   isSecured: false
   saslMechanism: "PLAIN"

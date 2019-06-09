@@ -30,7 +30,7 @@ import java.util.stream.*;
 public class HealthCheckConfiguration {
   @Component
   @ManagedResource
-  public static class HealthCheck {
+  public static final class HealthCheck {
     private final HealthEndpoint healthEndpoint;
 
     public HealthCheck(HealthEndpoint healthEndpoint) {
@@ -50,9 +50,9 @@ public class HealthCheckConfiguration {
       return details.entrySet().stream()
           .collect(Collectors.toMap(Map.Entry::getKey,
                                     e -> {
-                                      Health health = (Health) e.getValue();
-                                      Map<String, Object> detail = new LinkedHashMap<>();
-                                      final boolean healthy = Status.UP.equals(health.getStatus());
+                                      final var health = (Health) e.getValue();
+                                      final var detail = new LinkedHashMap<String, Object>();
+                                      final var healthy = Status.UP.equals(health.getStatus());
                                       detail.put("healthy", healthy);
                                       detail.put("message", health.getDetails().toString());
                                       return detail;

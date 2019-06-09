@@ -12,7 +12,7 @@ import javax.annotation.*;
 public class MessageFormatConfiguration {
   @Component
   @ConfigurationProperties(prefix = "message")
-  public static class MessageFormatProperties {
+  public static final class MessageFormatProperties {
     private MessageFormat format;
 
     @PostConstruct
