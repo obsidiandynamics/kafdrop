@@ -64,7 +64,7 @@ public class ServiceDiscoveryConfiguration {
     Map<String, Object> details = new LinkedHashMap<>();
 
     Optional.ofNullable(infoEndpoint.info())
-        .ifPresent(infoMap -> Optional.ofNullable((Map<String, Object>) infoMap.get("build"))
+        .ifPresent(infoMap -> Optional.ofNullable((Map<?, ?>) infoMap.get("build"))
             .ifPresent(buildInfo -> {
               details.put("serviceName", buildInfo.get("artifact"));
               details.put("serviceDescription", buildInfo.get("description"));

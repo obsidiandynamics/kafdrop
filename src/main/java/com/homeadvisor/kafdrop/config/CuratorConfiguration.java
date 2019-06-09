@@ -47,7 +47,8 @@ public class CuratorConfiguration {
   @Component
   @ConfigurationProperties(prefix = "zookeeper")
   public static class ZookeeperProperties {
-    static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
+    private static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
+
     @NotBlank
     private String connect;
 
