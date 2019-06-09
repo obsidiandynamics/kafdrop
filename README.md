@@ -11,7 +11,7 @@ The project is a continuation of the original [HomeAdvisor/Kafdrop](https://gith
 # Requirements
 
 * Java 11 or newer
-* Kafka + ZooKeeper cluster
+* Kafka (version 0.10.0 or newer)
 
 Optional, additional integration:
 
@@ -93,10 +93,9 @@ mvn assembly:single docker:build
 
 # APIs
 ## JSON endpoints
-Starting with version 2.0.0, Kafdrop offers a set of Kafka APIs that mirror the existing HTML views. Any existing endpoint can be returned as JSON by simply setting the `Accept: application/json` header. There are also two endpoints that are JSON only:
+Starting with version 2.0.0, Kafdrop offers a set of Kafka APIs that mirror the existing HTML views. Any existing endpoint can be returned as JSON by simply setting the `Accept: application/json` header. Some endpoints are JSON only:
 
-* `/topic`: Returns array of all topic names.
-* `/topic/{topicName}/{consumerId}`: Returns partition offset and lag details for a specific topic and consumer.
+* `/topic`: Returns a list of all topics.
 
 ## Swagger
 To help document the Kafka APIs, Swagger has been included. The Swagger output is available by default at the following Kafdrop URL:

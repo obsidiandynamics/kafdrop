@@ -22,10 +22,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class BrokerNotFoundException extends RuntimeException {
-  public BrokerNotFoundException() {
-  }
-
+public final class BrokerNotFoundException extends RuntimeException {
   public BrokerNotFoundException(String message) {
     super(message);
   }

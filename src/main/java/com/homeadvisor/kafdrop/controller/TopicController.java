@@ -50,14 +50,13 @@ public class TopicController {
     return "topic-detail";
   }
 
-  @ApiOperation(value = "getTopic", notes = "Get partition and consumer details for a topic")
+  @ApiOperation(value = "getTopic", notes = "Get details for a topic")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Success", response = TopicVO.class),
-      @ApiResponse(code = 404, message = "Invalid topic name or consumer group")
+      @ApiResponse(code = 404, message = "Invalid topic name")
   })
   @RequestMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-  public @ResponseBody
-  TopicVO getTopic(@PathVariable("name") String topicName) {
+  public @ResponseBody TopicVO getTopic(@PathVariable("name") String topicName) {
     return kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
   }
@@ -67,8 +66,7 @@ public class TopicController {
       @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List")
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-  public @ResponseBody
-  List<String> getAllTopics() {
-    return kafkaMonitor.getTopics().stream().map(TopicVO::getName).collect(Collectors.toList());
+  public @ResponseBody List<TopicVO> getAllTopics() {
+    return kafkaMonitor.getTopics();
   }
 }
