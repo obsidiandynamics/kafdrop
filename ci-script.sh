@@ -51,6 +51,7 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
       echo "Release already exists; skipping"
     else
       echo "Unexpected error checking release status: $get_release_tag"
+      exit 1
     fi
   fi
 
