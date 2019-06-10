@@ -21,7 +21,7 @@ package kafdrop;
 import com.google.common.base.*;
 import kafdrop.config.ini.*;
 import org.slf4j.*;
-import org.springframework.boot.*;
+import org.springframework.boot.Banner.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.builder.*;
 import org.springframework.boot.context.event.*;
@@ -42,7 +42,7 @@ public class Kafdrop {
 
   public static void main(String[] args) {
     new SpringApplicationBuilder(Kafdrop.class)
-        .bannerMode(Banner.Mode.OFF)
+        .bannerMode(Mode.OFF)
         .listeners(new EnvironmentSetupListener(),
                    new LoggingConfigurationListener())
         .run(args);
