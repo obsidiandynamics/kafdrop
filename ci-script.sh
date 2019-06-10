@@ -40,7 +40,7 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
         \"tag_name\": \"$app_ver\", \
         \"target_commitish\": \"master\", \
         \"name\": \"$app_ver\", \
-        \"body\": \"Download from [Bintray](https://bintray.com/obsidiandynamics/kafdrop/download_file?file_path=com%2Fobsidiandynamics%2Fkafdrop%2F${app_ver}%2Fkafdrop-${app_ver}.jar)\", \
+        \"body\": \"Download from [Bintray](https://bintray.com/obsidiandynamics/kafdrop/download_file?file_path=com%2Fobsidiandynamics%2Fkafdrop%2Fkafdrop%2F${app_ver}%2Fkafdrop-${app_ver}.jar)\", \
         \"draft\": false, \
         \"prerelease\": false \
       }"
