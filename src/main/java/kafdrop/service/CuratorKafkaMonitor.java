@@ -196,7 +196,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
         })
         .orElseGet(ClusterSummaryVO::new);
     topicSummary.setTopicCount(topics.size());
-    topicSummary.setPreferredReplicaPercent(topicSummary.getPreferredReplicaPercent() / topics.size());
+    topicSummary.setPreferredReplicaPercent(topics.isEmpty() ? 0 : topicSummary.getPreferredReplicaPercent() / topics.size());
     return topicSummary;
   }
 
