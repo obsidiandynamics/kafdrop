@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Kafdrop contributors.
+ * Copyright 2017 Kafdrop contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,8 @@
  *
  */
 
-jQuery(document).ready(function () {
-    jQuery(document).on('click', '.toggle-link', function (e) {
-        var self = jQuery(this),
-            linkText = self.find("i"),
-            target = jQuery(document).find(self.data('toggle-target'));
+package kafdrop.service;
 
-        e.preventDefault();
-        target.slideToggle();
-        linkText.toggleClass('fa-chevron-circle-down fa-chevron-circle-right');
-    });
-});
+public final class NotInitializedException extends RuntimeException {
+  NotInitializedException() {}
+}

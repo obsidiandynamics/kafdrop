@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Kafdrop contributors.
+ * Copyright 2017 Kafdrop contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,25 @@
  *
  */
 
-.l-content {
-    padding-left: 20px;
-    padding-right: 20px;
-    margin: 0 auto;
-}
+package kafdrop.service;
 
-.clearing {
-    height: 1px;
-    line-height: 1px;
-    font-size: 1px;
-    clear: both;
-}
+import kafdrop.model.*;
+import kafdrop.util.*;
+import org.apache.kafka.common.*;
 
-table.overview {
-    width: 33%;
-}
+import java.util.*;
 
-.hidden {
-    display: none;
-}
+public interface KafkaMonitor {
+  List<BrokerVO> getBrokers();
 
-.error {
-    color: red;
-}
+  Optional<BrokerVO> getBroker(int id);
 
-input[type=text].error {
-    border-color: red;
+  List<TopicVO> getTopics();
+
+  List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count,
+                              MessageDeserializer deserializer);
+
+  Optional<TopicVO> getTopic(String topic);
+
+  ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
 }
