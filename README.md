@@ -131,7 +131,7 @@ cors.enabled=false
 ```
 
 ## Actuator
-Health and info endpoints are available at the following path: /debug
+Health and info endpoints are available at the following path: /actuator
 
 This can be overridden with the following configuration:
 ```

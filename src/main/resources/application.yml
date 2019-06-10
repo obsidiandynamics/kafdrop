@@ -11,34 +11,15 @@ spring:
       read_unknown_enum_values_as_null: true
 
 management:
-  metrics:
-    export:
-      jmx:
-        domain:${spring.jmx.default_domain}.metrics
   endpoints:
-    jmx:
-      domain: ${spring.jmx.default_domain}
     web:
-      base-path: /debug
+      base-path: /actuator
+      exposure.include: "*"
   server:
     port: 9000
 
 kafdrop.monitor:
   clientId: Kafdrop
-
-# Properties to expose via the InfoEndpoint & ServiceDiscovery
-info.build:
-  artifact: ${project.artifactId}
-  name: ${project.name}
-  description: ${project.description}
-  version: ${project.version}
-
-# Default values usually provided by Maven during a build
-project:
-  artifactId: kafdrop-DEV
-  name: KafDropr (DEV)
-  description: ${project.name}
-  version: DEV
 
 kafka:
   brokerConnect: localhost:9092
