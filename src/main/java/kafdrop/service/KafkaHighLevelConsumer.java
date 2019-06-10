@@ -86,16 +86,20 @@ public final class KafkaHighLevelConsumer {
     return partitionsVo;
   }
 
-  synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition topicPartition, long offset, Long count,
+  synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition topicPartition, long offset, int count,
                                                                      MessageDeserializer deserializer) {
     initializeClient();
     kafkaConsumer.assign(Collections.singletonList(topicPartition));
     kafkaConsumer.seek(topicPartition, offset);
 
-    final var rawRecords = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS));
-    final var numRecords = rawRecords.count();
-    return rawRecords.records(topicPartition)
-        .subList(0, Math.min(count.intValue(), numRecords))
+    final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
+    while (rawRecords.size() <= count) {
+      final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(topicPartition);
+      if (polled.isEmpty()) break;
+      rawRecords.addAll(polled);
+    }
+    return rawRecords
+        .subList(0, Math.min(count, rawRecords.size()))
         .stream()
         .map(rec -> new ConsumerRecord<>(rec.topic(),
                                          rec.partition(),

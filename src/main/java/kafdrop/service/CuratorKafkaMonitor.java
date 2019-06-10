@@ -221,7 +221,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   }
 
   @Override
-  public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, long count,
+  public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
                                      MessageDeserializer deserializer) {
     final List<ConsumerRecord<String, String>> records =
         kafkaHighLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);

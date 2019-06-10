@@ -33,7 +33,7 @@ public class MessageInspector {
     this.kafkaMonitor = kafkaMonitor;
   }
 
-  public List<MessageVO> getMessages(String topicName, int partitionId, long offset, long count,
+  public List<MessageVO> getMessages(String topicName, int partitionId, long offset, int count,
                                      MessageDeserializer deserializer) {
     final var topicPartition = new TopicPartition(topicName, partitionId);
     return kafkaMonitor.getMessages(topicPartition, offset, count, deserializer);

@@ -93,7 +93,7 @@ public final class MessageController {
                          messageInspector.getMessages(topicName,
                                                       messageForm.getPartition(),
                                                       messageForm.getOffset(),
-                                                      messageForm.getCount(),
+                                                      messageForm.getCount().intValue(),
                                                       deserializer));
 
     }
@@ -119,7 +119,7 @@ public final class MessageController {
       @PathVariable("name") String topicName,
       @RequestParam(name = "partition", required = false) Integer partition,
       @RequestParam(name = "offset", required = false) Long offset,
-      @RequestParam(name = "count", required = false) Long count
+      @RequestParam(name = "count", required = false) Integer count
   ) {
     if (partition == null || offset == null || count == null) {
       final TopicVO topic = kafkaMonitor.getTopic(topicName)
