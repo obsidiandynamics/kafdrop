@@ -47,8 +47,10 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
       set +x
       curl -u $GITHUB_USER:$GITHUB_PASS -X POST $repo_url/releases -d "$release_json"
       set -x
-    else
+    elif [ $get_release_tag == "200" ]; then
       echo "Release already exists; skipping"
+    else
+      echo "Unexpected error checking release status: $get_release_tag"
     fi
   fi
 
