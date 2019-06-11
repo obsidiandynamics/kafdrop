@@ -7,7 +7,11 @@ import org.slf4j.*;
 import org.springframework.stereotype.*;
 
 import java.util.*;
+import java.util.Map.*;
+import java.util.function.*;
 import java.util.stream.*;
+
+import static java.util.function.Predicate.not;
 
 @Service
 public final class KafkaConsumerMonitor implements ConsumerMonitor {
@@ -53,10 +57,15 @@ public final class KafkaConsumerMonitor implements ConsumerMonitor {
       this.offsets = offsets;
     }
 
-    boolean containsTopic(String topic) {
-      return offsets.keySet().stream()
-          .map(TopicPartition::topic)
-          .anyMatch(topic::equals);
+    boolean isEmpty() {
+      return offsets.isEmpty();
+    }
+
+    ConsumerGroupOffsets forTopic(String topic) {
+      final var filteredOffsets = offsets.entrySet().stream()
+          .filter(e -> e.getKey().topic().equals(topic))
+          .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+      return new ConsumerGroupOffsets(groupId, filteredOffsets);
     }
 
     @Override
@@ -73,7 +82,8 @@ public final class KafkaConsumerMonitor implements ConsumerMonitor {
     final var consumerGroups = highLevelAdminClient.listConsumerGroups();
     return consumerGroups.stream()
         .map(this::resolveOffsets)
-        .filter(offsets -> offsets.containsTopic(topic))
+        .map(offsets -> offsets.forTopic(topic))
+        .filter(not(ConsumerGroupOffsets::isEmpty))
         .collect(Collectors.toList());
   }
 }

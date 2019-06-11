@@ -12,7 +12,6 @@ BINTRAY_UPLOAD_ENABLED=1
 GITHUB_RELEASE_ENABLED=1
 
 set -e
-export NO_GCE_CHECK=true
 if [ $DOCKER_PUSH_ENABLED = 1 ]; then
   echo "$REG_PASS" | docker login -u $REG_USER --password-stdin
 fi
