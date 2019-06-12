@@ -91,8 +91,8 @@ The following command will generate a Docker image:
 mvn assembly:single docker:build
 ```
 
-## Docker Compose sandbox
-There is a `docker-compose.yaml` file that bundles a sandbox Kafka/ZooKeeper instance with Kafdrop:
+## Docker Compose
+There is a `docker-compose.yaml` file that bundles a Kafka/ZooKeeper instance with Kafdrop:
 ```sh
 cd docker-compose/kafka-kafdrop
 docker-compose up
