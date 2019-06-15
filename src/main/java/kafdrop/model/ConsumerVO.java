@@ -54,16 +54,18 @@ public class ConsumerVO implements Comparable<ConsumerVO> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    ConsumerVO vo = (ConsumerVO) o;
-
-    return groupId.equals(vo.groupId);
+    if (this == o) {
+      return true;
+    } else if (o instanceof ConsumerVO) {
+      final var that = (ConsumerVO) o;
+      return Objects.equals(groupId, that.groupId);
+    } else {
+      return false;
+    }
   }
 
   @Override
   public int hashCode() {
-    return groupId.hashCode();
+    return Objects.hashCode(groupId);
   }
 }

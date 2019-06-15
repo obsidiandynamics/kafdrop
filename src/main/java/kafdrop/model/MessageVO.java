@@ -18,8 +18,6 @@
 
 package kafdrop.model;
 
-import org.apache.kafka.common.header.*;
-
 import java.util.*;
 import java.util.stream.*;
 

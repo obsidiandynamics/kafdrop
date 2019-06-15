@@ -25,8 +25,7 @@ if [ $JMX_PORT ]; then
     -Djava.rmi.server.hostname=$HOST"
 fi
 
-ARGS="--add-exports=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED \
-     -Xss256K \
+ARGS="-Xss256K \
      $JMX_ARGS \
      $HEAP_ARGS \
      $JVM_OPTS"

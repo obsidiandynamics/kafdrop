@@ -8,10 +8,9 @@ import org.springframework.stereotype.*;
 
 import java.util.*;
 import java.util.Map.*;
-import java.util.function.*;
 import java.util.stream.*;
 
-import static java.util.function.Predicate.not;
+import static java.util.function.Predicate.*;
 
 @Service
 public final class KafkaConsumerMonitor implements ConsumerMonitor {

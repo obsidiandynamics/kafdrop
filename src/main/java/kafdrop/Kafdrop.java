@@ -59,7 +59,7 @@ public class Kafdrop {
     };
   }
 
-  private static class LoggingConfigurationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+  private static final class LoggingConfigurationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
     private static final String PROP_LOGGING_FILE = "logging.file";
     private static final String PROP_LOGGER = "LOGGER";
     private static final String PROP_SPRING_BOOT_LOG_LEVEL = "logging.level.org.springframework.boot";
@@ -72,8 +72,8 @@ public class Kafdrop {
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-      final Environment environment = event.getEnvironment();
-      final String loggingFile = environment.getProperty(PROP_LOGGING_FILE);
+      final var environment = event.getEnvironment();
+      final var loggingFile = environment.getProperty(PROP_LOGGING_FILE);
       if (loggingFile != null) {
         System.setProperty(PROP_LOGGER, "FILE");
         try {
@@ -90,7 +90,7 @@ public class Kafdrop {
     }
   }
 
-  private static class EnvironmentSetupListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+  private static final class EnvironmentSetupListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
     private static final String SM_CONFIG_DIR = "sm.config.dir";
     private static final String CONFIG_SUFFIX = "-config.ini";
 
@@ -101,7 +101,7 @@ public class Kafdrop {
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-      final ConfigurableEnvironment environment = event.getEnvironment();
+      final var environment = event.getEnvironment();
 
       LOG.info("Initializing jaas config");
       final String env = environment.getProperty("kafka.env");
@@ -133,11 +133,11 @@ public class Kafdrop {
       }
     }
 
-    private IniFilePropertySource readProperties(Environment environment, String name) {
-      final File file = new File(environment.getProperty(SM_CONFIG_DIR), name + CONFIG_SUFFIX);
+    private static IniFilePropertySource readProperties(Environment environment, String name) {
+      final var file = new File(environment.getProperty(SM_CONFIG_DIR), name + CONFIG_SUFFIX);
       if (file.exists() && file.canRead()) {
-        try (InputStream in = new FileInputStream(file);
-             Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
+        try (var in = new FileInputStream(file);
+             var reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
           return new IniFilePropertySource(name, new IniFileReader().read(reader), environment.getActiveProfiles());
         } catch (IOException ex) {
           LOG.error("Unable to read configuration file {}: {}", file, ex);

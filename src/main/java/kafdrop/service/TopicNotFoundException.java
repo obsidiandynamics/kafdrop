@@ -23,9 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class TopicNotFoundException extends RuntimeException {
-  public TopicNotFoundException() {
-  }
-
   public TopicNotFoundException(String message) {
     super(message);
   }

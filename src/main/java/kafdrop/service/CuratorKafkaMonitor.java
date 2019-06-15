@@ -20,7 +20,6 @@ package kafdrop.service;
 
 import com.fasterxml.jackson.databind.*;
 import com.google.common.base.*;
-import com.google.common.collect.*;
 import kafdrop.model.*;
 import kafdrop.util.*;
 import kafka.utils.*;
@@ -28,7 +27,6 @@ import org.apache.commons.lang3.*;
 import org.apache.curator.framework.*;
 import org.apache.curator.framework.recipes.cache.*;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache.*;
-import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
 import org.apache.kafka.common.header.*;
 import org.slf4j.*;
@@ -89,7 +87,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
     });
     topicConfigPathCache.start(StartMode.POST_INITIALIZED_EVENT);
 
-    final TreeCache topicTreeCache = new TreeCache(curatorFramework, ZkUtils.BrokerTopicsPath());
+    final var topicTreeCache = new TreeCache(curatorFramework, ZkUtils.BrokerTopicsPath());
     topicTreeCache.getListenable().addListener((client, event) -> {
       if (event.getType() == TreeCacheEvent.Type.INITIALIZED) {
         cacheInitCounter.decrementAndGet();
@@ -117,7 +115,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
     Optional.ofNullable(controllerNodeCache.getCurrentData())
         .map(data -> {
           try {
-            final Map controllerData = objectMapper.readerFor(Map.class).readValue(data.getData());
+            final var controllerData = objectMapper.readerFor(Map.class).<Map<?, ?>>readValue(data.getData());
             return (Integer) controllerData.get("brokerid");
           } catch (IOException e) {
             LOG.error("Unable to read controller data", e);
@@ -147,12 +145,12 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   }
 
   private void addBroker(BrokerVO broker) {
-    final BrokerVO oldBroker = brokerCache.put(broker.getId(), broker);
+    final var oldBroker = brokerCache.put(broker.getId(), broker);
     LOG.info("Kafka broker {} was {}", broker.getId(), oldBroker == null ? "added" : "updated");
   }
 
   private void removeBroker(int brokerId) {
-    final BrokerVO broker = brokerCache.remove(brokerId);
+    final var broker = brokerCache.remove(brokerId);
     LOG.info("Kafka broker {} was removed", broker.getId());
   }
 
@@ -170,9 +168,9 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
   @Override
   public ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics) {
-    final ClusterSummaryVO topicSummary = topics.stream()
+    final var topicSummary = topics.stream()
         .map(topic -> {
-          final ClusterSummaryVO summary = new ClusterSummaryVO();
+          final var summary = new ClusterSummaryVO();
           summary.setPartitionCount(topic.getPartitions().size());
           summary.setUnderReplicatedCount(topic.getUnderReplicatedPartitions().size());
           summary.setPreferredReplicaPercent(topic.getPreferredReplicaPercent());
@@ -212,7 +210,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   @Override
   public Optional<TopicVO> getTopic(String topic) {
     validateInitialized();
-    final Optional<TopicVO> topicVo = Optional.ofNullable(getTopicMetadata(topic).get(topic));
+    final var topicVo = Optional.ofNullable(getTopicMetadata(topic).get(topic));
     topicVo.ifPresent(vo -> vo.setPartitions(getTopicPartitionSizes(vo)));
     return topicVo;
   }
@@ -285,7 +283,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
     private BrokerVO parseBroker(ChildData input) {
       try {
-        final BrokerVO broker = objectMapper.readerFor(BrokerVO.class).readValue(input.getData());
+        final var broker = objectMapper.readerFor(BrokerVO.class).<BrokerVO>readValue(input.getData());
         broker.setId(brokerId(input));
         return broker;
       } catch (IOException e) {

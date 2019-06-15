@@ -77,9 +77,9 @@ public class ClusterSummaryVO {
   }
 
   public double getBrokerLeaderPartitionRatio(int brokerId) {
-    final int totalPartitionCount = getPartitionCount();
+    final var totalPartitionCount = getPartitionCount();
     if (totalPartitionCount != 0) {
-      final Integer brokerPartitionCount = getBrokerLeaderPartitionCount(brokerId);
+      final var brokerPartitionCount = getBrokerLeaderPartitionCount(brokerId);
       return brokerPartitionCount != null ? (double) brokerPartitionCount / totalPartitionCount : 0;
     } else {
       return 0;

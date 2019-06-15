@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 
 public final class ConsumerPartitionVOTest {
   private void doLagTest(long first, long last, long offset, long expectedLag) {
-    final ConsumerPartitionVO partition = new ConsumerPartitionVO("test", "test", 0);
+    final var partition = new ConsumerPartitionVO("test", "test", 0);
     partition.setFirstOffset(first);
     partition.setSize(last);
     partition.setOffset(offset);

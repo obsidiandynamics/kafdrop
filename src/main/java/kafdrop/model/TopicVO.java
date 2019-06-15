@@ -90,7 +90,7 @@ public class TopicVO implements Comparable<TopicVO> {
     if (partitions.isEmpty()) {
       return 0;
     } else {
-      long preferredLeaderCount = partitions.values().stream()
+      final var preferredLeaderCount = partitions.values().stream()
           .filter(TopicPartitionVO::isLeaderPreferred)
           .count();
       return ((double) preferredLeaderCount) / ((double) partitions.size());
@@ -106,18 +106,16 @@ public class TopicVO implements Comparable<TopicVO> {
   public boolean equals(Object o) {
     if (this == o) {
       return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
+    } else if (o instanceof TopicVO) {
+      final var that = (TopicVO) o;
+      return Objects.equals(name, that.name);
+    } else {
       return false;
     }
-
-    TopicVO that = (TopicVO) o;
-
-    return name.equals(that.name);
   }
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return Objects.hashCode(name);
   }
 }
