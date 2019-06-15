@@ -30,6 +30,7 @@ import org.apache.curator.framework.recipes.cache.*;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
+import org.apache.kafka.common.header.*;
 import org.slf4j.*;
 import org.springframework.stereotype.*;
 
@@ -223,21 +224,30 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
                                      MessageDeserializer deserializer) {
-    final List<ConsumerRecord<String, String>> records =
+    final var records =
         kafkaHighLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);
     if (records != null) {
-      final List<MessageVO> messageVos = Lists.newArrayList();
-      for (ConsumerRecord<String, String> record : records) {
-        final MessageVO messageVo = new MessageVO();
+      final var messageVos = new ArrayList<MessageVO>();
+      for (var record : records) {
+        final var messageVo = new MessageVO();
         messageVo.setKey(record.key());
         messageVo.setMessage(record.value());
-        messageVo.setHeaders(Arrays.toString(record.headers().toArray()));
+        messageVo.setHeaders(headersToMap(record.headers()));
+        messageVo.setTimestamp(new Date(record.timestamp()));
         messageVos.add(messageVo);
       }
       return messageVos;
     } else {
       return Collections.emptyList();
     }
+  }
+
+  private static Map<String, String> headersToMap(Headers headers) {
+    final var map = new TreeMap<String, String>();
+    for (var header : headers) {
+      map.put(header.key(), new String(header.value()));
+    }
+    return map;
   }
 
   private Map<Integer, TopicPartitionVO> getTopicPartitionSizes(TopicVO topic) {

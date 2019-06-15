@@ -104,7 +104,8 @@
             <div data-offset="${offset}" class="message-detail">
                 <span class="label label-default">Offset:</span> ${offset} &nbsp;
                 <span class="label label-default">Key:</span> ${msg.key!''} &nbsp;
-                <span class="label label-default">Headers:</span> ${msg.headers}
+                <span class="label label-default">Timestamp:</span> ${msg.timestamp?string('dd-MM-yyyy HH:mm:ss.SSS')}
+                <span class="label label-default">Headers:</span> ${msg.headersFormatted}
                 <div>
                     <a href="#" class="toggle-msg"><i class="fa fa-chevron-circle-right">&nbsp;</i></a>
                     <pre class="message-body">${msg.message!''}</pre>

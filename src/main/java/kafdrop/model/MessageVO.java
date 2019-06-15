@@ -18,10 +18,16 @@
 
 package kafdrop.model;
 
+import org.apache.kafka.common.header.*;
+
+import java.util.*;
+import java.util.stream.*;
+
 public final class MessageVO {
   private String message;
   private String key;
-  private String headers;
+  private Map<String, String> headers;
+  private Date timestamp;
 
   public String getMessage() {
     return message;
@@ -39,11 +45,29 @@ public final class MessageVO {
     this.key = key;
   }
 
-  public String getHeaders() {
+  public Map<String, String> getHeaders() {
     return headers;
   }
 
-  public void setHeaders(String headers) {
+  public void setHeaders(Map<String, String> headers) {
     this.headers = headers;
+  }
+
+  public String getHeadersFormatted() {
+    if (headers.isEmpty()) {
+      return "empty";
+    } else {
+      return headers.entrySet().stream()
+          .map(e -> e.getKey() + ": " + e.getValue())
+          .collect(Collectors.joining(", "));
+    }
+  }
+
+  public Date getTimestamp() {
+    return timestamp;
+  }
+
+  public void setTimestamp(Date timestamp) {
+    this.timestamp = timestamp;
   }
 }
