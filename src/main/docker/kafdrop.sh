@@ -25,7 +25,7 @@ if [ $JMX_PORT ]; then
     -Djava.rmi.server.hostname=$HOST"
 fi
 
-ARGS="-Xss256K \
+ARGS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED -Xss256K \
      $JMX_ARGS \
      $HEAP_ARGS \
      $JVM_OPTS"
