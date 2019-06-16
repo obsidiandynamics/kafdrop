@@ -20,7 +20,6 @@ package kafdrop;
 
 import com.google.common.base.*;
 import kafdrop.config.ini.*;
-import kafdrop.service.*;
 import org.slf4j.*;
 import org.springframework.boot.Banner.*;
 import org.springframework.boot.autoconfigure.*;

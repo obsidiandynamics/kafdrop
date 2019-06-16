@@ -19,7 +19,6 @@
 package kafdrop.service;
 
 import com.fasterxml.jackson.databind.*;
-import com.google.common.base.*;
 import kafdrop.model.*;
 import kafdrop.util.*;
 import kafka.utils.*;
@@ -34,7 +33,6 @@ import org.springframework.stereotype.*;
 
 import javax.annotation.*;
 import java.io.*;
-import java.util.Optional;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.stream.*;
