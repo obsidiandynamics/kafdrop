@@ -287,7 +287,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
         broker.setId(brokerId(input));
         return broker;
       } catch (IOException e) {
-        throw Throwables.propagate(e);
+        throw new RuntimeException(e);
       }
     }
   }
