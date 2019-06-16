@@ -102,25 +102,21 @@ public class Kafdrop {
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
       final var environment = event.getEnvironment();
 
-      LOG.info("Initializing jaas config");
+      LOG.info("Initializing JAAS config");
       final String env = environment.getProperty("kafka.env");
       final boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
       LOG.info("env: {} .isSecured kafka: {}", env, isSecured);
       if (isSecured && Strings.isNullOrEmpty(env)) {
-        throw new RuntimeException("'env' cannot be null if connecting to secured kafka.");
+        throw new IllegalArgumentException("Value of 'env' cannot be null if connecting to secured kafka.");
       }
 
-      LOG.info("ENV: {}", env);
+      LOG.info("Env: {}", env);
       String path;
 
       if (isSecured) {
-        if ((env.equalsIgnoreCase("stage") || env.equalsIgnoreCase("prod") || env.equalsIgnoreCase("local"))) {
-          path = environment.getProperty("user.dir") + "/kaas_" + env.toLowerCase() + "_jaas.conf";
-          LOG.info("PATH: {}", path);
-          System.setProperty("java.security.auth.login.config", path);
-        } else {
-          throw new RuntimeException("unable to identify env. set 'evn' variable either to 'stage' or 'prod' or local");
-        }
+        path = environment.getProperty("user.dir") + "/kaas_" + env.toLowerCase() + "_jaas.conf";
+        LOG.info("PATH: {}", path);
+        System.setProperty("java.security.auth.login.config", path);
       }
 
       if (environment.containsProperty(SM_CONFIG_DIR)) {
