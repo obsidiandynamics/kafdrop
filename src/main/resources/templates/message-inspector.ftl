@@ -117,4 +117,5 @@
         No messages found in partition ${(messageForm.partition)!"PARTITION_NOT_SET"} at offset ${messageForm.offset}
     </#if>
 </div>
+
 <@template.footer/>
