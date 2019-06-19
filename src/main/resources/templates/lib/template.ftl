@@ -23,6 +23,7 @@
     <link type="text/css" rel="stylesheet" href="/css/global.css"/>
 
     <script src="/js/jquery.min.js"></script>
+    <script src="/js/popper.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/global.js"></script>
 
@@ -30,7 +31,7 @@
 </head>
 <body>
 <#include "../includes/header.ftl">
-<div class="container l-container">
+<div class="container">
     </#macro>
 
     <#macro footer>

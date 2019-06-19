@@ -40,24 +40,24 @@
 <#setting number_format="0">
 
 
-<h1>Topic Messages: <a href="/topic/${topic.name}">${topic.name}</a></h1>
+<h2>Topic Messages: <a href="/topic/${topic.name}">${topic.name}</a></h2>
 
 <#assign selectedPartition=messageForm.partition!0?number>
 <#assign selectedFormat=messageForm.format!defaultFormat>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
-    <span class="label label-default">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>&nbsp;
-    <span class="label label-default">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>&nbsp;
-    <span class="label label-default">Size:</span> <span
+    <span class="badge badge-light">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>&nbsp;
+    <span class="badge badge-light">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>&nbsp;
+    <span class="badge badge-light">Size:</span> <span
             id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
 </div>
 
-<div id="messageFormPanel" class="panel panel-default">
-    <form method="GET" action="/topic/${topic.name}/messages" id="messageForm" class="form-inline panel-body">
+<div id="messageFormPanel" class="card">
+    <form method="GET" action="/topic/${topic.name}/messages" id="messageForm" class="form-inline card-body">
         <div class="form-group">
             <label for="partition">Partition</label>
-            <select id="partition" name="partition">
+            <select class="form-control" id="partition" name="partition">
                 <#list topic.partitions as p>
                     <option value="${p.id}" data-first-offset="${p.firstOffset}" data-last-offset="${p.size}"
                             <#if p.id == selectedPartition>selected="selected"</#if>>${p.id}</option>
@@ -85,7 +85,7 @@
         &nbsp;&nbsp;
         <div class="form-group">
             <label for="format">Message format</label>
-            <select id="format" name="format">
+            <select class="form-control" id="format" name="format">
                 <#list messageFormats as f>
                     <option value="${f}" <#if f == selectedFormat>selected="selected"</#if>>${f}</option>
                 </#list>
@@ -93,7 +93,7 @@
         </div>
         &nbsp;&nbsp;
 
-        <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> View Messages</button>
+        <button class="btn btn-success" type="submit"><i class="fa fa-search"></i> View Messages</button>
     </form>
 </div>
 
@@ -103,10 +103,10 @@
         <#list messages as msg>
             <#assign offset=messageForm.offset + msg_index>
             <div data-offset="${offset}" class="message-detail">
-                <span class="label label-default">Offset:</span> ${offset} &nbsp;
-                <span class="label label-default">Key:</span> ${msg.key!''} &nbsp;
-                <span class="label label-default">Timestamp:</span> ${msg.timestamp?string('yyyy-MM-dd HH:mm:ss.SSS')}
-                <span class="label label-default">Headers:</span> ${msg.headersFormatted}
+                <span class="badge badge-light">Offset:</span> ${offset} &nbsp;
+                <span class="badge badge-light">Key:</span> ${msg.key!''} &nbsp;
+                <span class="badge badge-light">Timestamp:</span> ${msg.timestamp?string('yyyy-MM-dd HH:mm:ss.SSS')}
+                <span class="badge badge-light">Headers:</span> ${msg.headersFormatted}
                 <div>
                     <a href="#" class="toggle-msg"><i class="fa fa-chevron-circle-right">&nbsp;</i></a>
                     <pre class="message-body">${msg.message!''}</pre>
@@ -117,5 +117,4 @@
         No messages found in partition ${(messageForm.partition)!"PARTITION_NOT_SET"} at offset ${messageForm.offset}
     </#if>
 </div>
-
 <@template.footer/>

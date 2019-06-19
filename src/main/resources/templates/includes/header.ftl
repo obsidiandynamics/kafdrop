@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 
-<div class="header page-header">
+<div class="pb-2 mt-5 mb-4 border-bottom">
     <div class="container">
         <h1 class="app-name brand"><a href="/">Kafdrop</a> <#if profile??><span class="small">${profile}</span></#if>
         </h1>
