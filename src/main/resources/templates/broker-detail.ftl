@@ -29,10 +29,10 @@
 
 <#setting number_format="0">
 
-<h1>Broker ID: ${broker.id}</h1>
+<h2>Broker ID: ${broker.id}</h2>
 
 <div id="topic-overview">
-    <h2>Broker Overview</h2>
+    <h3>Broker Overview</h3>
 
     <table class="table table-bordered overview">
         <tbody>
@@ -66,7 +66,7 @@
 </div>
 
 <div>
-    <h2>Topic Detail</h2>
+    <h3>Topic Detail</h3>
 
     <table class="table table-bordered">
         <thead>

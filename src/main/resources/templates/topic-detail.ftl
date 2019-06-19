@@ -28,17 +28,17 @@
 
 <#setting number_format="0">
 
-<h1>Topic: ${topic.name}</h1>
+<h2>Topic: ${topic.name}</h2>
 
 <div id="action-bar" class="container">
-    <a class="btn btn-default" href="/topic/${topic.name}/messages"><i class="fa fa-eye"></i> View Messages</a>
+    <a class="btn btn-outline-light" href="/topic/${topic.name}/messages"><i class="fa fa-eye"></i> View Messages</a>
 </div>
 
 <div class="container-fluid">
     <div class="row">
 
         <div id="topic-overview" class="col-md-8">
-            <h2>Overview</h2>
+            <h3>Overview</h3>
 
             <table class="table table-bordered">
                 <tbody>
@@ -68,7 +68,7 @@
 
 
         <div id="topic-config" class="col-md-4">
-            <h2>Configuration</h2>
+            <h3>Configuration</h3>
 
             <#if topic.config?size == 0>
                 <div>No topic-specific configuration</div>
@@ -90,8 +90,8 @@
 
     <div class="row">
         <div id="partition-detail" class="col-md-8">
-            <h2>Partition Detail</h2>
-            <table id="partition-detail-table" class="table table-bordered table-condensed small">
+            <h3>Partition Detail</h3>
+            <table id="partition-detail-table" class="table table-bordered table-sm small">
                 <thead>
                 <tr>
                     <th>Partition</th>
@@ -124,8 +124,8 @@
         </div>
 
         <div id="consumers" class="col-md-4">
-            <h2>Consumers</h2>
-            <table id="consumers-table" class="table table-bordered table-condensed small">
+            <h3>Consumers</h3>
+            <table id="consumers-table" class="table table-bordered table-sm small">
                 <thead>
                 <tr>
                     <th>Group ID</th>

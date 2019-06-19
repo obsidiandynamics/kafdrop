@@ -18,10 +18,10 @@
 
 <#setting number_format="0">
 
-<h1>Kafka Consumer: ${consumer.groupId}</h1>
+<h2>Kafka Consumer: ${consumer.groupId}</h2>
 
 <div id="overview">
-    <h2>Overview</h2>
+    <h3>Overview</h3>
     <table class="table table-bordered overview">
         <tbody>
         <tr>
@@ -43,8 +43,8 @@
 <div id="topics">
     <#list consumer.topics as consumerTopic>
         <#assign tableId='topic-${consumerTopic_index}-table'>
-        <h2><@template.toggleLink target="#${tableId}" anchor='${tableId}' /> Topic: <a
-                    href="/topic/${consumerTopic.topic}">${consumerTopic.topic}</a></h2>
+        <h3><@template.toggleLink target="#${tableId}" anchor='${tableId}' /> Topic: <a
+                    href="/topic/${consumerTopic.topic}">${consumerTopic.topic}</a></h3>
         <div id="${tableId}">
             <p>
             <table class="table table-bordered overview">
@@ -71,7 +71,7 @@
             </table>
             </p>
             <p>
-            <table class="table table-bordered table-condensed">
+            <table class="table table-bordered table-sm">
                 <thead>
                 <tr>
                     <th>Partition</th>
