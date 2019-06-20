@@ -226,6 +226,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
       final var messageVos = new ArrayList<MessageVO>();
       for (var record : records) {
         final var messageVo = new MessageVO();
+        messageVo.setPartition(topicPartition.partition());
         messageVo.setKey(record.key());
         messageVo.setMessage(record.value());
         messageVo.setHeaders(headersToMap(record.headers()));

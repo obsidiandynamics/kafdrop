@@ -18,7 +18,7 @@
 <#import "/spring.ftl" as spring />
 <@template.header "Topic: ${topic.name}: Messages">
     <style type="text/css">
-        h1 {
+        h2 {
             margin-bottom: 16px;
         }
 
@@ -28,6 +28,10 @@
 
         #partitionSizes {
             margin-left: 16px;
+        }
+
+        .badge {
+            margin-right: 5px;
         }
 
         .toggle-msg {

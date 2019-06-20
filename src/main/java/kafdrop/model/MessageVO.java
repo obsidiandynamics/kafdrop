@@ -22,10 +22,14 @@ import java.util.*;
 import java.util.stream.*;
 
 public final class MessageVO {
+  private int partition;
   private String message;
   private String key;
   private Map<String, String> headers;
   private Date timestamp;
+
+  public int getPartition() { return partition; }
+  public void setPartition(int partition) { this.partition = partition; }
 
   public String getMessage() {
     return message;

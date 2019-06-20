@@ -54,6 +54,41 @@ public final class MessageController {
   }
 
   /**
+   * Human friendly view of reading all topic messages sorted by timestamp.
+   * @param topicName Name of topic
+   * @param model
+   * @return View for seeing all messages in a topic sorted by timestamp.
+   */
+  @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/allmessages")
+  public String viewAllMessages(@PathVariable("name") String topicName,
+                                Model model, @RequestParam(name = "count", required = false) Integer count) {
+    final int size = (count != null? count : 100);
+    final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+        .orElseThrow(() -> new TopicNotFoundException(topicName));
+
+    model.addAttribute("topic", topic);
+    model.addAttribute("defaultFormat", defaultFormat);
+    model.addAttribute("messageFormats", MessageFormat.values());
+
+    final var deserializer = getDeserializer(topicName, defaultFormat);
+    final List<MessageVO> messages = new ArrayList<>();
+
+    for (TopicPartitionVO partition : topic.getPartitions()) {
+      messages.addAll(messageInspector.getMessages(topicName,
+          partition.getId(),
+          partition.getFirstOffset(),
+          size,
+          deserializer));
+    }
+
+    Collections.sort(messages, Comparator.comparing(MessageVO::getTimestamp));
+    model.addAttribute("messages", messages);
+
+    return "topic-messages";
+  }
+
+  /**
    * Human friendly view of reading messages.
    * @param topicName Name of topic
    * @param messageForm Message form for submitting requests to view messages.
