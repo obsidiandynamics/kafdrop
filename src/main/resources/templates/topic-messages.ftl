@@ -38,7 +38,7 @@
         <#list messages as msg>
             <div class="message-detail">
                 <span class="badge badge-light">Partition:</span> ${msg.partition} &nbsp;
-                <!--<span class="badge badge-light">Offset:</span>  &nbsp; -->
+                <span class="badge badge-light">Offset:</span> ${msg.offset} &nbsp;
                 <span class="badge badge-light">Key:</span> ${msg.key!''} &nbsp;
                 <span class="badge badge-light">Timestamp:</span> ${msg.timestamp?string('yyyy-MM-dd HH:mm:ss.SSS')}
                 <span class="badge badge-light">Headers:</span> ${msg.headersFormatted}

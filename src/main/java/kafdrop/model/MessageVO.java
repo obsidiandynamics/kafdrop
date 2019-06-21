@@ -23,6 +23,7 @@ import java.util.stream.*;
 
 public final class MessageVO {
   private int partition;
+  private long offset;
   private String message;
   private String key;
   private Map<String, String> headers;
@@ -30,6 +31,9 @@ public final class MessageVO {
 
   public int getPartition() { return partition; }
   public void setPartition(int partition) { this.partition = partition; }
+
+  public long getOffset() { return offset; }
+  public void setOffset(long offset) { this.offset = offset; }
 
   public String getMessage() {
     return message;

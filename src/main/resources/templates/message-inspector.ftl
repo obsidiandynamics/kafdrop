@@ -105,9 +105,8 @@
 <div id="message-display" class="container">
     <#if messages?? && messages?size gt 0>
         <#list messages as msg>
-            <#assign offset=messageForm.offset + msg_index>
-            <div data-offset="${offset}" class="message-detail">
-                <span class="badge badge-light">Offset:</span> ${offset} &nbsp;
+            <div class="message-detail">
+                <span class="badge badge-light">Offset:</span> ${msg.offset} &nbsp;
                 <span class="badge badge-light">Key:</span> ${msg.key!''} &nbsp;
                 <span class="badge badge-light">Timestamp:</span> ${msg.timestamp?string('yyyy-MM-dd HH:mm:ss.SSS')}
                 <span class="badge badge-light">Headers:</span> ${msg.headersFormatted}
