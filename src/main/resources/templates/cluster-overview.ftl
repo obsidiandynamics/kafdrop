@@ -13,10 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Broker List"/>
 
-<script src="/js/powerFilter.js"></script>
+<script src="<@spring.url '/js/powerFilter.js'/>"></script>
 
 
 <#setting number_format="0">
@@ -87,7 +88,7 @@
             </#if>
             <#list brokers as b>
                 <tr>
-                    <td><a href="/broker/${b.id}"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
+                    <td><a href="<@spring.url '/broker/${b.id}'/>"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
                     <td>${b.host}</td>
                     <td>${b.port?string}</td>
                     <td>${b.version}</td>
@@ -144,7 +145,7 @@
             </#if>
             <#list topics as t>
                 <tr class="dataRow">
-                    <td><a href="/topic/${t.name}">${t.name}</a></td>
+                    <td><a href="<@spring.url '/topic/${t.name}'/>">${t.name}</a></td>
                     <td>${t.partitions?size}</td>
                     <td <#if t.preferredReplicaPercent lt 1.0>class="warning"</#if>>${t.preferredReplicaPercent?string.percent}</td>
                     <td <#if t.underReplicatedPartitions?size gt 0>class="warning"</#if>>${t.underReplicatedPartitions?size}</td>
