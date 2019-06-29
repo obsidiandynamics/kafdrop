@@ -146,3 +146,76 @@ This can be overridden with the following configuration:
 ```
 management.endpoints.web.base-path=<path>
 ```
+
+# Guides
+## Securing Kafdrop
+Kafdrop doesn't (yet) natively implement an authentication mechanism to restrict user access. Here's a quick workaround using NGINX using Basic Auth. The instructions below are for macOS and Homebrew.
+
+### Requirements
+* NGINX: install using `which nginx > /dev/null || brew install nginx`
+* Apache HTTP utilities: `which htpasswd > /dev/null || brew install httpd`
+
+### Setup
+Set the admin password (you will be prompted):
+```sh
+htpasswd -c /usr/local/etc/nginx/.htpasswd admin
+```
+
+Add a logout page in `/usr/local/opt/nginx/html/401.html`:
+```html
+<!DOCTYPE html>
+<p>Not authorized. <a href="<!--# echo var="scheme" -->://<!--# echo var="http_host" -->/">Login</a>.</p>
+```
+
+Use the following snippet for `/usr/local/etc/nginx/nginx.conf`:
+```
+worker_processes 4;
+  
+events {
+  worker_connections 1024;
+}
+
+http {
+  upstream kafdrop {
+    server 127.0.0.1:9000;
+    keepalive 64;
+  }
+
+  server {
+    listen *:8080;
+    server_name _;
+    access_log /usr/local/var/log/nginx/nginx.access.log;
+    error_log /usr/local/var/log/nginx/nginx.error.log;
+    auth_basic "Restricted Area";
+    auth_basic_user_file /usr/local/etc/nginx/.htpasswd;
+
+    location / {
+      proxy_pass http://kafdrop;
+    }
+
+    location /logout {
+      return 401;
+    }
+
+    error_page 401 /errors/401.html;
+
+    location /errors {
+      auth_basic off;
+      ssi        on;
+      alias /usr/local/opt/nginx/html;
+    }
+  }
+}
+```
+
+Run NGINX:
+```sh
+nginx
+```
+
+Or reload its configuration if already running:
+```sh
+nginx -s reload
+```
+
+To logout, browse to [/logout](http://localhost:8080/logout).
