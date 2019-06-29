@@ -23,7 +23,7 @@ import java.util.stream.*;
 
 public final class TopicPartitionVO {
   private final int id;
-  private Map<Integer, PartitionReplica> replicas = new LinkedHashMap<>();
+  private final Map<Integer, PartitionReplica> replicas = new LinkedHashMap<>();
   private Integer leaderId;
   private Integer preferredLeaderId;
   private long size = -1;
@@ -116,5 +116,10 @@ public final class TopicPartitionVO {
     boolean isLeader() {
       return leader;
     }
+  }
+
+  @Override
+  public String toString() {
+    return TopicPartitionVO.class.getSimpleName() + " [id=" + id +", firstOffset=" + firstOffset + ", size=" + size + "]";
   }
 }

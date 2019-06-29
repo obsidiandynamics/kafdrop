@@ -44,7 +44,7 @@ public final class TopicController {
     final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
-    model.addAttribute("consumers", consumerMonitor.getConsumers(topic));
+    model.addAttribute("consumers", consumerMonitor.getConsumers(Collections.singleton(topic)));
 
     return "topic-detail";
   }

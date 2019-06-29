@@ -34,6 +34,7 @@
 <div id="action-bar" class="container">
     <a class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
 </div>
+<br/>
 
 <div class="container-fluid">
     <div class="row">
@@ -136,7 +137,7 @@
                 <tbody>
                 <#list consumers![] as c>
                     <tr>
-                        <td>${c.groupId}</td>
+                        <td><a href="<@spring.url '/consumer/${c.groupId}'/>">${c.groupId}</a></td>
                         <td>${c.getTopic(topic.name).lag}</td>
                     </tr>
                 </#list>
