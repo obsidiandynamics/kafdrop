@@ -32,7 +32,9 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
   fi
 
   if [ $GITHUB_RELEASE_ENABLED = 1 ]; then
+    set +x
     get_release_status=$(curl -u $GITHUB_USER:$GITHUB_PASS -s -o /dev/null -w "%{http_code}" $repo_url/releases/tags/$app_ver)
+    set -x
     echo "Release tag query status code: $get_release_status"
     if [ $get_release_status == "404" ]; then
       echo "Publishing release"
@@ -46,7 +48,6 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
       }"
       set +x
       curl -u $GITHUB_USER:$GITHUB_PASS -X POST $repo_url/releases -d "$release_json"
-      set -x
     elif [ $get_release_status == "200" ]; then
       echo "Release already exists; skipping"
     else
