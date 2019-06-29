@@ -69,6 +69,7 @@ Apply the chart:
 helm upgrade -i kafdrop chart --set image.tag=3.0.0 \
     --set zkConnect=<host:port,host:port> \
     --set kafkaBrokerConnect=<host:port,host:port> \
+    --set server.servlet.contextPath="/" \
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
 
