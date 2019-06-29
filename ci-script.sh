@@ -32,6 +32,7 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
   fi
 
   if [ $GITHUB_RELEASE_ENABLED = 1 ]; then
+    curl -s -H 'User-Agent: CI' $repo_url/releases/tags/$app_ver
     get_release_tag=$(curl -s -o /dev/null -w "%{http_code}" -H 'User-Agent: CI' $repo_url/releases/tags/$app_ver)
     echo "Release tag $get_release_tag"
     if [ $get_release_tag == "404" ]; then
