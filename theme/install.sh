@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 cd $(dirname $0)
 
@@ -9,15 +8,22 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-which grunt > /dev/null || npm install -g grunt-cli
+which grunt > /dev/null
+if [ $? -ne 0 ]; then
+  echo "ERROR: grunt not installed; run 'npm install -g grunt-cli'"
+  exit 1
+fi
 
+set -e
 cd ..
 mkdir -p target
 cd target
 if [ -d bootswatch ]; then
+  echo "Updating bootswatch"
   cd bootswatch
   git pull
 else
+  echo "Cloning bootswatch"
   git clone https://github.com/thomaspark/bootswatch.git
   cd bootswatch
 fi
@@ -25,6 +31,7 @@ fi
 mkdir -p dist/kafdrop
 cp ../../theme/*.scss dist/kafdrop
 
+echo "Building theme"
 npm install
 grunt swatch:kafdrop
 theme_target_dir=src/main/resources/static/css
