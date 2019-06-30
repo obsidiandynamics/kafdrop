@@ -148,6 +148,9 @@ management.endpoints.web.base-path=<path>
 ```
 
 # Guides
+## Updating the Bootstrap theme
+Edit the `.scss` files in the `theme` directory, then run `theme/install.sh`. This will overwrite `src/main/resources/static/css/bootstrap.min.css`. Then build as usual. (Requires `npm`.)
+
 ## Securing Kafdrop
 Kafdrop doesn't (yet) natively implement an authentication mechanism to restrict user access. Here's a quick workaround using NGINX using Basic Auth. The instructions below are for macOS and Homebrew.
 
