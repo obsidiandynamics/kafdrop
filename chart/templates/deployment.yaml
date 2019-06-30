@@ -38,14 +38,14 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: "{{ .Values.server.servlet.contextPath }}/actuator/health"
+              path: "{{ .Values.server.servlet.contextPath }}actuator/health"
               port: http
             initialDelaySeconds: 180
             periodSeconds: 30
             timeoutSeconds: 10
           readinessProbe:
             httpGet:
-              path: "{{ .Values.server.servlet.contextPath }}/actuator/health"
+              path: "{{ .Values.server.servlet.contextPath }}actuator/health"
               port: http
             initialDelaySeconds: 20
             periodSeconds: 5
