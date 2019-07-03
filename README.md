@@ -67,11 +67,13 @@ git clone https://github.com/obsidiandynamics/kafdrop && cd kafdrop
 Apply the chart:
 ```sh
 helm upgrade -i kafdrop chart --set image.tag=3.x.x \
-    --set zkConnect=<host:port,host:port> \
-    --set kafkaBrokerConnect=<host:port,host:port> \
+    --set zookeeper.connect=<host:port,host:port> \
+    --set kafka.brokerConnect=<host:port,host:port> \
     --set server.servlet.contextPath="/" \
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
+
+For all Helm configuration options, have a peek into [chart/values.yaml](chart/values.yaml).
 
 Replace `3.x.x` with the image tag of [obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop). Services will be bound on port 9000 by default (node port 30900).
 

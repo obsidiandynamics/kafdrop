@@ -25,9 +25,17 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: ZOOKEEPER_CONNECT
-            value: "{{ .Values.zkConnect }}"
+            value: "{{ .Values.zookeeper.connect }}"
+          - name: ZOOKEEPER_SESSIONTIMEOUTMILLIS
+            value: "{{ .Values.zookeeper.sessionTimeoutMillis }}"
+          - name: ZOOKEEPER_CONNECTTIMEOUTMILLIS
+            value: "{{ .Values.zookeeper.connectTimeoutMillis }}"
+          - name: ZOOKEEPER_RETRYMILLIS
+            value: "{{ .Values.zookeeper.retryMillis }}"
+          - name: ZOOKEEPER_MAXRETRIES
+            value: "{{ .Values.zookeeper.maxRetries }}"
           - name: KAFKA_BROKERCONNECT
-            value: "{{ .Values.kafkaBrokerConnect }}"
+            value: "{{ .Values.kafka.brokerConnect }}"
           - name: JVM_OPTS
             value: "{{ .Values.jvm.opts }}"
           - name: SERVER_SERVLET_CONTEXTPATH
