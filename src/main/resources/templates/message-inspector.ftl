@@ -14,8 +14,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<#import "lib/template.ftl" as template>
 <#import "/spring.ftl" as spring />
+<#import "lib/template.ftl" as template>
 <@template.header "Topic: ${topic.name}: Messages">
     <style type="text/css">
         h2 {
@@ -39,12 +39,12 @@
         }
     </style>
 
-    <script src="/js/message-inspector.js"></script>
+    <script src="<@spring.url '/js/message-inspector.js'/>"></script>
 </@template.header>
 <#setting number_format="0">
 
 
-<h2>Topic Messages: <a href="/topic/${topic.name}">${topic.name}</a></h2>
+<h2>Topic Messages: <a href="<@spring.url '/topic/${topic.name}'/>">${topic.name}</a></h2>
 
 <#assign selectedPartition=messageForm.partition!0?number>
 <#assign selectedFormat=messageForm.format!defaultFormat>
@@ -58,7 +58,7 @@
 </div>
 
 <div id="messageFormPanel" class="card">
-    <form method="GET" action="/topic/${topic.name}/messages" id="messageForm" class="form-inline card-body">
+    <form method="GET" action="<@spring.url '/topic/${topic.name}/messages'/>" id="messageForm" class="form-inline card-body">
         <div class="form-group">
             <label for="partition">Partition</label>
             <select class="form-control" id="partition" name="partition">

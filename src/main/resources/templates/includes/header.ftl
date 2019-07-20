@@ -13,10 +13,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
+<#import "/spring.ftl" as spring />
 <div class="pb-2 mt-5 mb-4 border-bottom">
     <div class="container">
-        <h1 class="app-name brand"><a href="/">Kafdrop</a> <#if profile??><span class="small">${profile}</span></#if>
+        <h1 class="app-name brand"><a href="<@spring.url '/'/>">Kafdrop</a> <#if profile??><span class="small">${profile}</span></#if>
         </h1>
     </div>
 </div>

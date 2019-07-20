@@ -200,9 +200,13 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   @Override
   public List<TopicVO> getTopics() {
     validateInitialized();
-    return getTopicMetadata().values().stream()
+    final var topicVos = getTopicMetadata().values().stream()
         .sorted(Comparator.comparing(TopicVO::getName))
         .collect(Collectors.toList());
+    for (var topicVo : topicVos) {
+      topicVo.setPartitions(getTopicPartitionSizes(topicVo));
+    }
+    return topicVos;
   }
 
   @Override

@@ -13,6 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 
 <@template.header "Topic: ${topic.name}: Messages">
@@ -31,7 +32,7 @@
 </@template.header>
 <#setting number_format="0">
 
-<h2>Topic Messages: <a href="/topic/${topic.name}">${topic.name}</a></h2>
+<h2>Topic Messages: <a href="<@spring.url '/topic/${topic.name}'/>">${topic.name}</a></h2>
 
 <div class="container">
     <#if messages?? && messages?size gt 0>

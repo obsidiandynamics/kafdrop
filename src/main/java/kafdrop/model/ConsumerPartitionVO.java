@@ -18,7 +18,7 @@
 
 package kafdrop.model;
 
-public class ConsumerPartitionVO {
+public final class ConsumerPartitionVO {
   private final String groupId;
   private final String topic;
   private final int partitionId;
@@ -36,7 +36,7 @@ public class ConsumerPartitionVO {
     return topic;
   }
 
-  int getPartitionId() {
+  public int getPartitionId() {
     return partitionId;
   }
 
@@ -48,11 +48,15 @@ public class ConsumerPartitionVO {
     this.size = size;
   }
 
+  public long getFirstOffset() {
+    return firstOffset;
+  }
+
   public void setFirstOffset(long firstOffset) {
     this.firstOffset = firstOffset;
   }
 
-  long getLag() {
+  public long getLag() {
     if (size < 0 || firstOffset < 0) {
       return 0;
     } else if (offset < firstOffset) {
@@ -72,13 +76,8 @@ public class ConsumerPartitionVO {
 
   @Override
   public String toString() {
-    return ConsumerPartitionVO.class.getSimpleName() + " [" +
-        "groupId=" + groupId +
-        ", topic=" + topic +
-        ", partitionId=" + partitionId +
-        ", offset=" + offset +
-        ", size=" + size +
-        ", firstOffset=" + firstOffset +
-        "]";
+    return ConsumerPartitionVO.class.getSimpleName() + " [groupId=" + groupId +
+        ", topic=" + topic + ", partitionId=" + partitionId + ", offset=" + offset +
+        ", size=" + size + ", firstOffset=" + firstOffset + "]";
   }
 }

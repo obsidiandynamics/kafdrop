@@ -13,6 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Topic: ${topic.name}">
     <style type="text/css">
@@ -31,7 +32,7 @@
 <h2>Topic: ${topic.name}</h2>
 
 <div id="action-bar" class="container">
-    <a class="btn btn-outline-light" href="/topic/${topic.name}/allmessages"><i class="fa fa-eye"></i> View Messages</a>
+  <a class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/allmessages'/>"><i class="fa fa-eye"></i> View Messages</a>
 </div>
 
 <div class="container-fluid">

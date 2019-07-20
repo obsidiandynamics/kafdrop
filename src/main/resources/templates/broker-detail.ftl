@@ -13,6 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Broker: ${broker.id?string}">
     <style type="text/css">
@@ -80,7 +81,7 @@
         <tbody>
         <#list topics as t>
             <tr>
-                <td><a href="/topic/${t.name}">${t.name}</a></td>
+                <td><a href="<@spring.url '/topic/${t.name}'/>">${t.name}</a></td>
                 <td>${t.partitions?size}</td>
                 <td>${t.getLeaderPartitions(broker.id)?size}</td>
                 <td class="leader-partitions"><#list t.getLeaderPartitions(broker.id) as p>${p.id}<#sep>,</#list></td>

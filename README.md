@@ -1,10 +1,10 @@
-Kafdrop 3
+<img src="https://raw.githubusercontent.com/wiki/obsidiandynamics/kafdrop/images/kafdrop-logo.png" width="90px" alt="logo"/> Kafdrop 3
 ===
 [![Download](https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/images/download.svg)](https://bintray.com/obsidiandynamics/kafdrop/main/_latestVersion)
 [![Build](https://travis-ci.org/obsidiandynamics/kafdrop.svg?branch=master)](https://travis-ci.org/obsidiandynamics/kafdrop#)
 
 
-Kafdrop 3 is a UI for monitoring Apache Kafka clusters. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
+Kafdrop 3 is a UI for navigating and monitoring Apache Kafka brokers. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
 
 This project is a reboot of [Kafdrop 2.x](https://github.com/HomeAdvisor/Kafdrop), dragged kicking and screaming into the world of JDK 11+, Kafka 2.x and Kubernetes. It's a lightweight application that runs on Spring Boot and requires very little configuration.
 
@@ -52,6 +52,7 @@ docker run -d --rm -p 9000:9000 \
     -e ZOOKEEPER_CONNECT=<host:port,host:port> \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
     -e JVM_OPTS="-Xms32M -Xmx64M" \
+    -e SERVER_SERVLET_CONTEXTPATH="/" \
     obsidiandynamics/kafdrop
 ```
 
@@ -65,13 +66,18 @@ git clone https://github.com/obsidiandynamics/kafdrop && cd kafdrop
 
 Apply the chart:
 ```sh
-helm upgrade -i kafdrop chart --set image.tag=3.0.0 \
-    --set zkConnect=<host:port,host:port> \
-    --set kafkaBrokerConnect=<host:port,host:port> \
+helm upgrade -i kafdrop chart --set image.tag=3.x.x \
+    --set zookeeper.connect=<host:port,host:port> \
+    --set kafka.brokerConnect=<host:port,host:port> \
+    --set server.servlet.contextPath="/" \
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
 
-Replace `3.0.0` with the image tag of [obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop). Services will be bound on port 9000 by default (node port 30900).
+For all Helm configuration options, have a peek into [chart/values.yaml](chart/values.yaml).
+
+Replace `3.x.x` with the image tag of [obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop). Services will be bound on port 9000 by default (node port 30900).
+
+**Note:** The context path _must_ end with a slash.
 
 Proxy to the Kubernetes cluster:
 ```sh
@@ -144,3 +150,79 @@ This can be overridden with the following configuration:
 ```
 management.endpoints.web.base-path=<path>
 ```
+
+# Guides
+## Updating the Bootstrap theme
+Edit the `.scss` files in the `theme` directory, then run `theme/install.sh`. This will overwrite `src/main/resources/static/css/bootstrap.min.css`. Then build as usual. (Requires `npm`.)
+
+## Securing Kafdrop
+Kafdrop doesn't (yet) natively implement an authentication mechanism to restrict user access. Here's a quick workaround using NGINX using Basic Auth. The instructions below are for macOS and Homebrew.
+
+### Requirements
+* NGINX: install using `which nginx > /dev/null || brew install nginx`
+* Apache HTTP utilities: `which htpasswd > /dev/null || brew install httpd`
+
+### Setup
+Set the admin password (you will be prompted):
+```sh
+htpasswd -c /usr/local/etc/nginx/.htpasswd admin
+```
+
+Add a logout page in `/usr/local/opt/nginx/html/401.html`:
+```html
+<!DOCTYPE html>
+<p>Not authorized. <a href="<!--# echo var="scheme" -->://<!--# echo var="http_host" -->/">Login</a>.</p>
+```
+
+Use the following snippet for `/usr/local/etc/nginx/nginx.conf`:
+```
+worker_processes 4;
+  
+events {
+  worker_connections 1024;
+}
+
+http {
+  upstream kafdrop {
+    server 127.0.0.1:9000;
+    keepalive 64;
+  }
+
+  server {
+    listen *:8080;
+    server_name _;
+    access_log /usr/local/var/log/nginx/nginx.access.log;
+    error_log /usr/local/var/log/nginx/nginx.error.log;
+    auth_basic "Restricted Area";
+    auth_basic_user_file /usr/local/etc/nginx/.htpasswd;
+
+    location / {
+      proxy_pass http://kafdrop;
+    }
+
+    location /logout {
+      return 401;
+    }
+
+    error_page 401 /errors/401.html;
+
+    location /errors {
+      auth_basic off;
+      ssi        on;
+      alias /usr/local/opt/nginx/html;
+    }
+  }
+}
+```
+
+Run NGINX:
+```sh
+nginx
+```
+
+Or reload its configuration if already running:
+```sh
+nginx -s reload
+```
+
+To logout, browse to [/logout](http://localhost:8080/logout).

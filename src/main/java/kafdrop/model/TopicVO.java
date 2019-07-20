@@ -118,4 +118,9 @@ public class TopicVO implements Comparable<TopicVO> {
   public int hashCode() {
     return Objects.hashCode(name);
   }
+
+  @Override
+  public String toString() {
+    return TopicVO.class.getSimpleName() + " [name=" + name +", partitions=" + partitions + "]";
+  }
 }
