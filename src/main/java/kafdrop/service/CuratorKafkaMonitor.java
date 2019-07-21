@@ -222,6 +222,29 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
   }
 
   @Override
+  public List<MessageVO> getMessages(String topic, int count,
+                                     MessageDeserializer deserializer) {
+    final var records =
+        kafkaHighLevelConsumer.getLatestRecords(topic, count, deserializer);
+    if (records != null) {
+      final var messageVos = new ArrayList<MessageVO>();
+      for (var record : records) {
+        final var messageVo = new MessageVO();
+        messageVo.setPartition(record.partition());
+        messageVo.setOffset(record.offset());
+        messageVo.setKey(record.key());
+        messageVo.setMessage(record.value());
+        messageVo.setHeaders(headersToMap(record.headers()));
+        messageVo.setTimestamp(new Date(record.timestamp()));
+        messageVos.add(messageVo);
+      }
+      return messageVos;
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
                                      MessageDeserializer deserializer) {
     final var records =

@@ -72,7 +72,7 @@ public final class MessageController {
     model.addAttribute("messageFormats", MessageFormat.values());
 
     final var deserializer = getDeserializer(topicName, defaultFormat);
-    final List<MessageVO> messages = new ArrayList<>();
+    final List<MessageVO> messages = messageInspector.getMessages(topicName, size, deserializer);
 
     for (TopicPartitionVO partition : topic.getPartitions()) {
       messages.addAll(messageInspector.getMessages(topicName,
@@ -82,7 +82,7 @@ public final class MessageController {
           deserializer));
     }
 
-    Collections.sort(messages, Comparator.comparing(MessageVO::getTimestamp));
+    messages.sort(Comparator.comparing(MessageVO::getTimestamp));
     model.addAttribute("messages", messages);
 
     return "topic-messages";

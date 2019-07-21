@@ -93,9 +93,9 @@ public final class KafkaHighLevelConsumer {
     kafkaConsumer.seek(topicPartition, offset);
 
     final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
-    while (rawRecords.size() <= count) {
+    while (rawRecords.size() <= count) { //TODO should stop if get to count or get to the latest offset
       final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(topicPartition);
-      if (polled.isEmpty()) break;
+      if (polled.isEmpty()) break;  //TODO remove this
       rawRecords.addAll(polled);
     }
     return rawRecords
@@ -113,6 +113,53 @@ public final class KafkaHighLevelConsumer {
                                          deserializer.deserializeMessage(ByteBuffer.wrap(rec.value())),
                                          rec.headers(),
                                          rec.leaderEpoch()))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Gets records from all partitions of a given topic.
+   * @param count The maximum number of records getting back.
+   * @param deserializer Message deserializer
+   * @return A list of consumer records for a given topic.
+   */
+  synchronized List<ConsumerRecord<String, String>> getLatestRecords(String topic,
+                                                                     int count,
+                                                                     MessageDeserializer deserializer) {
+    initializeClient();
+    final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
+    final var topicPartitions = partitionInfoSet.stream()
+        .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+            partitionInfo.partition()))
+        .collect(Collectors.toList());
+    kafkaConsumer.assign(topicPartitions);
+    for (var topicPartition : topicPartitions) {
+      kafkaConsumer.seek(topicPartition, count); //TODO fix latest offset - count > 0
+    }
+
+    final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
+
+    while (rawRecords.size() <= count) { // TODO find all messages for each partition
+      final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS));
+      for (var record : polled) {
+        rawRecords.add(record);
+      }
+    }
+
+    return rawRecords
+        .subList(0, Math.min(count, rawRecords.size()))
+        .stream()
+        .map(rec -> new ConsumerRecord<>(rec.topic(),
+            rec.partition(),
+            rec.offset(),
+            rec.timestamp(),
+            rec.timestampType(),
+            0L,
+            rec.serializedKeySize(),
+            rec.serializedValueSize(),
+            rec.key(),
+            deserializer.deserializeMessage(ByteBuffer.wrap(rec.value())),
+            rec.headers(),
+            rec.leaderEpoch()))
         .collect(Collectors.toList());
   }
 
