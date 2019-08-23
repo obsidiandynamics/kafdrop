@@ -5,6 +5,7 @@ import org.apache.kafka.clients.*;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.springframework.stereotype.*;
 
 import javax.annotation.*;
