@@ -26,6 +26,10 @@ public final class KafkaHighLevelAdminClient {
   public void init() {
     final var props = new Properties();
     props.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getBrokerConnect());
+    if (kafkaConfiguration.getIsSecured()) {
+        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaConfiguration.getSecurityProtocol());
+        props.put(SaslConfigs.SASL_MECHANISM, kafkaConfiguration.getSaslMechanism());
+    }
     adminClient = AdminClient.create(props);
   }
 

@@ -39,7 +39,7 @@
         <tbody>
         <tr>
             <td><i class="fa fa-laptop"></i> Host</td>
-            <td>${broker.host}:${broker.port}</td>
+            <td>${broker.host?if_exists}:${broker.port}</td>
         </tr>
         <tr>
             <td><i class="fa fa-clock-o"></i> Start time</td>

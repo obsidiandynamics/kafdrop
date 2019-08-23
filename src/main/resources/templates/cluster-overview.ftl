@@ -89,7 +89,7 @@
             <#list brokers as b>
                 <tr>
                     <td><a href="<@spring.url '/broker/${b.id}'/>"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
-                    <td>${b.host}</td>
+                    <td>${b.host?if_exists}</td>
                     <td>${b.port?string}</td>
                     <td>${b.version}</td>
                     <td>${b.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
