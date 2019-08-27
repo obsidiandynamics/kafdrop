@@ -37,12 +37,12 @@ function prefix(text, pref) {
 
 $(document).ready(function () {
     var searchTag = "searchRow";
-    $('input[name="searchRow"]').attr('title', "Power Filter: w/space for OR, '!' for exclude");
+    $('input[name=searchTag]').attr('title', "Power Filter: w/space for OR, '!' for exclude");
 
     var counter = "(" + $('.dataRow:visible').length + ")";
     $('#rowCount').text(counter);
 
-    $('input[name="searchRow"]').keyup(function () {
+    $('input[name=searchTag]').keyup(function () {
         var searchterm = $(this).val();
         var rowTag = "tr.dataRow";
         if (searchterm.length >= 2) {
@@ -57,7 +57,7 @@ $(document).ready(function () {
             var noMatchExpr = rowTag;
             var someFilter = false;
 
-            for (i = 0; i < bits.length; i++) {
+            for (var i = 0; i < bits.length; i++) {
                 var bit = bits[i];
 
                 if (bit == "!") {
