@@ -36,13 +36,12 @@ function prefix(text, pref) {
 }
 
 $(document).ready(function () {
-    var searchTag = "searchRow";
-    $('input[name=searchTag]').attr('title', "Power Filter: w/space for OR, '!' for exclude");
+    $('input[name="searchRow"]').attr('title', "Power Filter: w/space for OR, '!' for exclude");
 
     var counter = "(" + $('.dataRow:visible').length + ")";
     $('#rowCount').text(counter);
 
-    $('input[name=searchTag]').keyup(function () {
+    $('input[name="searchRow"]').keyup(function () {
         var searchterm = $(this).val();
         var rowTag = "tr.dataRow";
         if (searchterm.length >= 2) {
