@@ -25,8 +25,12 @@ You can run the Kafdrop JAR directly, via Docker, or in Kubernetes.
 ## Running from JAR
 ```sh
 java --add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
-    -jar target/kafdrop-<version>.jar --zookeeper.connect=<host>:<port>,<host>:<port>,...
+    -jar target/kafdrop-<version>.jar \
+    --zookeeper.connect=<host>:<port>,<host>:<port>,... \
+    --kafka.brokerConnect=<host:port,host:port>,...
 ```
+
+If unspecified, `zookeeper.connect` defaults to `localhost:2181`, while `kafka.brokerConnect` -> `localhost:9092`.
 
 Open a browser and navigate to [http://localhost:9000](http://localhost:9000). The port can be overridden by adding the following config:
 
