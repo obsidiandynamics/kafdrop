@@ -56,7 +56,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
   private final KafkaHighLevelConsumer kafkaHighLevelConsumer;
 
-  public CuratorKafkaMonitor(CuratorFramework curatorFramework, ObjectMapper objectMapper, CuratorKafkaMonitorProperties properties, KafkaHighLevelConsumer kafkaHighLevelConsumer) {
+  public CuratorKafkaMonitor(CuratorFramework curatorFramework, ObjectMapper objectMapper, KafkaHighLevelConsumer kafkaHighLevelConsumer) {
     this.curatorFramework = curatorFramework;
     this.objectMapper = objectMapper;
     this.kafkaHighLevelConsumer = kafkaHighLevelConsumer;
