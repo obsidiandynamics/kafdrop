@@ -86,18 +86,35 @@ public final class KafkaHighLevelConsumer {
     return partitionsVo;
   }
 
+  /**
+   * Retrieves latest records from the given offset.
+   * @param topicPartition Topic partition
+   * @param offset Offset to seek from
+   * @param count Maximum number of records returned
+   * @param deserializer Message deserialiser
+   * @return Latest records
+   */
   synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition topicPartition, long offset, int count,
                                                                      MessageDeserializer deserializer) {
     initializeClient();
-    kafkaConsumer.assign(Collections.singletonList(topicPartition));
+    final var partitionList = Collections.singletonList(topicPartition);
+    kafkaConsumer.assign(partitionList);
     kafkaConsumer.seek(topicPartition, offset);
 
     final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
-    while (rawRecords.size() <= count) { //TODO should stop if get to count or get to the latest offset
+    final var latestOffset = Math.max(0, kafkaConsumer.endOffsets(partitionList).get(topicPartition) - 1);
+    var currentOffset = offset;
+
+    // stop if get to count or get to the latest offset
+    while (rawRecords.size() < count && currentOffset < latestOffset) {
       final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(topicPartition);
-      if (polled.isEmpty()) break;  //TODO remove this
-      rawRecords.addAll(polled);
+
+      if (!polled.isEmpty()) {
+        rawRecords.addAll(polled);
+        currentOffset = polled.get(polled.size() - 1).offset();
+      }
     }
+
     return rawRecords
         .subList(0, Math.min(count, rawRecords.size()))
         .stream()
