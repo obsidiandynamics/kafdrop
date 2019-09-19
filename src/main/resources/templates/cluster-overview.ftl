@@ -1,5 +1,5 @@
 <#--
- Copyright 2016 HomeAdvisor, Inc.
+ Copyright 2016 Kafdrop contributors.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Broker List"/>
 
-<script src="/js/powerFilter.js"></script>
+<script src="<@spring.url '/js/powerFilter.js'/>"></script>
 
 
 <#setting number_format="0">
@@ -58,7 +59,6 @@
                 <th>ID</th>
                 <th>Host</th>
                 <th>Port</th>
-                <th>JMX Port</th>
                 <th>Version</th>
                 <th>
                     Start Time
@@ -88,10 +88,9 @@
             </#if>
             <#list brokers as b>
                 <tr>
-                    <td><a href="/broker/${b.id}"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
-                    <td>${b.host}</td>
+                    <td><a href="<@spring.url '/broker/${b.id}'/>"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
+                    <td>${b.host?if_exists}</td>
                     <td>${b.port?string}</td>
-                    <td>${b.jmxPort?string}</td>
                     <td>${b.version}</td>
                     <td>${b.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
                     <td><@template.yn b.controller/></td>
@@ -146,7 +145,7 @@
             </#if>
             <#list topics as t>
                 <tr class="dataRow">
-                    <td><a href="/topic/${t.name}">${t.name}</a></td>
+                    <td><a href="<@spring.url '/topic/${t.name}'/>">${t.name}</a></td>
                     <td>${t.partitions?size}</td>
                     <td <#if t.preferredReplicaPercent lt 1.0>class="warning"</#if>>${t.preferredReplicaPercent?string.percent}</td>
                     <td <#if t.underReplicatedPartitions?size gt 0>class="warning"</#if>>${t.underReplicatedPartitions?size}</td>

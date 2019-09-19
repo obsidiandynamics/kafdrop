@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HomeAdvisor, Inc.
+ * Copyright 2016 Kafdrop contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,6 @@
  *
  *
  */
-
-.l-content {
-    padding-left: 20px;
-    padding-right: 20px;
-    margin: 0 auto;
-}
 
 .clearing {
     height: 1px;

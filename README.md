@@ -1,17 +1,21 @@
-Kafdrop 3
+<img src="https://raw.githubusercontent.com/wiki/obsidiandynamics/kafdrop/images/kafdrop-logo.png" width="90px" alt="logo"/> Kafdrop 3
 ===
 [![Download](https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/images/download.svg)](https://bintray.com/obsidiandynamics/kafdrop/main/_latestVersion)
 [![Build](https://travis-ci.org/obsidiandynamics/kafdrop.svg?branch=master)](https://travis-ci.org/obsidiandynamics/kafdrop#)
+[![Docker](https://img.shields.io/docker/pulls/obsidiandynamics/kafdrop.svg)](https://hub.docker.com/r/obsidiandynamics/kafdrop)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/obsidiandynamics/kafdrop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/obsidiandynamics/kafdrop/context:java)
 
 
-Kafdrop 3 is a UI for monitoring Apache Kafka clusters. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
+Kafdrop 3 is a UI for navigating and monitoring Apache Kafka brokers. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
 
-The project is a continuation of the original [HomeAdvisor/Kafdrop](https://github.com/HomeAdvisor/Kafdrop), which has now been dragged kicking and screaming into the world of JDK 11+ and Kubernetes. It's a lightweight application that runs on Spring Boot and requires very little configuration.
+![Overview Screenshot](docs/images/overview.png?raw=true)
+
+This project is a reboot of [Kafdrop 2.x](https://github.com/HomeAdvisor/Kafdrop), dragged kicking and screaming into the world of JDK 11+, Kafka 2.x and Kubernetes. It's a lightweight application that runs on Spring Boot and requires very little configuration.
 
 # Requirements
 
 * Java 11 or newer
-* Kafka + ZooKeeper cluster
+* Kafka (version 0.10.0 or newer)
 
 Optional, additional integration:
 
@@ -22,9 +26,13 @@ You can run the Kafdrop JAR directly, via Docker, or in Kubernetes.
 
 ## Running from JAR
 ```sh
-java --add-exports=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED \
-    -jar target/kafdrop-<version>.jar --zookeeper.connect=<host>:<port>,<host>:<port>,...
+java --add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
+    -jar target/kafdrop-<version>.jar \
+    --zookeeper.connect=<host>:<port>,<host>:<port>,... \
+    --kafka.brokerConnect=<host:port,host:port>,...
 ```
+
+If unspecified, `zookeeper.connect` defaults to `localhost:2181`, while `kafka.brokerConnect` -> `localhost:9092`.
 
 Open a browser and navigate to [http://localhost:9000](http://localhost:9000). The port can be overridden by adding the following config:
 
@@ -44,7 +52,7 @@ Finally, a default message format (e.g. to deserialize Avro messages) can option
 Valid format values are `DEFAULT` and `AVRO`. This can also be configured at the topic level via dropdown when viewing messages.
 
 ## Running with Docker
-Images are hosted on [hub.docker.com/r/obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop).
+Images are hosted at [hub.docker.com/r/obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop).
 
 Launch container in background:
 ```sh
@@ -52,6 +60,7 @@ docker run -d --rm -p 9000:9000 \
     -e ZOOKEEPER_CONNECT=<host:port,host:port> \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
     -e JVM_OPTS="-Xms32M -Xmx64M" \
+    -e SERVER_SERVLET_CONTEXTPATH="/" \
     obsidiandynamics/kafdrop
 ```
 
@@ -65,13 +74,18 @@ git clone https://github.com/obsidiandynamics/kafdrop && cd kafdrop
 
 Apply the chart:
 ```sh
-helm upgrade -i kafdrop chart --set image.tag=3.0.0 \
-    --set zkConnect=<host:port,host:port> \
-    --set kafkaBrokerConnect=<host:port,host:port> \
+helm upgrade -i kafdrop chart --set image.tag=3.x.x \
+    --set zookeeper.connect=<host:port,host:port> \
+    --set kafka.brokerConnect=<host:port,host:port> \
+    --set server.servlet.contextPath="/" \
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
 
-Replace `3.0.0` with the image tag of [obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop). Services will be bound on port 9000 by default (node port 30900).
+For all Helm configuration options, have a peek into [chart/values.yaml](chart/values.yaml).
+
+Replace `3.x.x` with the image tag of [obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop). Services will be bound on port 9000 by default (node port 30900).
+
+**Note:** The context path _must_ end with a slash.
 
 Proxy to the Kubernetes cluster:
 ```sh
@@ -91,12 +105,18 @@ The following command will generate a Docker image:
 mvn assembly:single docker:build
 ```
 
+## Docker Compose
+There is a `docker-compose.yaml` file that bundles a Kafka/ZooKeeper instance with Kafdrop:
+```sh
+cd docker-compose/kafka-kafdrop
+docker-compose up
+```
+
 # APIs
 ## JSON endpoints
-Starting with version 2.0.0, Kafdrop offers a set of Kafka APIs that mirror the existing HTML views. Any existing endpoint can be returned as JSON by simply setting the `Accept: application/json` header. There are also two endpoints that are JSON only:
+Starting with version 2.0.0, Kafdrop offers a set of Kafka APIs that mirror the existing HTML views. Any existing endpoint can be returned as JSON by simply setting the `Accept: application/json` header. Some endpoints are JSON only:
 
-* `/topic`: Returns array of all topic names.
-* `/topic/{topicName}/{consumerId}`: Returns partition offset and lag details for a specific topic and consumer.
+* `/topic`: Returns a list of all topics.
 
 ## Swagger
 To help document the Kafka APIs, Swagger has been included. The Swagger output is available by default at the following Kafdrop URL:
@@ -130,3 +150,87 @@ You can also disable CORS entirely with the following configuration:
 ```
 cors.enabled=false
 ```
+
+## Actuator
+Health and info endpoints are available at the following path: /actuator
+
+This can be overridden with the following configuration:
+```
+management.endpoints.web.base-path=<path>
+```
+
+# Guides
+## Updating the Bootstrap theme
+Edit the `.scss` files in the `theme` directory, then run `theme/install.sh`. This will overwrite `src/main/resources/static/css/bootstrap.min.css`. Then build as usual. (Requires `npm`.)
+
+## Securing Kafdrop
+Kafdrop doesn't (yet) natively implement an authentication mechanism to restrict user access. Here's a quick workaround using NGINX using Basic Auth. The instructions below are for macOS and Homebrew.
+
+### Requirements
+* NGINX: install using `which nginx > /dev/null || brew install nginx`
+* Apache HTTP utilities: `which htpasswd > /dev/null || brew install httpd`
+
+### Setup
+Set the admin password (you will be prompted):
+```sh
+htpasswd -c /usr/local/etc/nginx/.htpasswd admin
+```
+
+Add a logout page in `/usr/local/opt/nginx/html/401.html`:
+```html
+<!DOCTYPE html>
+<p>Not authorized. <a href="<!--# echo var="scheme" -->://<!--# echo var="http_host" -->/">Login</a>.</p>
+```
+
+Use the following snippet for `/usr/local/etc/nginx/nginx.conf`:
+```
+worker_processes 4;
+  
+events {
+  worker_connections 1024;
+}
+
+http {
+  upstream kafdrop {
+    server 127.0.0.1:9000;
+    keepalive 64;
+  }
+
+  server {
+    listen *:8080;
+    server_name _;
+    access_log /usr/local/var/log/nginx/nginx.access.log;
+    error_log /usr/local/var/log/nginx/nginx.error.log;
+    auth_basic "Restricted Area";
+    auth_basic_user_file /usr/local/etc/nginx/.htpasswd;
+
+    location / {
+      proxy_pass http://kafdrop;
+    }
+
+    location /logout {
+      return 401;
+    }
+
+    error_page 401 /errors/401.html;
+
+    location /errors {
+      auth_basic off;
+      ssi        on;
+      alias /usr/local/opt/nginx/html;
+    }
+  }
+}
+```
+
+Run NGINX:
+```sh
+nginx
+```
+
+Or reload its configuration if already running:
+```sh
+nginx -s reload
+```
+
+To logout, browse to [/logout](http://localhost:8080/logout).

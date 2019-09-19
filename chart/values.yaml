@@ -5,14 +5,25 @@ image:
   tag: latest
   pullPolicy: Always
 
-zkConnect: localhost:2181
-kafkaBrokerConnect: localhost:9092
+zookeeper:
+  connect: localhost:2181
+  sessionTimeoutMillis: 5000
+  connectTimeoutMillis: 15000
+  retryMillis: 5000
+  maxRetries: 2147483647
+
+kafka:
+  brokerConnect: localhost:9092
 
 jvm:
   opts: ""
 
 nameOverride: ""
 fullnameOverride: ""
+
+server:
+  servlet:
+    contextPath: /
 
 service:
   type: NodePort
@@ -39,3 +50,5 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+podAnnotations: {}

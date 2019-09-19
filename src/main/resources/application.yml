@@ -1,5 +1,7 @@
 server:
   port: 9000
+  servlet:
+    context-path: /
 
 spring:
   jmx:
@@ -10,42 +12,19 @@ spring:
       fail_on_unknown_properties: false
       read_unknown_enum_values_as_null: true
 
-endpoints.jmx.domain: ${spring.jmx.default_domain}
-metrics.jmx.domain: ${spring.jmx.default_domain}-metrics
-management.contextPath: /debug
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure.include: "*"
+  server:
+    port: 9000
 
 kafdrop.monitor:
-  kafkaVersion: "0.11.0.2"
-  threadPoolSize: 10
-  retry:
-    maxAttempts: 5
-    backoffMillis: 2000
+  clientId: Kafdrop
 
-
-curator.discovery:
-  enabled: true
-  basePath: /homeadvisor/services
-
-# Properties to expose via the InfoEndpoint & ServiceDiscovery
-info.build:
-  artifact: ${project.artifactId}
-  name: ${project.name}
-  description: ${project.description}
-  version: ${project.version}
-
-# Default values usually provided by Maven during a build
-project:
-  artifactId: kafdrop-DEV
-  name: KafDropr (DEV)
-  description: ${project.name}
-  version: DEV
-
-# env can be 'local', 'stage', 'prod'
 kafka:
-  env: local
   brokerConnect: localhost:9092
-  keyDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
-  valueDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
   isSecured: false
   saslMechanism: "PLAIN"
   securityProtocol: "SASL_PLAINTEXT"

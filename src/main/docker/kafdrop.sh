@@ -1,5 +1,15 @@
 #!/bin/bash
 
+echo ""
+echo ":::    :::     :::     :::::::::: :::::::::  :::::::::   ::::::::  :::::::::        ::::::::  "
+echo ":+:   :+:    :+: :+:   :+:        :+:    :+: :+:    :+: :+:    :+: :+:    :+:      :+:    :+: "
+echo "+:+  +:+    +:+   +:+  +:+        +:+    +:+ +:+    +:+ +:+    +:+ +:+    +:+             +:+ "
+echo "+#++:++    +#++:++#++: :#::+::#   +#+    +:+ +#++:++#:  +#+    +:+ +#++:++#+           +#++:  "
+echo "+#+  +#+   +#+     +#+ +#+        +#+    +#+ +#+    +#+ +#+    +#+ +#+                    +#+ "
+echo "#+#   #+#  #+#     #+# #+#        #+#    #+# #+#    #+# #+#    #+# #+#             #+#    #+# "
+echo "###    ### ###     ### ###        #########  ###    ###  ########  ###              ########  "
+echo ""
+
 # Set marathon ports to 0:0 to have marathon assign and pass random port
 if [ $PORT0 ]; then
     JMX_PORT=$PORT0;
@@ -25,8 +35,7 @@ if [ $JMX_PORT ]; then
     -Djava.rmi.server.hostname=$HOST"
 fi
 
-ARGS="--add-exports=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED \
-     -Xss256K \
+ARGS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED -Xss256K \
      $JMX_ARGS \
      $HEAP_ARGS \
      $JVM_OPTS"

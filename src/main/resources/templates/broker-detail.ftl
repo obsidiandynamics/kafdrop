@@ -1,5 +1,5 @@
 <#--
- Copyright 2016 HomeAdvisor, Inc.
+ Copyright 2016 Kafdrop contributors.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Broker: ${broker.id?string}">
     <style type="text/css">
@@ -29,16 +30,16 @@
 
 <#setting number_format="0">
 
-<h1>Broker ID: ${broker.id}</h1>
+<h2>Broker ID: ${broker.id}</h2>
 
 <div id="topic-overview">
-    <h2>Broker Overview</h2>
+    <h3>Broker Overview</h3>
 
     <table class="table table-bordered overview">
         <tbody>
         <tr>
             <td><i class="fa fa-laptop"></i> Host</td>
-            <td>${broker.host}:${broker.port}</td>
+            <td>${broker.host?if_exists}:${broker.port}</td>
         </tr>
         <tr>
             <td><i class="fa fa-clock-o"></i> Start time</td>
@@ -66,7 +67,7 @@
 </div>
 
 <div>
-    <h2>Topic Detail</h2>
+    <h3>Topic Detail</h3>
 
     <table class="table table-bordered">
         <thead>
@@ -80,7 +81,7 @@
         <tbody>
         <#list topics as t>
             <tr>
-                <td><a href="/topic/${t.name}">${t.name}</a></td>
+                <td><a href="<@spring.url '/topic/${t.name}'/>">${t.name}</a></td>
                 <td>${t.partitions?size}</td>
                 <td>${t.getLeaderPartitions(broker.id)?size}</td>
                 <td class="leader-partitions"><#list t.getLeaderPartitions(broker.id) as p>${p.id}<#sep>,</#list></td>

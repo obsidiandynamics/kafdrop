@@ -17,9 +17,9 @@ if [ $DOCKER_PUSH_ENABLED = 1 ]; then
 fi
 
 set -x
-app_ver=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+app_ver=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)
 echo Kafdrop version $app_ver
-mvn clean integration-test package assembly:single docker:build
+mvn -B clean integration-test package assembly:single docker:build
 if [ $DOCKER_PUSH_ENABLED = 1 ]; then 
   docker push docker.io/obsidiandynamics/kafdrop:$app_ver
 fi
@@ -32,23 +32,27 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
   fi
 
   if [ $GITHUB_RELEASE_ENABLED = 1 ]; then
-    get_release_tag=$(curl -s -o /dev/null -w "%{http_code}" $repo_url/releases/tag/$app_ver)
-    echo "Release tag $get_release_tag"
-    if [ $get_release_tag == "404" ]; then
+    set +x
+    get_release_status=$(curl -u $GITHUB_USER:$GITHUB_PASS -s -o /dev/null -w "%{http_code}" $repo_url/releases/tags/$app_ver)
+    set -x
+    echo "Release tag query status code: $get_release_status"
+    if [ $get_release_status == "404" ]; then
       echo "Publishing release"
       release_json="{ \
         \"tag_name\": \"$app_ver\", \
         \"target_commitish\": \"master\", \
-        \"name\": \"Download from [Bintray](https://bintray.com/obsidiandynamics/kafdrop/main/${app_ver}#files)\", \
-        \"body\": \"Release $app_ver\", \
+        \"name\": \"$app_ver\", \
+        \"body\": \"Download from [Bintray](https://bintray.com/obsidiandynamics/kafdrop/download_file?file_path=com%2Fobsidiandynamics%2Fkafdrop%2Fkafdrop%2F${app_ver}%2Fkafdrop-${app_ver}.jar)\", \
         \"draft\": false, \
         \"prerelease\": false \
       }"
       set +x
       curl -u $GITHUB_USER:$GITHUB_PASS -X POST $repo_url/releases -d "$release_json"
-      set -x
-    else
+    elif [ $get_release_status == "200" ]; then
       echo "Release already exists; skipping"
+    else
+      echo "Unexpected error checking release status: $get_release_status"
+      exit 1
     fi
   fi
 
@@ -57,7 +61,7 @@ if [[ ! $app_ver =~ "-SNAPSHOT" ]]; then
     curl -X DELETE https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/versions/$app_ver -u ${BINTRAY_USER}:${BINTRAY_KEY} || echo Skipped 'delete'
     cat settings.xml.template | sed "s/{{BINTRAY_USER}}/${BINTRAY_USER}/g" | sed "s/{{BINTRAY_KEY}}/${BINTRAY_KEY}/g" > settings.xml
     set -x
-    mvn deploy -s settings.xml
+    mvn -B deploy -s settings.xml
   fi
 else
   echo "Snapshot version"

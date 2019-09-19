@@ -1,5 +1,5 @@
 <#--
- Copyright 2016 HomeAdvisor, Inc.
+ Copyright 2016 Kafdrop contributors.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Topic: ${topic.name}">
     <style type="text/css">
@@ -28,17 +29,18 @@
 
 <#setting number_format="0">
 
-<h1>Topic: ${topic.name}</h1>
+<h2>Topic: ${topic.name}</h2>
 
 <div id="action-bar" class="container">
-    <a class="btn btn-default" href="/topic/${topic.name}/messages"><i class="fa fa-eye"></i> View Messages</a>
+    <a class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
 </div>
+<br/>
 
 <div class="container-fluid">
     <div class="row">
 
         <div id="topic-overview" class="col-md-8">
-            <h2>Overview</h2>
+            <h3>Overview</h3>
 
             <table class="table table-bordered">
                 <tbody>
@@ -68,10 +70,10 @@
 
 
         <div id="topic-config" class="col-md-4">
-            <h2>Configuration</h2>
+            <h3>Configuration</h3>
 
             <#if topic.config?size == 0>
-                <div>No topic specific configuration</div>
+                <div>No topic-specific configuration</div>
             <#else>
                 <table class="table table-bordered">
                     <tbody>
@@ -90,8 +92,8 @@
 
     <div class="row">
         <div id="partition-detail" class="col-md-8">
-            <h2>Partition Detail</h2>
-            <table id="partition-detail-table" class="table table-bordered table-condensed small">
+            <h3>Partition Detail</h3>
+            <table id="partition-detail-table" class="table table-bordered table-sm small">
                 <thead>
                 <tr>
                     <th>Partition</th>
@@ -124,27 +126,19 @@
         </div>
 
         <div id="consumers" class="col-md-4">
-            <h2>Consumers</h2>
-            <table id="consumers-table" class="table table-bordered table-condensed small">
+            <h3>Consumers</h3>
+            <table id="consumers-table" class="table table-bordered table-sm small">
                 <thead>
                 <tr>
                     <th>Group ID</th>
-                    <th>Lag</th>
-                    <th>Active Instances</th>
+                    <th>Combined Lag</th>
                 </tr>
                 </thead>
                 <tbody>
                 <#list consumers![] as c>
                     <tr>
-                        <td><a href="/consumer/${c.groupId}">${c.groupId}</a></td>
+                        <td><a href="<@spring.url '/consumer/${c.groupId}'/>">${c.groupId}</a></td>
                         <td>${c.getTopic(topic.name).lag}</td>
-                        <td>
-                            <ul class="list-unstyled">
-                                <#list c.getActiveInstancesForTopic(topic.name) as i>
-                                    <li>${i.id}</li>
-                                </#list>
-                            </ul>
-                        </td>
                     </tr>
                 </#list>
                 </tbody>

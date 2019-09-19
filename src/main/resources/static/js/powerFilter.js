@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HomeAdvisor, Inc.
+ * Copyright 2016 Kafdrop contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ function prefix(text, pref) {
 }
 
 $(document).ready(function () {
-    var searchTag = "searchRow";
     $('input[name="searchRow"]').attr('title', "Power Filter: w/space for OR, '!' for exclude");
 
     var counter = "(" + $('.dataRow:visible').length + ")";
@@ -57,7 +56,7 @@ $(document).ready(function () {
             var noMatchExpr = rowTag;
             var someFilter = false;
 
-            for (i = 0; i < bits.length; i++) {
+            for (var i = 0; i < bits.length; i++) {
                 var bit = bits[i];
 
                 if (bit == "!") {

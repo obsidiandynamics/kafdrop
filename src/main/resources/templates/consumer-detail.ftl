@@ -1,5 +1,5 @@
 <#--
- Copyright 2016 HomeAdvisor, Inc.
+ Copyright 2016 Kafdrop contributors.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -13,92 +13,64 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Consumer: ${consumer.groupId}"/>
 
 <#setting number_format="0">
 
-<h1>Kafka Consumer: ${consumer.groupId}</h1>
+<h2>Kafka Consumer: ${consumer.groupId}</h2>
 
-<div id="overview">
-    <h2>Overview</h2>
-    <table class="table table-bordered overview">
-        <tbody>
-        <tr>
-            <td>Active Instances</td>
-            <td>${consumer.activeInstances?size}</td>
-        </tr>
-        <tr>
-            <td>Topics</td>
-            <td>${consumer.topics?size}</td>
-        </tr>
-        <tr>
-            <td>Active Topics</td>
-            <td>${consumer.activeTopicCount}</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+<div class="container-fluid">
+    <div id="overview">
+        <h3>Overview</h3>
+        <table class="table table-bordered overview">
+            <tbody>
+            <tr>
+                <td>Topics</td>
+                <td>${consumer.topics?size}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-<div id="topics">
-    <#list consumer.topics as consumerTopic>
-        <#assign tableId='topic-${consumerTopic_index}-table'>
-        <h2><@template.toggleLink target="#${tableId}" anchor='${tableId}' /> Topic: <a
-                    href="/topic/${consumerTopic.topic}">${consumerTopic.topic}</a></h2>
-        <div id="${tableId}">
-            <p>
-            <table class="table table-bordered overview">
-                <tbody>
-                <tr>
-                    <td>Total Threads</td>
-                    <td>${consumerTopic.ownerCount}</td>
-                </tr>
-                <tr>
-                    <td>Partition Coverage</td>
-                    <td>${consumerTopic.coveragePercent * 100.0}%
-                        (${consumerTopic.assignedPartitionCount} of ${consumerTopic.partitions?size})
-                    </td>
-                </tr>
-                <tr>
-                    <td>Total Lag</td>
-                    <td>${consumerTopic.lag}</td>
-                </tr>
-                <tr>
-                    <td>Max Lag</td>
-                    <td>${consumerTopic.maxLag}</td>
-                </tr>
-                </tbody>
-            </table>
-            </p>
-            <p>
-            <table class="table table-bordered table-condensed">
-                <thead>
-                <tr>
-                    <th>Partition</th>
-                    <th>First Offset</th>
-                    <th>Last Offset</th>
-                    <th>Offset</th>
-                    <th>Lag</th>
-                    <th>Owner</th>
-                </tr>
-                </thead>
-                <tbody>
-                <#list consumerTopic.partitions as p>
+    <div id="topics">
+        <#list consumer.topics as consumerTopic>
+            <#assign tableId='topic-${consumerTopic_index}-table'>
+            <h3><@template.toggleLink target="#${tableId}" anchor='${tableId}' /> Topic: <a
+                        href="<@spring.url '/topic/${consumerTopic.topic}'/>">${consumerTopic.topic}</a></h3>
+            <div id="${tableId}">
+                <p>
+                <table class="table table-bordered table-sm">
+                    <thead>
                     <tr>
-                        <td>${p.partitionId}</td>
-                        <td>${p.firstOffset}</td>
-                        <td>${p.size}</td>
-                        <td>${p.offset}</td>
-                        <td>${p.lag}</td>
-                        <td>${p.owner!''}</td>
+                        <th>Partition</th>
+                        <th>First Offset</th>
+                        <th>Last Offset</th>
+                        <th>Consumer Offset</th>
+                        <th>Lag</th>
                     </tr>
-                </#list>
-                </tbody>
-            </table>
-            </p>
-        </div>
-    </#list>
-
+                    </thead>
+                    <tbody>
+                    <#list consumerTopic.partitions as p>
+                        <tr>
+                            <td>${p.partitionId}</td>
+                            <td>${p.firstOffset}</td>
+                            <td>${p.size}</td>
+                            <td>${p.offset}</td>
+                            <td>${p.lag}</td>
+                        </tr>
+                    </#list>
+                    <tr>
+                        <td colspan="4"><b>Combined lag</b></td>
+                        <td><b>${consumerTopic.lag}</b></td>
+                    </tr>
+                    </tbody>
+                </table>
+                </p>
+            </div>
+        </#list>
+    </div>
 </div>
 
 <@template.footer/>
