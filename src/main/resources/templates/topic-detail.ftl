@@ -34,7 +34,7 @@
 <div id="action-bar" class="container">
   <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
 </div>
-
+<br/>
 <div class="container-fluid">
     <div class="row">
 
@@ -109,7 +109,7 @@
                 <tbody>
                 <#list topic.partitions as p>
                     <tr>
-                        <td><a href="/topic/${topic.name}/messages?partition=${p.id}&offset=${p.firstOffset}&count=${p.size - p.firstOffset}">${p.id}</a></td>
+                        <td><a href="<@spring.url '/topic/${topic.name}/messages?partition=${p.id}&offset=${p.firstOffset}&count=${p.size - p.firstOffset}'/>">${p.id}</a></td>
                         <td>${p.firstOffset}</td>
                         <td>${p.size}</td>
                         <td>${p.size - p.firstOffset}</td>
@@ -136,7 +136,7 @@
                 <tbody>
                 <#list consumers![] as c>
                     <tr>
-                        <td>${c.groupId}</td>
+                        <td><a href="<@spring.url '/consumer/${c.groupId}'/>">${c.groupId}</a></td>
                         <td>${c.getTopic(topic.name).lag}</td>
                     </tr>
                 </#list>
