@@ -13,3 +13,6 @@ target
 .vscode
 .env
 settings.xml
+
+kafka.properties
+kafka.truststore.jks
