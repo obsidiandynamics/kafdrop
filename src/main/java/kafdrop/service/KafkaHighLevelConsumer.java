@@ -102,8 +102,8 @@ public final class KafkaHighLevelConsumer {
     kafkaConsumer.seek(partition, offset);
 
     final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
-    final var latestOffset = Math.max(0, kafkaConsumer.endOffsets(partitions).get(partition) - 1);
-    var currentOffset = offset;
+    final var latestOffset = kafkaConsumer.endOffsets(partitions).get(partition) - 1;
+    var currentOffset = offset - 1;
 
     // stop if get to count or get to the latest offset
     while (rawRecords.size() < count && currentOffset < latestOffset) {
