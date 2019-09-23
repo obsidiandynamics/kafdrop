@@ -41,7 +41,7 @@ public final class KafkaHighLevelConsumer {
       properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
       properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
       properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
-      properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+      properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
       properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafdrop-client");
       properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getBrokerConnect());
 
@@ -157,7 +157,6 @@ public final class KafkaHighLevelConsumer {
     }
 
     final var totalCount = count * partitions.size();
-    //final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(totalCount);
     final Map<TopicPartition, List<ConsumerRecord<String, byte[]>>> rawRecords
         = partitions.stream().collect(Collectors.toMap(p -> p , p -> new ArrayList<>(count)));
 

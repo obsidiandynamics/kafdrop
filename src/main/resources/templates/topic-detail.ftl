@@ -25,7 +25,6 @@
             word-break: break-all;
         }
     </style>
-    <script src="<@spring.url '/js/topic-messages.js'/>"></script>
 </@template.header>
 
 <#setting number_format="0">
@@ -33,7 +32,7 @@
 <h2>Topic: ${topic.name}</h2>
 
 <div id="action-bar" class="container">
-  <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/allmessages'/>"><i class="fa fa-eye"></i> View Messages</a>
+  <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
 </div>
 
 <div class="container-fluid">
