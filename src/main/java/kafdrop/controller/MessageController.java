@@ -59,7 +59,7 @@ public final class MessageController {
    * @param model
    * @return View for seeing all messages in a topic sorted by timestamp.
    */
-  @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/allmessages")
+  @GetMapping("/topic/{name:.+}/allmessages")
   public String viewAllMessages(@PathVariable("name") String topicName,
                                 Model model, @RequestParam(name = "count", required = false) Integer count) {
     final int size = (count != null? count : 100);
@@ -96,7 +96,7 @@ public final class MessageController {
    * @param model
    * @return View for seeing messages in a partition.
    */
-  @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/messages")
+  @GetMapping("/topic/{name:.+}/messages")
   public String viewMessageForm(@PathVariable("name") String topicName,
                                 @Valid @ModelAttribute("messageForm") PartitionOffsetInfo messageForm,
                                 BindingResult errors,

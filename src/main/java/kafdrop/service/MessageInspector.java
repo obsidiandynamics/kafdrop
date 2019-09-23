@@ -43,7 +43,7 @@ public class MessageInspector {
   }
 
   /**
-   * Gets messages for a given topic.
+   * Gets all messages from all partitions of a given topic.
    */
   public List<MessageVO> getMessages(String topicName, int count,
                                      MessageDeserializer deserializer) {

@@ -88,26 +88,26 @@ public final class KafkaHighLevelConsumer {
 
   /**
    * Retrieves latest records from the given offset.
-   * @param topicPartition Topic partition
+   * @param partition Topic partition
    * @param offset Offset to seek from
    * @param count Maximum number of records returned
    * @param deserializer Message deserialiser
    * @return Latest records
    */
-  synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition topicPartition, long offset, int count,
+  synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition partition, long offset, int count,
                                                                      MessageDeserializer deserializer) {
     initializeClient();
-    final var partitionList = Collections.singletonList(topicPartition);
-    kafkaConsumer.assign(partitionList);
-    kafkaConsumer.seek(topicPartition, offset);
+    final var partitions = Collections.singletonList(partition);
+    kafkaConsumer.assign(partitions);
+    kafkaConsumer.seek(partition, offset);
 
     final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
-    final var latestOffset = Math.max(0, kafkaConsumer.endOffsets(partitionList).get(topicPartition) - 1);
+    final var latestOffset = Math.max(0, kafkaConsumer.endOffsets(partitions).get(partition) - 1);
     var currentOffset = offset;
 
     // stop if get to count or get to the latest offset
     while (rawRecords.size() < count && currentOffset < latestOffset) {
-      final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(topicPartition);
+      final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(partition);
 
       if (!polled.isEmpty()) {
         rawRecords.addAll(polled);
@@ -144,27 +144,41 @@ public final class KafkaHighLevelConsumer {
                                                                      MessageDeserializer deserializer) {
     initializeClient();
     final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
-    final var topicPartitions = partitionInfoSet.stream()
+    final var partitions = partitionInfoSet.stream()
         .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
             partitionInfo.partition()))
         .collect(Collectors.toList());
-    kafkaConsumer.assign(topicPartitions);
-    for (var topicPartition : topicPartitions) {
-      kafkaConsumer.seek(topicPartition, count); //TODO fix latest offset - count > 0
+    kafkaConsumer.assign(partitions);
+    final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+
+    for (var partition : partitions) {
+      final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+      kafkaConsumer.seek(partition, Math.max(0, latestOffset - count));
     }
 
-    final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
+    final var totalCount = count * partitions.size();
+    //final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(totalCount);
+    final Map<TopicPartition, List<ConsumerRecord<String, byte[]>>> rawRecords
+        = partitions.stream().collect(Collectors.toMap(p -> p , p -> new ArrayList<>(count)));
 
-    while (rawRecords.size() <= count) { // TODO find all messages for each partition
+    var moreRecords = true;
+    while (rawRecords.size() < totalCount && moreRecords) {
       final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS));
-      for (var record : polled) {
-        rawRecords.add(record);
+
+      moreRecords = false;
+      for (var partition : polled.partitions()) {
+        var records = polled.records(partition);
+        if (!records.isEmpty()) {
+          rawRecords.get(partition).addAll(records);
+          moreRecords = records.get(records.size() - 1).offset() < latestOffsets.get(partition) - 1;
+        }
       }
     }
 
     return rawRecords
-        .subList(0, Math.min(count, rawRecords.size()))
+        .values()
         .stream()
+        .flatMap(Collection::stream)
         .map(rec -> new ConsumerRecord<>(rec.topic(),
             rec.partition(),
             rec.offset(),
