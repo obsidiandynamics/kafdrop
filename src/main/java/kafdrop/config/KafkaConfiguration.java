@@ -17,8 +17,8 @@ public final class KafkaConfiguration {
   private static final Logger LOG = LoggerFactory.getLogger(KafkaConfiguration.class);
 
   private static final String KAFKA_PROPERTIES_FILE = "kafka.properties";
-
   private static final String KAFKA_TRUSTSTORE_FILE = "kafka.truststore.jks";
+  private static final String KAFKA_KEYSTORE_FILE = "kafka.keystore.jks";
 
   private String brokerConnect;
   private Boolean isSecured = false;
@@ -35,6 +35,11 @@ public final class KafkaConfiguration {
     if (new File(KAFKA_TRUSTSTORE_FILE).isFile()) {
       LOG.info("Assigning truststore location to {}", KAFKA_TRUSTSTORE_FILE);
       properties.put("ssl.truststore.location", KAFKA_TRUSTSTORE_FILE);
+    }
+
+    if (new File(KAFKA_KEYSTORE_FILE).isFile()) {
+      LOG.info("Assigning keystore location to {}", KAFKA_KEYSTORE_FILE);
+      properties.put("ssl.keystore.location", KAFKA_KEYSTORE_FILE);
     }
 
     final var propertiesFile = new File(KAFKA_PROPERTIES_FILE);
