@@ -56,7 +56,7 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
   private final KafkaHighLevelConsumer kafkaHighLevelConsumer;
 
-  public CuratorKafkaMonitor(CuratorFramework curatorFramework, ObjectMapper objectMapper, CuratorKafkaMonitorProperties properties, KafkaHighLevelConsumer kafkaHighLevelConsumer) {
+  public CuratorKafkaMonitor(CuratorFramework curatorFramework, ObjectMapper objectMapper, KafkaHighLevelConsumer kafkaHighLevelConsumer) {
     this.curatorFramework = curatorFramework;
     this.objectMapper = objectMapper;
     this.kafkaHighLevelConsumer = kafkaHighLevelConsumer;
@@ -199,7 +199,6 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
   @Override
   public List<TopicVO> getTopics() {
-    validateInitialized();
     final var topicVos = getTopicMetadata().values().stream()
         .sorted(Comparator.comparing(TopicVO::getName))
         .collect(Collectors.toList());
@@ -211,7 +210,6 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
   @Override
   public Optional<TopicVO> getTopic(String topic) {
-    validateInitialized();
     final var topicVo = Optional.ofNullable(getTopicMetadata(topic).get(topic));
     topicVo.ifPresent(vo -> vo.setPartitions(getTopicPartitionSizes(vo)));
     return topicVo;

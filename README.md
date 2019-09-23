@@ -2,9 +2,13 @@
 ===
 [![Download](https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/images/download.svg)](https://bintray.com/obsidiandynamics/kafdrop/main/_latestVersion)
 [![Build](https://travis-ci.org/obsidiandynamics/kafdrop.svg?branch=master)](https://travis-ci.org/obsidiandynamics/kafdrop#)
+[![Docker](https://img.shields.io/docker/pulls/obsidiandynamics/kafdrop.svg)](https://hub.docker.com/r/obsidiandynamics/kafdrop)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/obsidiandynamics/kafdrop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/obsidiandynamics/kafdrop/context:java)
 
 
 Kafdrop 3 is a UI for navigating and monitoring Apache Kafka brokers. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
+
+![Overview Screenshot](docs/images/overview.png?raw=true)
 
 This project is a reboot of [Kafdrop 2.x](https://github.com/HomeAdvisor/Kafdrop), dragged kicking and screaming into the world of JDK 11+, Kafka 2.x and Kubernetes. It's a lightweight application that runs on Spring Boot and requires very little configuration.
 
@@ -23,8 +27,12 @@ You can run the Kafdrop JAR directly, via Docker, or in Kubernetes.
 ## Running from JAR
 ```sh
 java --add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
-    -jar target/kafdrop-<version>.jar --zookeeper.connect=<host>:<port>,<host>:<port>,...
+    -jar target/kafdrop-<version>.jar \
+    --zookeeper.connect=<host>:<port>,<host>:<port>,... \
+    --kafka.brokerConnect=<host:port,host:port>,...
 ```
+
+If unspecified, `zookeeper.connect` defaults to `localhost:2181`, while `kafka.brokerConnect` -> `localhost:9092`.
 
 Open a browser and navigate to [http://localhost:9000](http://localhost:9000). The port can be overridden by adding the following config:
 

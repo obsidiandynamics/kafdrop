@@ -5,6 +5,7 @@ import org.apache.kafka.clients.*;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
+import org.apache.kafka.common.config.*;
 import org.springframework.stereotype.*;
 
 import javax.annotation.*;
@@ -26,6 +27,10 @@ public final class KafkaHighLevelAdminClient {
   public void init() {
     final var props = new Properties();
     props.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getBrokerConnect());
+    if (kafkaConfiguration.getIsSecured()) {
+        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaConfiguration.getSecurityProtocol());
+        props.put(SaslConfigs.SASL_MECHANISM, kafkaConfiguration.getSaslMechanism());
+    }
     adminClient = AdminClient.create(props);
   }
 
