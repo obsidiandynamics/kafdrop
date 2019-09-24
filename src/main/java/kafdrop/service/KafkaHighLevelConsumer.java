@@ -37,7 +37,6 @@ public final class KafkaHighLevelConsumer {
     if (kafkaConsumer == null) {
       final var properties = new Properties();
       properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-      properties.put(ConsumerConfig.GROUP_ID_CONFIG, "kafdrop-consumer-group");
       properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
       properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
       properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
@@ -127,7 +126,7 @@ public final class KafkaHighLevelConsumer {
                                          rec.serializedKeySize(),
                                          rec.serializedValueSize(),
                                          rec.key(),
-                                         deserializer.deserializeMessage(ByteBuffer.wrap(rec.value())),
+                                         deserialize(deserializer, rec.value()),
                                          rec.headers(),
                                          rec.leaderEpoch()))
         .collect(Collectors.toList());
@@ -187,10 +186,14 @@ public final class KafkaHighLevelConsumer {
             rec.serializedKeySize(),
             rec.serializedValueSize(),
             rec.key(),
-            deserializer.deserializeMessage(ByteBuffer.wrap(rec.value())),
+            deserialize(deserializer, rec.value()),
             rec.headers(),
             rec.leaderEpoch()))
         .collect(Collectors.toList());
+  }
+
+  private static String deserialize(MessageDeserializer deserializer, byte[] bytes) {
+    return bytes != null ? deserializer.deserializeMessage(ByteBuffer.wrap(bytes)) : "empty";
   }
 
   synchronized Map<String, TopicVO> getTopicsInfo(String[] topics) {
@@ -199,7 +202,7 @@ public final class KafkaHighLevelConsumer {
       final var topicSet = kafkaConsumer.listTopics().keySet();
       topics = Arrays.copyOf(topicSet.toArray(), topicSet.size(), String[].class);
     }
-    final var topicVos = new HashMap<String, TopicVO>();
+    final var topicVos = new HashMap<String, TopicVO>(topics.length, 1f);
 
     for (var topic : topics) {
       topicVos.put(topic, getTopicInfo(topic));
@@ -209,19 +212,19 @@ public final class KafkaHighLevelConsumer {
   }
 
   private TopicVO getTopicInfo(String topic) {
-    final List<PartitionInfo> partitionInfoList = kafkaConsumer.partitionsFor(topic);
-    final TopicVO topicVo = new TopicVO(topic);
-    final Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
+    final var partitionInfoList = kafkaConsumer.partitionsFor(topic);
+    final var topicVo = new TopicVO(topic);
+    final var partitions = new TreeMap<Integer, TopicPartitionVO>();
 
-    for (PartitionInfo partitionInfo : partitionInfoList) {
+    for (var partitionInfo : partitionInfoList) {
       final TopicPartitionVO topicPartitionVo = new TopicPartitionVO(partitionInfo.partition());
 
-      final Node leader = partitionInfo.leader();
+      final var leader = partitionInfo.leader();
       if (leader != null) {
         topicPartitionVo.addReplica(new TopicPartitionVO.PartitionReplica(leader.id(), true, true));
       }
 
-      for (Node node : partitionInfo.replicas()) {
+      for (var node : partitionInfo.replicas()) {
         topicPartitionVo.addReplica(new TopicPartitionVO.PartitionReplica(node.id(), true, false));
       }
       partitions.put(partitionInfo.partition(), topicPartitionVo);
