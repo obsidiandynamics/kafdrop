@@ -37,7 +37,7 @@ If unspecified, `zookeeper.connect` defaults to `localhost:2181`, while `kafka.b
 Open a browser and navigate to [http://localhost:9000](http://localhost:9000). The port can be overridden by adding the following config:
 
 ```
---server.port=<port>
+--server.port=<port> --management.server.port=<port>
 ```
 
 Optionally, configure a schema registry connection with:
