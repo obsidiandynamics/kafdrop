@@ -22,10 +22,18 @@ import java.util.*;
 import java.util.stream.*;
 
 public final class MessageVO {
+  private int partition;
+  private long offset;
   private String message;
   private String key;
   private Map<String, String> headers;
   private Date timestamp;
+
+  public int getPartition() { return partition; }
+  public void setPartition(int partition) { this.partition = partition; }
+
+  public long getOffset() { return offset; }
+  public void setOffset(long offset) { this.offset = offset; }
 
   public String getMessage() {
     return message;
