@@ -11,7 +11,7 @@ import java.util.Map.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-import static java.util.function.Predicate.*;
+import static java.util.function.Predicate.not;
 
 @Service
 public final class KafkaConsumerMonitor implements ConsumerMonitor {
@@ -105,7 +105,7 @@ public final class KafkaConsumerMonitor implements ConsumerMonitor {
   }
 
   private ConsumerGroupOffsets resolveOffsets(String groupId) {
-    return new ConsumerGroupOffsets(groupId, highLevelAdminClient.listConsumerGroupOffsets(groupId));
+    return new ConsumerGroupOffsets(groupId, highLevelAdminClient.listConsumerGroupOffsetsIfAuthorized(groupId));
   }
 
   private List<ConsumerGroupOffsets> getConsumerOffsets(Set<String> topics) {
