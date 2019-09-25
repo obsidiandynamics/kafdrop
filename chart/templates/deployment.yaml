@@ -40,6 +40,12 @@ spec:
             value: "{{ .Values.zookeeper.maxRetries }}"
           - name: KAFKA_BROKERCONNECT
             value: "{{ .Values.kafka.brokerConnect }}"
+          - name: KAFKA_PROPERTIES
+            value: "{{ .Values.kafka.properties }}"
+          - name: KAFKA_TRUSTSTORE
+            value: "{{ .Values.kafka.truststore }}"
+          - name: KAFKA_KEYSTORE
+            value: "{{ .Values.kafka.keystore }}"
           - name: JVM_OPTS
             value: "{{ .Values.jvm.opts }}"
           - name: SERVER_SERVLET_CONTEXTPATH
