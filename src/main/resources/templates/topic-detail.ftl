@@ -32,10 +32,9 @@
 <h2>Topic: ${topic.name}</h2>
 
 <div id="action-bar" class="container">
-    <a class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
+  <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
 </div>
 <br/>
-
 <div class="container-fluid">
     <div class="row">
 
@@ -110,7 +109,7 @@
                 <tbody>
                 <#list topic.partitions as p>
                     <tr>
-                        <td>${p.id}</td>
+                        <td><a href="<@spring.url '/topic/${topic.name}/messages?partition=${p.id}&offset=${p.firstOffset}&count=${p.size - p.firstOffset}'/>">${p.id}</a></td>
                         <td>${p.firstOffset}</td>
                         <td>${p.size}</td>
                         <td>${p.size - p.firstOffset}</td>
