@@ -212,7 +212,7 @@ public final class KafkaHighLevelConsumer {
     final var partitions = new TreeMap<Integer, TopicPartitionVO>();
 
     for (var partitionInfo : partitionInfoList) {
-      final TopicPartitionVO topicPartitionVo = new TopicPartitionVO(partitionInfo.partition());
+      final var topicPartitionVo = new TopicPartitionVO(partitionInfo.partition());
 
       final var leader = partitionInfo.leader();
       if (leader != null) {
