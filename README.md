@@ -10,7 +10,7 @@ Kafdrop 3 is a UI for navigating and monitoring Apache Kafka brokers. The tool d
 
 ![Overview Screenshot](docs/images/overview.png?raw=true)
 
-This project is a reboot of [Kafdrop 2.x](https://github.com/HomeAdvisor/Kafdrop), dragged kicking and screaming into the world of JDK 11+, Kafka 2.x and Kubernetes. It's a lightweight application that runs on Spring Boot and requires very little configuration.
+This project is a reboot of [Kafdrop 2.x](https://github.com/HomeAdvisor/Kafdrop), dragged kicking and screaming into the world of JDK 11+, Kafka 2.x, Helm and Kubernetes. It's a lightweight application that runs on Spring Boot and is dead-easy to configure, supporting SASL and TLS-secured brokers.
 
 # Requirements
 
@@ -152,7 +152,7 @@ cors.enabled=false
 ```
 
 ## Actuator
-Health and info endpoints are available at the following path: /actuator
+Health and info endpoints are available at the following path: `/actuator`
 
 This can be overridden with the following configuration:
 ```
@@ -160,10 +160,42 @@ management.endpoints.web.base-path=<path>
 ```
 
 # Guides
+## Connecting to a Secure Broker
+Kafdrop supports TLS (SSL) and SASL connections for [encryption and authentication](http://kafka.apache.org/090/documentation.html#security). This can be configured by providing a combination of the following files (placed into the Kafka root directory):
+
+* `kafka.truststore.jks`: specifying the certificate for authenticating brokers, if TLS is enabled.
+* `kafka.keystore.jks`: specifying the private key to authenticate the client to the broker, if mutual TLS authentication is required.
+* `kafka.properties`: specifying the necessary configuration, including key/truststore passwords, cipher suites, enabled TLS protocol versions, username/password pairs, etc. When supplying the truststore and/or keystore files, the `ssl.truststore.location` and `ssl.keystore.location` properties will be assigned automatically.
+
+### Using Docker
+The three files above can be supplied to a Docker instance in base-64-encoded form via environment variables:
+
+```sh
+docker run -d --rm -p 9000:9000 \
+    -e ZOOKEEPER_CONNECT=<host:port,host:port> \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e KAFKA_PROPERTIES=$(cat kafka.properties | base64) \
+    -e KAFKA_TRUSTSTORE=$(cat kafka.truststore.jks | base64) \   # optional
+    -e KAFKA_KEYSTORE=$(cat kafka.keystore.jks | base64)         # optional
+    obsidiandynamics/kafdrop
+```
+
+### Using Helm
+Like in the Docker example, supply the files in base-64 form:
+
+```sh
+helm upgrade -i kafdrop chart --set image.tag=3.x.x \
+    --set zookeeper.connect=<host:port,host:port> \
+    --set kafka.brokerConnect=<host:port,host:port> \
+    --set kafka.properties="$(cat kafka.properties | base64)" \
+    --set kafka.truststore="$(cat kafka.truststore | base64)" \
+    --set kafka.keystore="$(cat kafka.keystore | base64)"
+```
+
 ## Updating the Bootstrap theme
 Edit the `.scss` files in the `theme` directory, then run `theme/install.sh`. This will overwrite `src/main/resources/static/css/bootstrap.min.css`. Then build as usual. (Requires `npm`.)
 
-## Securing Kafdrop
+## Securing the Kafdrop UI
 Kafdrop doesn't (yet) natively implement an authentication mechanism to restrict user access. Here's a quick workaround using NGINX using Basic Auth. The instructions below are for macOS and Homebrew.
 
 ### Requirements
