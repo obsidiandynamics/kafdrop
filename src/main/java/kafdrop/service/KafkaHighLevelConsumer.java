@@ -42,12 +42,7 @@ public final class KafkaHighLevelConsumer {
       properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
       properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
       properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafdrop-client");
-      properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getBrokerConnect());
-
-      if (kafkaConfiguration.getIsSecured()) {
-        properties.put(SaslConfigs.SASL_MECHANISM, kafkaConfiguration.getSaslMechanism());
-        properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, kafkaConfiguration.getSecurityProtocol());
-      }
+      kafkaConfiguration.applyCommon(properties);
 
       kafkaConsumer = new KafkaConsumer<>(properties);
     }

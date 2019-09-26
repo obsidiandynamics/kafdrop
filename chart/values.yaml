@@ -14,6 +14,9 @@ zookeeper:
 
 kafka:
   brokerConnect: localhost:9092
+  properties: ""
+  truststore: ""
+  keystore: ""
 
 jvm:
   opts: ""
