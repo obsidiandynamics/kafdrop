@@ -28,11 +28,12 @@ You can run the Kafdrop JAR directly, via Docker, or in Kubernetes.
 ```sh
 java --add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
     -jar target/kafdrop-<version>.jar \
-    --zookeeper.connect=<host>:<port>,<host>:<port>,... \
     --kafka.brokerConnect=<host:port,host:port>,...
 ```
 
-If unspecified, `zookeeper.connect` defaults to `localhost:2181`, while `kafka.brokerConnect` -> `localhost:9092`.
+If unspecified, `kafka.brokerConnect` defaults to `localhost:9092`.
+
+**Note:** As of Kafdrop 3.10.0, a ZooKeeper connection is no longer required. All necessary cluster information is retrieved via the Kafka admin API.
 
 Open a browser and navigate to [http://localhost:9000](http://localhost:9000). The port can be overridden by adding the following config:
 
@@ -57,7 +58,6 @@ Images are hosted at [hub.docker.com/r/obsidiandynamics/kafdrop](https://hub.doc
 Launch container in background:
 ```sh
 docker run -d --rm -p 9000:9000 \
-    -e ZOOKEEPER_CONNECT=<host:port,host:port> \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
     -e JVM_OPTS="-Xms32M -Xmx64M" \
     -e SERVER_SERVLET_CONTEXTPATH="/" \
@@ -75,7 +75,6 @@ git clone https://github.com/obsidiandynamics/kafdrop && cd kafdrop
 Apply the chart:
 ```sh
 helm upgrade -i kafdrop chart --set image.tag=3.x.x \
-    --set zookeeper.connect=<host:port,host:port> \
     --set kafka.brokerConnect=<host:port,host:port> \
     --set server.servlet.contextPath="/" \
     --set jvm.opts="-Xms32M -Xmx64M"
@@ -172,7 +171,6 @@ The three files above can be supplied to a Docker instance in base-64-encoded fo
 
 ```sh
 docker run -d --rm -p 9000:9000 \
-    -e ZOOKEEPER_CONNECT=<host:port,host:port> \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
     -e KAFKA_PROPERTIES=$(cat kafka.properties | base64) \
     -e KAFKA_TRUSTSTORE=$(cat kafka.truststore.jks | base64) \   # optional
@@ -185,7 +183,6 @@ Like in the Docker example, supply the files in base-64 form:
 
 ```sh
 helm upgrade -i kafdrop chart --set image.tag=3.x.x \
-    --set zookeeper.connect=<host:port,host:port> \
     --set kafka.brokerConnect=<host:port,host:port> \
     --set kafka.properties="$(cat kafka.properties | base64)" \
     --set kafka.truststore="$(cat kafka.truststore | base64)" \

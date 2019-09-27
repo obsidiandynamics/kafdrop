@@ -28,6 +28,3 @@ kafka:
   isSecured: false
   saslMechanism: "PLAIN"
   securityProtocol: "SASL_PLAINTEXT"
-
-zookeeper:
-  connect: localhost:2181

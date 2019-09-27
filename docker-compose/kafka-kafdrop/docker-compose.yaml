@@ -6,7 +6,6 @@ services:
     ports:
       - "9000:9000"
     environment:
-      ZOOKEEPER_CONNECT: "kafka:2181"
       KAFKA_BROKERCONNECT: "kafka:29092"
       JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication"
     depends_on:

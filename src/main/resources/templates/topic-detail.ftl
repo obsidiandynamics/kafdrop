@@ -96,13 +96,14 @@
                 <thead>
                 <tr>
                     <th>Partition</th>
-                    <th>First Offset</th>
-                    <th>Last Offset</th>
+                    <th>First<br>Offset</th>
+                    <th>Last<br>Offset</th>
                     <th>Size</th>
-                    <th>Leader</th>
-                    <th>Replicas</th>
-                    <th>In-sync Replicas</th>
-                    <th>Preferred Leader</th>
+                    <th>Leader<br>Node</th>
+                    <th>Replica<br>Nodes</th>
+                    <th>In-sync<br>Replica<br>Nodes</th>
+                    <th>Offline<br>Replica<br>Nodes</th>
+                    <th>Preferred<br>Leader</th>
                     <th>Under-replicated</th>
                 </tr>
                 </thead>
@@ -116,6 +117,7 @@
                         <td <#if !(p.leader)??>class="warning"</#if>>${(p.leader.id)!"none"}</td>
                         <td><#list p.replicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
                         <td><#list p.inSyncReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
+                        <td><#list p.offlineReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
                         <td <#if !p.leaderPreferred>class="warning"</#if>><@template.yn p.leaderPreferred/></td>
                         <td <#if p.underReplicated>class="warning"</#if>><@template.yn p.underReplicated/></td>
                     </tr>

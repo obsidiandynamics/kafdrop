@@ -43,4 +43,6 @@ public interface KafkaMonitor {
   Optional<TopicVO> getTopic(String topic);
 
   ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
+
+  List<ConsumerVO> getConsumers(Collection<TopicVO> topicVos);
 }

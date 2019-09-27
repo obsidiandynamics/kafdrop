@@ -26,7 +26,7 @@ import org.springframework.stereotype.*;
 import java.util.*;
 
 @Service
-public class MessageInspector {
+public final class MessageInspector {
   private final KafkaMonitor kafkaMonitor;
 
   public MessageInspector(KafkaMonitor kafkaMonitor) {

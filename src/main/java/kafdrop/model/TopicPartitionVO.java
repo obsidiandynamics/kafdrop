@@ -71,7 +71,18 @@ public final class TopicPartitionVO {
 
   private Stream<PartitionReplica> inSyncReplicaStream() {
     return replicas.values().stream()
-        .filter(PartitionReplica::isInService);
+        .filter(PartitionReplica::isInSync);
+  }
+
+  public List<PartitionReplica> getOfflineReplicas() {
+    return offlineReplicasStream()
+        .sorted(Comparator.comparingInt(PartitionReplica::getId))
+        .collect(Collectors.toList());
+  }
+
+  private Stream<PartitionReplica> offlineReplicasStream() {
+    return replicas.values().stream()
+        .filter(PartitionReplica::isOffline);
   }
 
   public boolean isUnderReplicated() {
@@ -94,27 +105,33 @@ public final class TopicPartitionVO {
     this.firstOffset = firstOffset;
   }
 
-  public static class PartitionReplica {
+  public static final class PartitionReplica {
     private final Integer id;
-    private final boolean inService;
+    private final boolean inSync;
     private final boolean leader;
+    private final boolean offline;
 
-    public PartitionReplica(Integer id, boolean inService, boolean leader) {
+    public PartitionReplica(Integer id, boolean inSync, boolean leader, boolean offline) {
       this.id = id;
-      this.inService = inService;
+      this.inSync = inSync;
       this.leader = leader;
+      this.offline = offline;
     }
 
     public Integer getId() {
       return id;
     }
 
-    boolean isInService() {
-      return inService;
+    boolean isInSync() {
+      return inSync;
     }
 
     boolean isLeader() {
       return leader;
+    }
+
+    boolean isOffline() {
+      return offline;
     }
   }
 

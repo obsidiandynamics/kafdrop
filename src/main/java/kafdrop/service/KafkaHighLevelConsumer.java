@@ -213,14 +213,18 @@ public final class KafkaHighLevelConsumer {
 
     for (var partitionInfo : partitionInfoList) {
       final var topicPartitionVo = new TopicPartitionVO(partitionInfo.partition());
+      final var inSyncReplicaIds = Arrays.stream(partitionInfo.inSyncReplicas()).map(Node::id).collect(Collectors.toSet());
+      final var offlineReplicaIds = Arrays.stream(partitionInfo.offlineReplicas()).map(Node::id).collect(Collectors.toSet());
+
+      for (var node : partitionInfo.replicas()) {
+        final var isInSync = inSyncReplicaIds.contains(node.id());
+        final var isOffline = offlineReplicaIds.contains(node.id());
+        topicPartitionVo.addReplica(new TopicPartitionVO.PartitionReplica(node.id(), isInSync, false, isOffline));
+      }
 
       final var leader = partitionInfo.leader();
       if (leader != null) {
-        topicPartitionVo.addReplica(new TopicPartitionVO.PartitionReplica(leader.id(), true, true));
-      }
-
-      for (var node : partitionInfo.replicas()) {
-        topicPartitionVo.addReplica(new TopicPartitionVO.PartitionReplica(node.id(), true, false));
+        topicPartitionVo.addReplica(new TopicPartitionVO.PartitionReplica(leader.id(), true, true, false));
       }
       partitions.put(partitionInfo.partition(), topicPartitionVo);
     }

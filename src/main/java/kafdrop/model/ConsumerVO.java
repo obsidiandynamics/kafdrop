@@ -22,7 +22,7 @@ import org.apache.commons.lang3.*;
 
 import java.util.*;
 
-public class ConsumerVO implements Comparable<ConsumerVO> {
+public final class ConsumerVO implements Comparable<ConsumerVO> {
   private final String groupId;
   private final Map<String, ConsumerTopicVO> topics = new TreeMap<>();
 

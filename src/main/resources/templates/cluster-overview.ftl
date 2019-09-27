@@ -28,23 +28,23 @@
         <table class="table table-bordered">
             <tbody>
             <tr>
-                <td>ZooKeeper host connection</td>
-                <td><#list zookeeper.connectList as z>${z}<#if z_has_next>, </#if></#list></td>
+                <td><i class="fa fa-server"></i>&nbsp;&nbsp;Bootstrap servers</td>
+                <td>${bootstrapServers}</td>
             </tr>
             <tr>
-                <td>Total topics</td>
+                <td><i class="fa fa-database"></i>&nbsp;&nbsp;Total topics</td>
                 <td>${clusterSummary.topicCount}</td>
             </tr>
             <tr>
-                <td>Total partitions</td>
+                <td><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Total partitions</td>
                 <td>${clusterSummary.partitionCount}</td>
             </tr>
             <tr>
-                <td>Total preferred partition leader</td>
+                <td><i class="fa fa-trophy"></i>&nbsp;&nbsp;Total preferred partition leader</td>
                 <td <#if clusterSummary.preferredReplicaPercent lt 1.0>class="warning"</#if>>${clusterSummary.preferredReplicaPercent?string.percent}</td>
             </tr>
             <tr>
-                <td>Total under-replicated partitions</td>
+                <td><i class="fa fa-heartbeat"></i>&nbsp;&nbsp;Total under-replicated partitions</td>
                 <td <#if clusterSummary.underReplicatedCount gt 0>class="warning"</#if>>${clusterSummary.underReplicatedCount}</td>
             </tr>
             </tbody>
@@ -56,22 +56,17 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Host</th>
-                <th>Port</th>
-                <th>Version</th>
+                <th><i class="fa fa-tag"></i>&nbsp;&nbsp;ID</th>
+                <th><i class="fa fa-laptop"></i>&nbsp;&nbsp;Host</th>
+                <th><i class="fa fa-plug"></i>&nbsp;&nbsp;Port</th>
+                <th><i class="fa fa-server"></i>&nbsp;&nbsp;Rack</th>
+                <th><i class="fa fa-trophy"></i>&nbsp;&nbsp;Controller</th>
                 <th>
-                    Start Time
-                    <a title="Time the broker joined the cluster"
-                       data-toggle="tooltip" data-placement="top" href="#"
-                    ><i class="fa fa-question-circle"></i></a>
-                </th>
-                <th>Controller</th>
-                <th>
-                    # Partitions (% of total)
+                    <i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Number of partitions (% of total)
                     <a title="# of partitions this broker is the leader for"
-                       data-toggle="tooltip" data-placement="top" href="#"
-                    ><i class="fa fa-question-circle"></i></a>
+                       data-toggle="tooltip" data-placement="top" href="#">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
                 </th>
             </tr>
             </thead>
@@ -91,8 +86,7 @@
                     <td><a href="<@spring.url '/broker/${b.id}'/>"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
                     <td>${b.host?if_exists}</td>
                     <td>${b.port?string}</td>
-                    <td>${b.version}</td>
-                    <td>${b.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
+                    <td><#if b.rack??>${b.rack}<#else>-</#if></td>
                     <td><@template.yn b.controller/></td>
                     <td>${(clusterSummary.getBrokerLeaderPartitionCount(b.id))!0}
                         (${(clusterSummary.getBrokerLeaderPartitionRatio(b.id))?string.percent})

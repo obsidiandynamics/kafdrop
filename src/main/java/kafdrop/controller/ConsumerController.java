@@ -30,17 +30,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/consumer")
 public final class ConsumerController {
   private final KafkaMonitor kafkaMonitor;
-  private final KafkaConsumerMonitor kafkaConsumerMonitor;
 
-  public ConsumerController(KafkaMonitor kafkaMonitor, KafkaConsumerMonitor kafkaConsumerMonitor) {
+  public ConsumerController(KafkaMonitor kafkaMonitor) {
     this.kafkaMonitor = kafkaMonitor;
-    this.kafkaConsumerMonitor = kafkaConsumerMonitor;
   }
 
   @RequestMapping("/{groupId:.+}")
   public String consumerDetail(@PathVariable("groupId") String groupId, Model model) throws ConsumerNotFoundException {
     final var topicVos = kafkaMonitor.getTopics();
-    final var consumer = kafkaConsumerMonitor.getConsumers(topicVos)
+    final var consumer = kafkaMonitor.getConsumers(topicVos)
         .stream()
         .filter(c -> c.getGroupId().equals(groupId))
         .findAny();
@@ -56,7 +54,7 @@ public final class ConsumerController {
   @RequestMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId) throws ConsumerNotFoundException {
     final var topicVos = kafkaMonitor.getTopics();
-    final var consumer = kafkaConsumerMonitor.getConsumers(topicVos)
+    final var consumer = kafkaMonitor.getConsumers(topicVos)
         .stream()
         .filter(c -> c.getGroupId().equals(groupId))
         .findAny();

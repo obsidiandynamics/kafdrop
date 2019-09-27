@@ -5,13 +5,6 @@ image:
   tag: latest
   pullPolicy: Always
 
-zookeeper:
-  connect: localhost:2181
-  sessionTimeoutMillis: 5000
-  connectTimeoutMillis: 15000
-  retryMillis: 5000
-  maxRetries: 2147483647
-
 kafka:
   brokerConnect: localhost:9092
   properties: ""

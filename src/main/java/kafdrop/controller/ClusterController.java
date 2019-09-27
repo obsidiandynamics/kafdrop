@@ -20,7 +20,6 @@ package kafdrop.controller;
 
 import io.swagger.annotations.*;
 import kafdrop.config.*;
-import kafdrop.config.CuratorConfiguration.*;
 import kafdrop.model.*;
 import kafdrop.service.*;
 import org.springframework.http.*;
@@ -33,19 +32,19 @@ import java.util.stream.*;
 
 @Controller
 public final class ClusterController {
+  private final KafkaConfiguration kafkaConfiguration;
+
   private final KafkaMonitor kafkaMonitor;
 
-  private final CuratorConfiguration.ZookeeperProperties zookeeperProperties;
-
-  public ClusterController(KafkaMonitor kafkaMonitor, ZookeeperProperties zookeeperProperties) {
+  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor) {
+    this.kafkaConfiguration = kafkaConfiguration;
     this.kafkaMonitor = kafkaMonitor;
-    this.zookeeperProperties = zookeeperProperties;
   }
 
   @RequestMapping("/")
   public String clusterInfo(Model model,
                             @RequestParam(value = "filter", required = false) String filter) {
-    model.addAttribute("zookeeper", zookeeperProperties);
+    model.addAttribute("bootstrapServers", kafkaConfiguration.getBrokerConnect());
 
     final List<BrokerVO> brokers = kafkaMonitor.getBrokers();
     final List<TopicVO> topics = kafkaMonitor.getTopics();
@@ -74,7 +73,6 @@ public final class ClusterController {
   @RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody ClusterInfoVO getCluster() {
     final ClusterInfoVO vo = new ClusterInfoVO();
-    vo.zookeeper = zookeeperProperties;
     vo.brokers = kafkaMonitor.getBrokers();
     vo.topics = kafkaMonitor.getTopics();
     vo.summary = kafkaMonitor.getClusterSummary(vo.topics);
@@ -83,7 +81,6 @@ public final class ClusterController {
 
   @ExceptionHandler(BrokerNotFoundException.class)
   public String brokerNotFound(Model model) {
-    model.addAttribute("zookeeper", zookeeperProperties);
     model.addAttribute("brokers", Collections.emptyList());
     model.addAttribute("topics", Collections.emptyList());
     return "cluster-overview";
@@ -95,11 +92,9 @@ public final class ClusterController {
   }
 
   /**
-   * Simple DTO to encapsulate the cluster state: ZK properties, broker list,
-   * and topic list.
+   * Simple DTO to encapsulate the cluster state.
    */
   public static final class ClusterInfoVO {
-    CuratorConfiguration.ZookeeperProperties zookeeper;
     ClusterSummaryVO summary;
     List<BrokerVO> brokers;
     List<TopicVO> topics;
