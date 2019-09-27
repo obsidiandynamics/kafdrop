@@ -24,7 +24,6 @@
         td.leader-partitions {
             word-break: break-all;
         }
-
     </style>
 </@template.header>
 
@@ -38,19 +37,23 @@
     <table class="table table-bordered overview">
         <tbody>
         <tr>
-            <td><i class="fa fa-laptop"></i> Host</td>
-            <td>${broker.host?if_exists}:${broker.port}</td>
+            <td><i class="fa fa-laptop"></i>&nbsp;&nbsp;Host</td>
+            <td>${broker.host?if_exists}</td>
         </tr>
         <tr>
-            <td><i class="fa fa-clock-o"></i> Start time</td>
-            <td>${broker.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
+            <td><i class="fa fa-plug"></i>&nbsp;&nbsp;Port</td>
+            <td>${broker.port}</td>
         </tr>
         <tr>
-            <td>Controller</td>
+            <td><i class="fa fa-server"></i>&nbsp;&nbsp;Rack</td>
+            <td><#if broker.rack??>${broker.rack}<#else>-</#if></td>
+        </tr>
+        <tr>
+            <td><i class="fa fa-trophy"></i>&nbsp;&nbsp;Controller</td>
             <td><@template.yn broker.controller/></td>
         </tr>
         <tr>
-            <td># of topics</td>
+            <td><i class="fa fa-database"></i>&nbsp;&nbsp;Number of topics</td>
             <td>${topics?size}</td>
         </tr>
 
@@ -59,7 +62,7 @@
             <#assign partitionCount=partitionCount+(t.getLeaderPartitions(broker.id)?size)>
         </#list>
         <tr>
-            <td># of partitions</td>
+            <td><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Number of partitions</td>
             <td>${partitionCount}</td>
         </tr>
         </tbody>

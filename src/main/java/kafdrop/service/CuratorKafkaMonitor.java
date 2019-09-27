@@ -56,10 +56,16 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
   private final KafkaHighLevelConsumer kafkaHighLevelConsumer;
 
-  public CuratorKafkaMonitor(CuratorFramework curatorFramework, ObjectMapper objectMapper, KafkaHighLevelConsumer kafkaHighLevelConsumer) {
+  private final KafkaHighLevelAdminClient kafkaHighLevelAdminClient;
+
+  public CuratorKafkaMonitor(CuratorFramework curatorFramework,
+                             ObjectMapper objectMapper,
+                             KafkaHighLevelConsumer kafkaHighLevelConsumer,
+                             KafkaHighLevelAdminClient kafkaHighLevelAdminClient) {
     this.curatorFramework = curatorFramework;
     this.objectMapper = objectMapper;
     this.kafkaHighLevelConsumer = kafkaHighLevelConsumer;
+    this.kafkaHighLevelAdminClient = kafkaHighLevelAdminClient;
   }
 
   @PostConstruct
@@ -154,14 +160,18 @@ public class CuratorKafkaMonitor implements KafkaMonitor {
 
   @Override
   public List<BrokerVO> getBrokers() {
-    validateInitialized();
-    return new ArrayList<>(brokerCache.values());
+    final var clusterDescription = kafkaHighLevelAdminClient.describeCluster();
+    final var brokerVos = new ArrayList<BrokerVO>(clusterDescription.nodes.size());
+    for (var node : clusterDescription.nodes) {
+      final var isController = node.id() == clusterDescription.controller.id();
+      brokerVos.add(new BrokerVO(node.id(), node.host(), node.port(), node.rack(), isController));
+    }
+    return brokerVos;
   }
 
   @Override
   public Optional<BrokerVO> getBroker(int id) {
-    validateInitialized();
-    return Optional.ofNullable(brokerCache.get(id));
+    return getBrokers().stream().filter(brokerVo -> brokerVo.getId() == id).findAny();
   }
 
   @Override

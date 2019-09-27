@@ -33,11 +33,14 @@ import java.util.stream.*;
 
 @Controller
 public final class ClusterController {
+  private final KafkaConfiguration kafkaConfiguration;
+
   private final KafkaMonitor kafkaMonitor;
 
   private final CuratorConfiguration.ZookeeperProperties zookeeperProperties;
 
-  public ClusterController(KafkaMonitor kafkaMonitor, ZookeeperProperties zookeeperProperties) {
+  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ZookeeperProperties zookeeperProperties) {
+    this.kafkaConfiguration = kafkaConfiguration;
     this.kafkaMonitor = kafkaMonitor;
     this.zookeeperProperties = zookeeperProperties;
   }
@@ -45,7 +48,7 @@ public final class ClusterController {
   @RequestMapping("/")
   public String clusterInfo(Model model,
                             @RequestParam(value = "filter", required = false) String filter) {
-    model.addAttribute("zookeeper", zookeeperProperties);
+    model.addAttribute("bootstrapServers", kafkaConfiguration.getBrokerConnect());
 
     final List<BrokerVO> brokers = kafkaMonitor.getBrokers();
     final List<TopicVO> topics = kafkaMonitor.getTopics();

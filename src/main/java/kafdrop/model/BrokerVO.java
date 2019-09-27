@@ -27,9 +27,18 @@ public class BrokerVO {
   private int id;
   private String host;
   private int port;
-  private int version;
   private boolean controller;
-  private Date timestamp;
+  private String rack;
+
+  public BrokerVO() {} //TODO remove constructor and make fields private
+
+  public BrokerVO(int id, String host, int port, String rack, boolean controller) {
+    this.id = id;
+    this.host = host;
+    this.port = port;
+    this.rack = rack;
+    this.controller = controller;
+  }
 
   public int getId() {
     return id;
@@ -59,16 +68,8 @@ public class BrokerVO {
     }
   }
 
-  public int getVersion() {
-    return version;
-  }
-
-  public void setVersion(int version) {
-    this.version = version;
-  }
-
-  public Date getTimestamp() {
-    return timestamp;
+  public String getRack() {
+    return rack;
   }
 
   public boolean isController() {
