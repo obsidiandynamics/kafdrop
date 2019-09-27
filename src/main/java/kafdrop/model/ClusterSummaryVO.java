@@ -20,7 +20,7 @@ package kafdrop.model;
 
 import java.util.*;
 
-public class ClusterSummaryVO {
+public final class ClusterSummaryVO {
   private int topicCount;
   private int partitionCount;
   private int underReplicatedCount;

@@ -18,19 +18,12 @@
 
 package kafdrop.model;
 
-import com.fasterxml.jackson.annotation.*;
-
-import java.util.*;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class BrokerVO {
-  private int id;
-  private String host;
-  private int port;
-  private boolean controller;
-  private String rack;
-
-  public BrokerVO() {} //TODO remove constructor and make fields private
+public final class BrokerVO {
+  private final int id;
+  private final String host;
+  private final int port;
+  private final boolean controller;
+  private final String rack;
 
   public BrokerVO(int id, String host, int port, String rack, boolean controller) {
     this.id = id;
@@ -44,28 +37,12 @@ public class BrokerVO {
     return id;
   }
 
-  public void setId(int id) {
-    this.id = id;
-  }
-
   public String getHost() {
     return host;
   }
 
-  public void setHost(String host) {
-    if (host != null) {
-      this.host = host;
-    }
-  }
-
   public int getPort() {
     return port;
-  }
-
-  public void setPort(int port) {
-    if (port > 0) {
-      this.port = port;
-    }
   }
 
   public String getRack() {
@@ -74,9 +51,5 @@ public class BrokerVO {
 
   public boolean isController() {
     return controller;
-  }
-
-  public void setController(boolean controller) {
-    this.controller = controller;
   }
 }

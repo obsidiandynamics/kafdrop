@@ -32,11 +32,9 @@ import java.util.*;
 @RequestMapping("/topic")
 public final class TopicController {
   private final KafkaMonitor kafkaMonitor;
-  private final ConsumerMonitor consumerMonitor;
 
-  public TopicController(KafkaMonitor kafkaMonitor, ConsumerMonitor consumerMonitor) {
+  public TopicController(KafkaMonitor kafkaMonitor) {
     this.kafkaMonitor = kafkaMonitor;
-    this.consumerMonitor = consumerMonitor;
   }
 
   @RequestMapping("/{name:.+}")
@@ -44,7 +42,7 @@ public final class TopicController {
     final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
-    model.addAttribute("consumers", consumerMonitor.getConsumers(Collections.singleton(topic)));
+    model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
 
     return "topic-detail";
   }

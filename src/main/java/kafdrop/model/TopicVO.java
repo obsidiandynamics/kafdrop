@@ -21,9 +21,11 @@ package kafdrop.model;
 import java.util.*;
 import java.util.stream.*;
 
-public class TopicVO implements Comparable<TopicVO> {
+public final class TopicVO implements Comparable<TopicVO> {
   private final String name;
+
   private Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
+
   private final Map<String, Object> config = new TreeMap<>();
 
   public TopicVO(String name) {

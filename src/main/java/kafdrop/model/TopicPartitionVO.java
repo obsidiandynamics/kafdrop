@@ -105,7 +105,7 @@ public final class TopicPartitionVO {
     this.firstOffset = firstOffset;
   }
 
-  public static class PartitionReplica {
+  public static final class PartitionReplica {
     private final Integer id;
     private final boolean inSync;
     private final boolean leader;
