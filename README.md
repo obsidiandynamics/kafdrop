@@ -185,8 +185,8 @@ Like in the Docker example, supply the files in base-64 form:
 helm upgrade -i kafdrop chart --set image.tag=3.x.x \
     --set kafka.brokerConnect=<host:port,host:port> \
     --set kafka.properties="$(cat kafka.properties | base64)" \
-    --set kafka.truststore="$(cat kafka.truststore | base64)" \
-    --set kafka.keystore="$(cat kafka.keystore | base64)"
+    --set kafka.truststore="$(cat kafka.truststore.jks | base64)" \
+    --set kafka.keystore="$(cat kafka.keystore.jks | base64)"
 ```
 
 ## Updating the Bootstrap theme
