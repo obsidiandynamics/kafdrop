@@ -25,19 +25,19 @@
                 </div>
                 <div id="github-star" class="col-md-1">
                     <a class="github-button" href="https://github.com/obsidiandynamics/kafdrop" data-show-count="true"
-                       aria-label="Star Kafdrop on GitHub">Star</a>
+                       aria-label="Star Kafdrop on GitHub" data-color-scheme="dark">Star</a>
                 </div>
                 <script>
                     $(document).ready(function(){
-                        setTimeout(restyle);
+                        setTimeout(function() { restyle(0); });
                     });
 
-                    function restyle() {
+                    function restyle(retries) {
                         var githubStarSpan = document.querySelector('#github-star span');
                         if (githubStarSpan != null) {
                             var shadowRoot = githubStarSpan.shadowRoot;
                             shadowRoot.querySelector('.btn')
-                                .setAttribute('style', 'color:#00f0fe; background-image:none; background-color:#222');
+                                .setAttribute('style', 'color:#00f0fe; background-image:none; background-color:#222; border-color:#222');
                             shadowRoot.querySelector('.social-count')
                                 .setAttribute('style', 'color:#222; background-image:none; background-color:#00f0fe; border-color:#00f0fe');
                             shadowRoot.querySelector('.social-count b')
@@ -45,7 +45,7 @@
                             shadowRoot.querySelector('.social-count i')
                                 .setAttribute('style', 'border-right-color:#00f0fe');
                         } else {
-                            setTimeout(restyle);
+                            setTimeout(function() { restyle(retries + 1); }, retries * 10);
                         }
                     }
                 </script>
