@@ -27,6 +27,7 @@
     <script src="<@spring.url '/js/popper.min.js'/>"></script>
     <script src="<@spring.url '/js/bootstrap.min.js'/>"></script>
     <script src="<@spring.url '/js/global.js'/>"></script>
+    <script src="<@spring.url '/js/github-buttons.js'/>"></script>
 
     <#nested>
 </head>
@@ -37,6 +38,7 @@
 
     <#macro footer>
 </div>
+<#include "../includes/footer.ftl">
 <#nested>
 </body>
 </html>

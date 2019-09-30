@@ -14,9 +14,42 @@
  limitations under the License.
 -->
 <#import "/spring.ftl" as spring />
+
 <div class="pb-2 mt-5 mb-4 border-bottom">
     <div class="container">
-        <h1 class="app-name brand"><a href="<@spring.url '/'/>">Kafdrop</a> <#if profile??><span class="small">${profile}</span></#if>
-        </h1>
+        <div class="container-fluid pl-0">
+            <div class="row">
+                <div id="title" class="col-md-11">
+                    <h1 class="app-name brand"><a href="<@spring.url '/'/>">Kafdrop</a> <#if profile??><span class="small">${profile}</span></#if>
+                    </h1>
+                </div>
+                <div id="github-star" class="col-md-1">
+                    <a class="github-button" href="https://github.com/obsidiandynamics/kafdrop" data-show-count="true"
+                       aria-label="Star Kafdrop on GitHub">Star</a>
+                </div>
+                <script>
+                    $(document).ready(function(){
+                        setTimeout(restyle);
+                    });
+
+                    function restyle() {
+                        var githubStarSpan = document.querySelector('#github-star span');
+                        if (githubStarSpan != null) {
+                            var shadowRoot = githubStarSpan.shadowRoot;
+                            shadowRoot.querySelector('.btn')
+                                .setAttribute('style', 'color:#00f0fe; background-image:none; background-color:#222');
+                            shadowRoot.querySelector('.social-count')
+                                .setAttribute('style', 'color:#222; background-image:none; background-color:#00f0fe; border-color:#00f0fe');
+                            shadowRoot.querySelector('.social-count b')
+                                .setAttribute('style', 'border-right-color:#00f0fe');
+                            shadowRoot.querySelector('.social-count i')
+                                .setAttribute('style', 'border-right-color:#00f0fe');
+                        } else {
+                            setTimeout(restyle);
+                        }
+                    }
+                </script>
+            </div>
+        </div>
     </div>
 </div>
