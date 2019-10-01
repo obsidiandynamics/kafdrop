@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/wiki/obsidiandynamics/kafdrop/images/kafdrop-logo.png" width="90px" alt="logo"/> Kafdrop 3
+<img src="https://raw.githubusercontent.com/wiki/obsidiandynamics/kafdrop/images/kafdrop-logo.png" width="90px" alt="logo"/> Kafdrop 3 – Web UI for Kafka
 ===
 [![Download](https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/images/download.svg)](https://bintray.com/obsidiandynamics/kafdrop/main/_latestVersion)
 [![Build](https://travis-ci.org/obsidiandynamics/kafdrop.svg?branch=master)](https://travis-ci.org/obsidiandynamics/kafdrop#)
@@ -6,7 +6,7 @@
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/obsidiandynamics/kafdrop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/obsidiandynamics/kafdrop/context:java)
 
 
-Kafdrop 3 is a UI for navigating and monitoring Apache Kafka brokers. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
+Kafdrop 3 is a web UI for browsing Kafka topics and consumer groups. The tool displays information such as brokers, topics, partitions, consumers and lets you view messages. 
 
 ![Overview Screenshot](docs/images/overview.png?raw=true)
 
@@ -64,7 +64,7 @@ docker run -d --rm -p 9000:9000 \
     obsidiandynamics/kafdrop
 ```
 
-Then access the UI at [http://localhost:9000](http://localhost:9000).
+Then access the web UI at [http://localhost:9000](http://localhost:9000).
 
 ## Running in Kubernetes (using a Helm Chart)
 Clone the repository (if necessary):
