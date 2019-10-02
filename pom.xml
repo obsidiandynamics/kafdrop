@@ -10,7 +10,7 @@
     <description>For when you have a Kafka cluster to monitor</description>
 
     <properties>
-        <spring.boot.version>2.1.5.RELEASE</spring.boot.version>
+        <spring.boot.version>2.1.8.RELEASE</spring.boot.version>
         <additionalparam>-Xdoclint:none</additionalparam>
 
         <!-- name of parameter changed in latest mvn javadoc plugin version-->

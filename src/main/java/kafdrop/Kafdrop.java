@@ -19,6 +19,8 @@
 package kafdrop;
 
 import com.google.common.base.*;
+import io.undertow.server.*;
+import io.undertow.websockets.jsr.*;
 import kafdrop.config.ini.*;
 import org.apache.log4j.*;
 import org.slf4j.*;
@@ -27,6 +29,8 @@ import org.springframework.boot.Banner.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.builder.*;
 import org.springframework.boot.context.event.*;
+import org.springframework.boot.web.embedded.undertow.*;
+import org.springframework.boot.web.server.*;
 import org.springframework.context.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.*;
@@ -48,6 +52,18 @@ public class Kafdrop {
         .listeners(new EnvironmentSetupListener(),
                    new LoggingConfigurationListener())
         .run(args);
+  }
+  
+  @Bean
+  public WebServerFactoryCustomizer<UndertowServletWebServerFactory> deploymentCustomizer() {
+    return factory -> {
+      final UndertowDeploymentInfoCustomizer customizer = deploymentInfo -> {
+        var inf = new WebSocketDeploymentInfo();
+        inf.setBuffers(new DefaultByteBufferPool(false, 64));
+        deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, inf);
+      };
+      factory.addDeploymentInfoCustomizers(customizer);
+    };
   }
 
   @Bean
