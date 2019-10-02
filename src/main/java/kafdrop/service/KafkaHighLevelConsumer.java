@@ -103,7 +103,6 @@ public final class KafkaHighLevelConsumer {
 
     // stop if got to count or get to the latest offset
     while (rawRecords.size() < count && currentOffset < latestOffset) {
-      System.out.println("currentOffset=" + currentOffset + ", latestOffset=" + latestOffset);
       final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(partition);
 
       if (!polled.isEmpty()) {
