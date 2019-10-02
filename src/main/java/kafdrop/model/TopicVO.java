@@ -26,7 +26,7 @@ public final class TopicVO implements Comparable<TopicVO> {
 
   private Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
 
-  private final Map<String, Object> config = new TreeMap<>();
+  private Map<String, String> config = Collections.emptyMap();
 
   public TopicVO(String name) {
     this.name = name;
@@ -36,8 +36,12 @@ public final class TopicVO implements Comparable<TopicVO> {
     return name;
   }
 
-  public Map<String, Object> getConfig() {
+  public Map<String, String> getConfig() {
     return config;
+  }
+
+  public void setConfig(Map<String, String> config) {
+    this.config = config;
   }
 
   public Map<Integer, TopicPartitionVO> getPartitionMap() {

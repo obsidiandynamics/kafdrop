@@ -20,6 +20,8 @@ package kafdrop.service;
 
 import kafdrop.model.*;
 import kafdrop.util.*;
+import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.admin.ConfigEntry.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
 import org.apache.kafka.common.header.*;
@@ -37,12 +39,12 @@ import static java.util.function.Predicate.not;
 public final class KafkaMonitorImpl implements KafkaMonitor {
   private static final Logger LOG = LoggerFactory.getLogger(KafkaMonitorImpl.class);
 
-  private final KafkaHighLevelConsumer kafkaHighLevelConsumer;
+  private final KafkaHighLevelConsumer highLevelConsumer;
 
   private final KafkaHighLevelAdminClient highLevelAdminClient;
 
   public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelAdminClient highLevelAdminClient) {
-    this.kafkaHighLevelConsumer = highLevelConsumer;
+    this.highLevelConsumer = highLevelConsumer;
     this.highLevelAdminClient = highLevelAdminClient;
   }
 
@@ -114,13 +116,32 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   }
 
   private Map<String, TopicVO> getTopicMetadata(String... topics) {
-    return kafkaHighLevelConsumer.getTopicsInfo(topics);
+    final var topicInfos = highLevelConsumer.getTopicInfos(topics);
+    final var retrievedTopicNames = topicInfos.keySet();
+    final var topicConfigs = highLevelAdminClient.describeTopicConfigs(retrievedTopicNames);
+
+    for (var topicVo : topicInfos.values()) {
+      final var config = topicConfigs.get(topicVo.getName());
+      if (config != null) {
+        final var configMap = new TreeMap<String, String>();
+        for (var configEntry : config.entries()) {
+          if (configEntry.source() != ConfigSource.DEFAULT_CONFIG &&
+              configEntry.source() != ConfigSource.STATIC_BROKER_CONFIG) {
+            configMap.put(configEntry.name(), configEntry.value());
+          }
+        }
+        topicVo.setConfig(configMap);
+      } else {
+        LOG.warn("Missing config for topic {}", topicVo.getName());
+      }
+    }
+    return topicInfos;
   }
 
   @Override
   public List<MessageVO> getMessages(String topic, int count,
                                      MessageDeserializer deserializer) {
-    final var records = kafkaHighLevelConsumer.getLatestRecords(topic, count, deserializer);
+    final var records = highLevelConsumer.getLatestRecords(topic, count, deserializer);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
       for (var record : records) {
@@ -142,7 +163,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
                                      MessageDeserializer deserializer) {
-    final var records = kafkaHighLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);
+    final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
       for (var record : records) {
@@ -170,7 +191,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   }
 
   private Map<Integer, TopicPartitionVO> getTopicPartitionSizes(TopicVO topic) {
-    return kafkaHighLevelConsumer.getPartitionSize(topic.getName());
+    return highLevelConsumer.getPartitionSize(topic.getName());
   }
 
   @Override

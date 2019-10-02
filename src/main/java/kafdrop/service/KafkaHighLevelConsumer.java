@@ -96,11 +96,14 @@ public final class KafkaHighLevelConsumer {
     kafkaConsumer.seek(partition, offset);
 
     final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
+    final var earliestOffset = kafkaConsumer.beginningOffsets(partitions).get(partition);
     final var latestOffset = kafkaConsumer.endOffsets(partitions).get(partition) - 1;
+    if (earliestOffset > latestOffset) return Collections.emptyList();
     var currentOffset = offset - 1;
 
-    // stop if get to count or get to the latest offset
+    // stop if got to count or get to the latest offset
     while (rawRecords.size() < count && currentOffset < latestOffset) {
+      System.out.println("currentOffset=" + currentOffset + ", latestOffset=" + latestOffset);
       final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(partition);
 
       if (!polled.isEmpty()) {
@@ -191,7 +194,7 @@ public final class KafkaHighLevelConsumer {
     return bytes != null ? deserializer.deserializeMessage(ByteBuffer.wrap(bytes)) : "empty";
   }
 
-  synchronized Map<String, TopicVO> getTopicsInfo(String[] topics) {
+  synchronized Map<String, TopicVO> getTopicInfos(String[] topics) {
     initializeClient();
     if (topics.length == 0) {
       final var topicSet = kafkaConsumer.listTopics().keySet();

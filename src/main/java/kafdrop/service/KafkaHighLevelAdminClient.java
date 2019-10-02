@@ -2,8 +2,11 @@ package kafdrop.service;
 
 import kafdrop.config.*;
 import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
+import org.apache.kafka.common.config.*;
+import org.apache.kafka.common.config.ConfigResource.*;
 import org.apache.kafka.common.errors.GroupAuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,5 +86,23 @@ public final class KafkaHighLevelAdminClient {
         throw new KafkaAdminClientException(e);
       }
     }
+  }
+
+  Map<String, Config> describeTopicConfigs(Set<String> topicNames) {
+    final var resources = topicNames.stream()
+        .map(topic -> new ConfigResource(Type.TOPIC, topic))
+        .collect(Collectors.toList());
+    final var result = adminClient.describeConfigs(resources);
+    final Map<String, Config> configsByTopic;
+    try {
+      final var allConfigs = result.all().get();
+      configsByTopic = new HashMap<>(allConfigs.size(), 1f);
+      for (var entry : allConfigs.entrySet()) {
+        configsByTopic.put(entry.getKey().name(), entry.getValue());
+      }
+    } catch (InterruptedException | ExecutionException e) {
+      throw new KafkaAdminClientException(e);
+    }
+    return configsByTopic;
   }
 }
