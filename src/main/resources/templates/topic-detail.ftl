@@ -31,13 +31,12 @@
 
 <h2>Topic: ${topic.name}</h2>
 
-<div id="action-bar" class="container">
+<div id="action-bar" class="container pl-4">
   <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
 </div>
 <br/>
-<div class="container-fluid">
+<div class="container-fluid pl-0">
     <div class="row">
-
         <div id="topic-overview" class="col-md-8">
             <h3>Overview</h3>
 
@@ -66,7 +65,6 @@
                 </tbody>
             </table>
         </div>
-
 
         <div id="topic-config" class="col-md-4">
             <h3>Configuration</h3>
