@@ -15,7 +15,7 @@
 -->
 <#import "/spring.ftl" as spring />
 
-<div class="pb-2 mt-5 mb-4 border-bottom">
+<div class="pb-2 mt-5 mb-4 border-bottom border-secondary">
     <div class="container">
         <div class="container-fluid pl-0">
             <div id="header-title-line" class="row">
