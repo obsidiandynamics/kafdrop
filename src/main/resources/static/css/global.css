@@ -56,3 +56,13 @@ input[type=text].error {
     vertical-align: bottom;
     display: inline-block;
 }
+
+#filter {
+    border: 1px solid #444;
+    color: white;
+    background-color: #222;
+}
+
+#filter:focus {
+    outline: #00f0fe auto 2px;
+}

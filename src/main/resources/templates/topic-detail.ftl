@@ -31,7 +31,7 @@
 
 <h2>Topic: ${topic.name}</h2>
 
-<div id="action-bar" class="container pl-4">
+<div id="action-bar" class="container pl-0">
   <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
 </div>
 <br/>
