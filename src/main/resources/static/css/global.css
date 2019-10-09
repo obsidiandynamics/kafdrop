@@ -38,3 +38,21 @@ table.overview {
 input[type=text].error {
     border-color: red;
 }
+
+#header-title-line {
+    height: 7em;
+}
+
+#logo {
+    height: 7em;
+    padding-bottom: 0.5em;
+}
+
+#title {
+    line-height: 7em;
+}
+
+#title h1 {
+    vertical-align: bottom;
+    display: inline-block;
+}

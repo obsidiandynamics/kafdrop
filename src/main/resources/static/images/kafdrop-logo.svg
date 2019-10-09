@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="25mm"
+   height="25mm"
+   viewBox="0 0 25 25"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (unknown)"
+   sodipodi:docname="kafdrop-logo.svg"
+   inkscape:export-filename="/home/emil/code/kafdrop.wiki/images/kafdrop-logo.png"
+   inkscape:export-xdpi="244.56"
+   inkscape:export-ydpi="244.56">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="69.558602"
+     inkscape:cy="44.378051"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1680"
+     inkscape:window-height="1013"
+     inkscape:window-x="1680"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     showguides="false"
+     inkscape:snap-grids="true"
+     inkscape:object-nodes="true" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-5.2582855,-3.9856467)">
+    <path
+       sodipodi:nodetypes="csssssssc"
+       inkscape:connector-curvature="0"
+       id="path4980-1"
+       d="m 13.324407,11.92708 c 0,0 -0.289464,1.220521 -1.148906,2.480464 -0.379177,0.555875 -1.154747,1.669448 -2.046039,2.887607 -1.1289077,1.542921 -2.3917736,3.351137 -2.3917736,5.2249 0,2.111477 1.5904922,5.657108 5.5159696,5.657108 3.92548,0 5.69008,-3.03042 5.626093,-6.022474 -0.03168,-1.481376 -1.191175,-3.275994 -2.351251,-4.872761 -0.942127,-1.296779 -1.859712,-2.523675 -2.187983,-3.042133 -0.732483,-1.156848 -1.01611,-2.312711 -1.01611,-2.312711 z"
+       style="fill:#0093f7;fill-opacity:0.8627451;stroke:none;stroke-width:0.04449259;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path4982-4"
+       d="m 16.603794,14.35294 5.248239,-5.1644419 6.103558,0.01656 -8.581803,9.1107549 C 18.279096,16.526429 17.680597,15.88396 16.603794,14.35294 Z"
+       style="fill:#401df3;fill-opacity:0.8627451;stroke:none;stroke-width:0.0279732px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path4984-6"
+       d="m 17.10234,28.754477 c 0,0 1.497634,-0.77142 2.373606,-2.269055 0.875974,-1.497631 0.843741,-3.490331 0.843741,-3.490331 l 4.104698,5.751106 z"
+       style="fill:#cb00e8;fill-opacity:0.8627451;stroke:none;stroke-width:0.0279732px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       sodipodi:nodetypes="ccccszcc"
+       inkscape:connector-curvature="0"
+       id="path4986-9"
+       d="M 6.7898339,6.7145164 C 7.9714992,5.7365535 8.1884937,4.1569659 8.1884937,4.1569659 l 4.3450993,9.666e-4 0.0019,3.318246 c 0,0 -0.05332,2.2262534 -0.649916,3.7582105 -0.85299,2.190304 -3.2432385,5.115673 -3.6568832,5.636308 -0.4136452,0.520634 -1.4576701,2.190938 -1.4576701,2.190938 z"
+       style="fill:#00f0fe;fill-opacity:0.8627451;stroke:none;stroke-width:0.03858981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>

@@ -18,9 +18,13 @@
 <div class="pb-2 mt-5 mb-4 border-bottom">
     <div class="container">
         <div class="container-fluid pl-0">
-            <div class="row">
-                <div id="title" class="col-md-11">
-                    <h1 class="app-name brand"><a href="<@spring.url '/'/>">Kafdrop</a> <#if profile??><span class="small">${profile}</span></#if>
+            <div id="header-title-line" class="row">
+                <div id="logo" class="col-md-1">
+                    <img alt="logo" height="100%" src="<@spring.url '/images/kafdrop-logo.svg'/>"/>
+                </div>
+                <div id="title" class="col-md-10">
+                    <h1 class="app-name brand mb-0">
+                        <a href="<@spring.url '/'/>">Kafdrop</a>
                     </h1>
                 </div>
                 <div id="github-star" class="col-md-1">
