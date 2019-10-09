@@ -22,11 +22,14 @@ import io.swagger.annotations.*;
 import kafdrop.config.*;
 import kafdrop.model.*;
 import kafdrop.service.*;
+import org.springframework.beans.factory.*;
+import org.springframework.boot.info.*;
 import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.ui.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -36,21 +39,35 @@ public final class ClusterController {
 
   private final KafkaMonitor kafkaMonitor;
 
-  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor) {
+  private final BuildProperties buildProperties;
+
+  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ObjectProvider<BuildInfo> buildInfoProvider) {
     this.kafkaConfiguration = kafkaConfiguration;
     this.kafkaMonitor = kafkaMonitor;
+    this.buildProperties = buildInfoProvider.stream()
+        .map(BuildInfo::getBuildProperties)
+        .findAny()
+        .orElseGet(ClusterController::blankBuildProperties);
+  }
+
+  private static BuildProperties blankBuildProperties() {
+    final var properties = new Properties();
+    properties.setProperty("version", "3.x");
+    properties.setProperty("time", String.valueOf(System.currentTimeMillis()));
+    return new BuildProperties(properties);
   }
 
   @RequestMapping("/")
   public String clusterInfo(Model model,
                             @RequestParam(value = "filter", required = false) String filter) {
     model.addAttribute("bootstrapServers", kafkaConfiguration.getBrokerConnect());
+    model.addAttribute("buildProperties", buildProperties);
 
-    final List<BrokerVO> brokers = kafkaMonitor.getBrokers();
-    final List<TopicVO> topics = kafkaMonitor.getTopics();
-    final ClusterSummaryVO clusterSummary = kafkaMonitor.getClusterSummary(topics);
+    final var brokers = kafkaMonitor.getBrokers();
+    final var topics = kafkaMonitor.getTopics();
+    final var clusterSummary = kafkaMonitor.getClusterSummary(topics);
 
-    final List<Integer> missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
+    final var missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
         .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
         .collect(Collectors.toList());
 
@@ -72,7 +89,7 @@ public final class ClusterController {
   })
   @RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody ClusterInfoVO getCluster() {
-    final ClusterInfoVO vo = new ClusterInfoVO();
+    final var vo = new ClusterInfoVO();
     vo.brokers = kafkaMonitor.getBrokers();
     vo.topics = kafkaMonitor.getTopics();
     vo.summary = kafkaMonitor.getClusterSummary(vo.topics);

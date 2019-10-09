@@ -22,8 +22,9 @@
 
 <#setting number_format="0">
 <div>
-    <h2>Kafka Cluster Overview</h2>
+    <div id="kafdropVersion">${buildProperties.getVersion()} [${buildProperties.getTime()}]</div>
 
+    <h2>Kafka Cluster Overview</h2>
     <div id="cluster-overview">
         <table class="table table-bordered">
             <tbody>

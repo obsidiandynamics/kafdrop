@@ -66,3 +66,10 @@ input[type=text].error {
 #filter:focus {
     outline: #00f0fe auto 2px;
 }
+
+#kafdropVersion {
+    color: #888;
+    font-size: 0.8em;
+    margin-top: -1.8em;
+    float: right;
+}
