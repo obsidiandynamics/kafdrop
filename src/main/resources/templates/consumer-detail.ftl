@@ -21,7 +21,7 @@
 
 <h2>Kafka Consumer: ${consumer.groupId}</h2>
 
-<div class="container-fluid">
+<div class="container-fluid pl-0">
     <div id="overview">
         <h3>Overview</h3>
         <table class="table table-bordered overview">
