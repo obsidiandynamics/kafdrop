@@ -2,6 +2,9 @@ server:
   port: 9000
   servlet:
     context-path: /
+  error:
+    whitelabel:
+      enabled: false
 
 spring:
   jmx:

@@ -73,3 +73,23 @@ input[type=text].error {
     margin-top: -1.8em;
     float: right;
 }
+
+#errorHeader {
+    font-size: 1.2em;
+}
+
+#errorMessage {
+    font-weight: bold;
+    color: #eb3474;
+}
+
+#stackTraceTitle {
+    padding-top: 2em;
+    font-weight: bold;
+    color: #999;
+}
+
+#stackTrace {
+    font-family: monospace;
+    color: #999;
+}
