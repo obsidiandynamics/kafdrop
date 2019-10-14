@@ -188,6 +188,7 @@ docker run -d --rm -p 9000:9000 \
 |KAFKA_PROPERTIES|base64 encoded string of your properties file. Include the trustore/keystore password, locations, connection encryption, broker address etc. |
 |KAFKA_TRUSTSTORE|base64 encoded string of your truststore file.|
 |KAFKA_KEYSTORE|base64 encoded string of your keystore file.|
+|HEAP_ARGS|Override default Xms, Xmx|
 
 ### Using Helm
 Like in the Docker example, supply the files in base-64 form:
