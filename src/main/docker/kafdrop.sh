@@ -22,7 +22,7 @@ fi
 
 # Marathon passes memory limit
 if [ $MARATHON_APP_RESOURCE_MEM ]; then
-    HEAP_ARGS="$HEAP_ARGS -Xms${MARATHON_APP_RESOURCE_MEM%.*}m -Xmx${MARATHON_APP_RESOURCE_MEM%.*}m"
+    HEAP_ARGS="-Xms${MARATHON_APP_RESOURCE_MEM%.*}m -Xmx${MARATHON_APP_RESOURCE_MEM%.*}m"
 fi
 
 if [ $JMX_PORT ]; then
