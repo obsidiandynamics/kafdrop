@@ -22,7 +22,7 @@ fi
 
 # Marathon passes memory limit
 if [ $MARATHON_APP_RESOURCE_MEM ]; then
-    HEAP_ARGS="-Xms${MARATHON_APP_RESOURCE_MEM%.*}m -Xmx${MARATHON_APP_RESOURCE_MEM%.*}m"
+    HEAP_ARGS="$HEAP_ARGS -Xms${MARATHON_APP_RESOURCE_MEM%.*}m -Xmx${MARATHON_APP_RESOURCE_MEM%.*}m"
 fi
 
 if [ $JMX_PORT ]; then
@@ -60,9 +60,9 @@ else
 fi
 
 ARGS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED -Xss256K \
-     $JMX_ARGS \
-     $HEAP_ARGS \
-     $JVM_OPTS"
+    $JMX_ARGS \
+    $HEAP_ARGS \
+    $JVM_OPTS"
 
 java $ARGS -jar /kafdrop*/kafdrop*jar
 
