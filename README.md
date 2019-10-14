@@ -177,6 +177,17 @@ docker run -d --rm -p 9000:9000 \
     -e KAFKA_KEYSTORE=$(cat kafka.keystore.jks | base64) \       # optional
     obsidiandynamics/kafdrop
 ```
+#### Environment Variables
+
+|Name |Comment|
+|----------------------|-------------------------------|
+|KAFKA_PROPERTIES_FILE |Localtion where kafka.properties file will be written (if KAFKA_PROPERTIES is set), and read by the application|
+|KAFKA_TRUSTSTORE_FILE|Location where the kafka.truststore.jks file will be written (if KAFKA_TRUSTSTORE is set) and read by the application |
+|KAFKA_KEYSTORE_FILE|Location where the kafka.keystore.jks file will be written(if KAFKA_KEYSTORE is set) and read by the application  |
+|KAFKA_BROKERCONNECT|The broker you wan to connect to. Optionnal if set in 'kafka.properties' or if you connect to 'localhost'|
+|KAFKA_PROPERTIES|base64 encoded string of your properties file. Include the trustore/keystore password, locations, connection encryption, broker address etc. |
+|KAFKA_TRUSTSTORE|base64 encoded string of your truststore file.|
+|KAFKA_KEYSTORE|base64 encoded string of your keystore file.|
 
 ### Using Helm
 Like in the Docker example, supply the files in base-64 form:
