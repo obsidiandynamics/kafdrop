@@ -31,3 +31,6 @@ kafka:
   isSecured: false
   saslMechanism: "PLAIN"
   securityProtocol: "SASL_PLAINTEXT"
+  truststoreLocation : "${KAFKA_TRUSTSTORE_FILE:/kafka.truststore.jks}"
+  propertiesFileLocation : "${KAFKA_PROPERTIES_FILE:/kafka.properties}"
+  keystoreLocation : "${KAFKA_KEYSTORE_FILE:/kafka.keystore.jks}"
