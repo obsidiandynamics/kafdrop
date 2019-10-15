@@ -178,16 +178,25 @@ docker run -d --rm -p 9000:9000 \
     obsidiandynamics/kafdrop
 ```
 #### Environment Variables
+##### Basic configuration
+|Name                   |Description
+|-----------------------|-------------------------------
+|`KAFKA_BROKERCONNECT`  |Bootstrap list of Kafka host/port pairs. Defaults to `localhost:9092`.
+|`KAFKA_PROPERTIES`     |Additional properties to configure the broker connection (base-64 encoded).
+|`KAFKA_TRUSTSTORE`     |Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
+|`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
+|`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
+|`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
 
-|Name |Comment|
-|----------------------|-------------------------------|
-|KAFKA_PROPERTIES_FILE |Location where kafka.properties file will be written (if KAFKA_PROPERTIES is set), and read by the application|
-|KAFKA_TRUSTSTORE_FILE|Location where the kafka.truststore.jks file will be written (if KAFKA_TRUSTSTORE is set) and read by the application |
-|KAFKA_KEYSTORE_FILE|Location where the kafka.keystore.jks file will be written(if KAFKA_KEYSTORE is set) and read by the application  |
-|KAFKA_BROKERCONNECT|The broker you wan to connect to. Optionnal if set in 'kafka.properties' or if you connect to 'localhost'|
-|KAFKA_PROPERTIES|base64 encoded string of your properties file. Include the trustore/keystore password, locations, connection encryption, broker address etc. |
-|KAFKA_TRUSTSTORE|base64 encoded string of your truststore file.|
-|KAFKA_KEYSTORE|base64 encoded string of your keystore file.|
+##### Advanced configuration
+|Name                   |Description
+|-----------------------|-------------------------------
+|`JVM_OPTS`             |JVM options.
+|`JMX_PORT`             |Port to use for JMX. No default; if unspecified, JMX will not be exposed.
+|`HOST`                 |The hostname to report for the RMI registry (used for JMX). Defaults to `localhost`.
+|`KAFKA_PROPERTIES_FILE`|Internal location where the Kafka properties file will be written to (if `KAFKA_PROPERTIES` is set). Defaults to `kafka.properties`.
+|`KAFKA_TRUSTSTORE_FILE`|Internal location where the truststore file will be written to (if `KAFKA_TRUSTSTORE` is set). Defaults to `kafka.truststore.jks`.
+|`KAFKA_KEYSTORE_FILE`  |Internal location where the keystore file will be written to (if `KAFKA_KEYSTORE` is set). Defaults to `kafka.keystore.jks`.
 
 ### Using Helm
 Like in the Docker example, supply the files in base-64 form:
