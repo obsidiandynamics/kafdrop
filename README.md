@@ -181,7 +181,7 @@ docker run -d --rm -p 9000:9000 \
 
 |Name |Comment|
 |----------------------|-------------------------------|
-|KAFKA_PROPERTIES_FILE |Localtion where kafka.properties file will be written (if KAFKA_PROPERTIES is set), and read by the application|
+|KAFKA_PROPERTIES_FILE |Location where kafka.properties file will be written (if KAFKA_PROPERTIES is set), and read by the application|
 |KAFKA_TRUSTSTORE_FILE|Location where the kafka.truststore.jks file will be written (if KAFKA_TRUSTSTORE is set) and read by the application |
 |KAFKA_KEYSTORE_FILE|Location where the kafka.keystore.jks file will be written(if KAFKA_KEYSTORE is set) and read by the application  |
 |KAFKA_BROKERCONNECT|The broker you wan to connect to. Optionnal if set in 'kafka.properties' or if you connect to 'localhost'|
