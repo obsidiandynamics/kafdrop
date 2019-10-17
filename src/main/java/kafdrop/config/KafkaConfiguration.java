@@ -20,11 +20,9 @@ public final class KafkaConfiguration {
   private Boolean isSecured = false;
   private String saslMechanism;
   private String securityProtocol;
-  private String truststoreLocation;
-  private String propertiesFileLocation;
-  private String keystoreLocation;
-
-
+  private String truststoreFile;
+  private String propertiesFile;
+  private String keystoreFile;
 
   public void applyCommon(Properties properties) {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
@@ -34,19 +32,22 @@ public final class KafkaConfiguration {
       properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
     }
 
-    if (new File(truststoreLocation).isFile()) {
-      LOG.info("Assigning truststore location to {}", truststoreLocation);
-      properties.put("ssl.truststore.location", truststoreLocation);
+    LOG.info("Checking truststore file {}", truststoreFile);
+    if (new File(truststoreFile).isFile()) {
+      LOG.info("Assigning truststore location to {}", truststoreFile);
+      properties.put("ssl.truststore.location", truststoreFile);
     }
 
-    if (new File(keystoreLocation).isFile()) {
-      LOG.info("Assigning keystore location to {}", keystoreLocation);
-      properties.put("ssl.keystore.location", keystoreLocation);
+    LOG.info("Checking keystore file {}", keystoreFile);
+    if (new File(keystoreFile).isFile()) {
+      LOG.info("Assigning keystore location to {}", keystoreFile);
+      properties.put("ssl.keystore.location", keystoreFile);
     }
 
-    final var propertiesFile = new File(propertiesFileLocation);
+    LOG.info("Checking properties file {}", propertiesFile);
+    final var propertiesFile = new File(this.propertiesFile);
     if (propertiesFile.isFile()) {
-      LOG.info("Loading properties from {}", propertiesFileLocation);
+      LOG.info("Loading properties from {}", this.propertiesFile);
       final var propertyOverrides = new Properties();
       try (var propsReader = new BufferedReader(new FileReader(propertiesFile))) {
         propertyOverrides.load(propsReader);
