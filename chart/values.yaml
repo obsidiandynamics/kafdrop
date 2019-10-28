@@ -10,9 +10,9 @@ kafka:
   properties: ""
   truststore: ""
   keystore: ""
-  properties_file: ""
-  truststore_file: ""
-  keystore_file: ""
+  propertiesFile: ""
+  truststoreFile: ""
+  keystoreFile: ""
 
 host:
 
