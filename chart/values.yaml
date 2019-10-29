@@ -10,14 +10,22 @@ kafka:
   properties: ""
   truststore: ""
   keystore: ""
+  propertiesFile: "kafka.properties"
+  truststoreFile: "kafka.truststore.jks"
+  keystoreFile: "kafka.keystore.jks"
+
+host:
 
 jvm:
   opts: ""
+jmx:
+  port: 8686
 
 nameOverride: ""
 fullnameOverride: ""
 
 server:
+  port: 9000
   servlet:
     contextPath: /
 
