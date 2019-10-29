@@ -5,9 +5,13 @@ import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
+import org.apache.kafka.common.acl.AccessControlEntryFilter;
+import org.apache.kafka.common.acl.AclBindingFilter;
 import org.apache.kafka.common.config.*;
 import org.apache.kafka.common.config.ConfigResource.*;
 import org.apache.kafka.common.errors.GroupAuthorizationException;
+import org.apache.kafka.common.errors.TopicAuthorizationException;
+import org.apache.kafka.common.resource.ResourcePatternFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.*;
@@ -101,8 +105,24 @@ public final class KafkaHighLevelAdminClient {
         configsByTopic.put(entry.getKey().name(), entry.getValue());
       }
     } catch (InterruptedException | ExecutionException e) {
+      if (e.getCause() instanceof TopicAuthorizationException) {
+        printAcls();
+      }
       throw new KafkaAdminClientException(e);
     }
     return configsByTopic;
+  }
+
+  private void printAcls() {
+    try {
+      final var acls = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY, AccessControlEntryFilter.ANY)).values().get();
+      final var newlineDelimitedAcls = new StringBuilder();
+      for (var acl : acls) {
+        newlineDelimitedAcls.append('\n').append(acl);
+      }
+      LOG.info("ACLs: {}", newlineDelimitedAcls);
+    } catch (InterruptedException | ExecutionException e) {
+      LOG.error("Error describing ACLs", e);
+    }
   }
 }
