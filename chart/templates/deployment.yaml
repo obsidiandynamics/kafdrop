@@ -38,34 +38,20 @@ spec:
             value: "{{ .Values.kafka.keystore }}"
           - name: JVM_OPTS
             value: "{{ .Values.jvm.opts }}"
-{{- if .Values.jmx.port }}
           - name: JMX_PORT
             value: "{{ .Values.jmx.port }}"
-{{- end }}
-{{- if .Values.host }}
           - name: HOST
             value: "{{ .Values.host }}"
-{{- end }}
-{{- if .Values.server.servlet.contextPath }}
           - name: SERVER_SERVLET_CONTEXTPATH
             value: "{{ .Values.server.servlet.contextPath }}"
-{{- end }}
-{{- if .Values.kafka.properties_file }}
           - name: KAFKA_PROPERTIES_FILE
-            value: "{{ .Values.kafka.properties_file }}"
-{{- end }}
-{{- if .Values.kafka.truststore_file }}
+            value: "{{ .Values.kafka.propertiesFile }}"
           - name: KAFKA_TRUSTSTORE_FILE
-            value: "{{ .Values.kafka.truststore_file }}"
-{{- end }}
-{{- if .Values.kafka.keystore_file }}
+            value: "{{ .Values.kafka.truststoreFile }}"
           - name: KAFKA_KEYSTORE_FILE
-            value: "{{ .Values.kafka.keystore_file }}"
-{{- end }}
-{{- if .Values.server.port }}
+            value: "{{ .Values.kafka.keystoreFile }}"
           - name: SERVER_PORT
             value: "{{ .Values.server.port }}"
-{{- end }}
           ports:
             - name: http
               containerPort: 9000
