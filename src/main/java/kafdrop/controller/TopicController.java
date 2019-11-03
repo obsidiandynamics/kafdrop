@@ -66,4 +66,14 @@ public final class TopicController {
   public @ResponseBody List<TopicVO> getAllTopics() {
     return kafkaMonitor.getTopics();
   }
+
+  @ApiOperation(value = "createTopic", notes = "Create topic")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Success", response = String.class)
+  })
+  @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  public String createTopic(CreateTopicVO createTopicVO) {
+    kafkaMonitor.createTopic(createTopicVO);
+    return "redirect:/";
+  }
 }

@@ -45,4 +45,10 @@ public interface KafkaMonitor {
   ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
 
   List<ConsumerVO> getConsumers(Collection<TopicVO> topicVos);
+
+  /**
+   * Create topic
+   * @param createTopicDto topic params
+   */
+  void createTopic(CreateTopicVO createTopicDto);
 }
