@@ -17,7 +17,4 @@ public final class CreateTopicVO {
 
     @ApiParam("Replications factor")
     int replicationFactor;
-
-    @ApiParam("Topic creation timeout in milliseconds")
-    int createTimeout;
 }

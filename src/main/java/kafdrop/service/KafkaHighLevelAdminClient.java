@@ -117,18 +117,15 @@ public final class KafkaHighLevelAdminClient {
    * Create topic or throw ${@code KafkaAdminClientException}
    *
    * @param newTopic topic to create
-   * @throws KafkaAdminClientException if timeout or computation threw an Exception
+   * @throws KafkaAdminClientException if computation threw an Exception
    */
-  void createTopic(NewTopic newTopic, int createTimeout) {
+  void createTopic(NewTopic newTopic) {
     final var creationResult = adminClient.createTopics(List.of(newTopic));
     try {
-      creationResult.all().get(createTimeout, TimeUnit.MILLISECONDS);
+      creationResult.all().get();
       LOG.info("Topic {} successfully created", newTopic.name());
     } catch (InterruptedException | ExecutionException e) {
       LOG.error("Error while creating topic", e);
-      throw new KafkaAdminClientException(e);
-    } catch (TimeoutException e) {
-      LOG.error("Topic create timeout", e);
       throw new KafkaAdminClientException(e);
     }
   }

@@ -169,10 +169,6 @@
                     <td>Replication factor</td>
                     <td><input type="number" name="replicationFactor" value="1" required></td>
                 </tr>
-                <tr>
-                    <td>Create timeout, ms</td>
-                    <td><input type="number" name="createTimeout" value="2000" required></td>
-                </tr>
                 </tbody>
             </table>
         </form>

@@ -208,7 +208,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     var newTopic = new NewTopic(
             createTopicDto.getName(), createTopicDto.getPartitionsNumber(), (short) createTopicDto.getReplicationFactor()
     );
-    highLevelAdminClient.createTopic(newTopic,createTopicDto.getCreateTimeout());
+    highLevelAdminClient.createTopic(newTopic);
   }
 
   private static List<ConsumerVO> convert(List<ConsumerGroupOffsets> consumerGroupOffsets, Collection<TopicVO> topicVos) {
