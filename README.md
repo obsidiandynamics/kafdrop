@@ -67,6 +67,8 @@ docker run -d --rm -p 9000:9000 \
 
 Then access the web UI at [http://localhost:9000](http://localhost:9000).
 
+> **Hey there!** We hope you really like Kafdrop! Please take a moment to ⭐ the repo or [Tweet](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fobsidiandynamics%2Fkafdrop&text=Get%20Kafdrop%20%E2%80%94%20a%20web-based%20UI%20for%20viewing%20%23ApacheKafka%20topics%20and%20browsing%20consumers%20) about it.
+
 ## Running in Kubernetes (using a Helm Chart)
 Clone the repository (if necessary):
 ```sh
@@ -284,3 +286,5 @@ nginx -s reload
 ```
 
 To logout, browse to [/logout](http://localhost:8080/logout).
+
+> **Hey there!** We hope you really like Kafdrop! Please take a moment to ⭐ the repo or [Tweet](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fobsidiandynamics%2Fkafdrop&text=Get%20Kafdrop%20%E2%80%94%20a%20web-based%20UI%20for%20viewing%20%23ApacheKafka%20topics%20and%20browsing%20consumers%20) about it.
