@@ -22,7 +22,6 @@ import com.google.common.base.*;
 import io.undertow.server.*;
 import io.undertow.websockets.jsr.*;
 import kafdrop.config.ini.*;
-import org.apache.log4j.*;
 import org.slf4j.*;
 import org.slf4j.Logger;
 import org.springframework.boot.Banner.*;
