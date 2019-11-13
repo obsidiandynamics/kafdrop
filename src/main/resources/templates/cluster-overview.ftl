@@ -149,29 +149,9 @@
             </#list>
             </tbody>
         </table>
-    </div>
-    <div id="create-form">
-        <form action="<@spring.url '/topic'/>" method="POST">
-            <button class="btn btn-outline-light" type="submit">
-                Create topic
-            </button>
-            <table class="table table-bordered" style="width: 50%; margin-top: 20px">
-                <tbody>
-                <tr>
-                    <td>Topic name</td>
-                    <td><input type="text" name="name" value="NewTopic" required></td>
-                </tr>
-                <tr>
-                    <td>Partitions number</td>
-                    <td><input type="number" name="partitionsNumber" value="1" required></td>
-                </tr>
-                <tr>
-                    <td>Replication factor</td>
-                    <td><input type="number" name="replicationFactor" value="1" required></td>
-                </tr>
-                </tbody>
-            </table>
-        </form>
+        <a class="btn btn-outline-light" href="<@spring.url '/topic/create'/>">
+            New
+        </a>
     </div>
 </div>
 
