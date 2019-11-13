@@ -87,7 +87,12 @@ public final class TopicController {
       @ApiResponse(code = 200, message = "Success", response = String.class)
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-  public void createTopic(CreateTopicVO createTopicVO) {
-    kafkaMonitor.createTopic(createTopicVO);
+  public String createTopic(CreateTopicVO createTopicVO, Model model) {
+      try { kafkaMonitor.createTopic(createTopicVO); } catch (Exception ex) {
+          model.addAttribute("errorMessage", ex.getMessage());
+      }
+      model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
+      model.addAttribute("topicName", createTopicVO.getName());
+      return "topic-create";
   }
 }

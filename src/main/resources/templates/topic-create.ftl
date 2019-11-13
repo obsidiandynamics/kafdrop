@@ -22,8 +22,6 @@
 
 <#setting number_format="0">
 <div>
-<#--    <div id="kafdropVersion">${buildProperties.getVersion()} [${buildProperties.getTime()}]</div>-->
-
     <h2>Topic creation</h2>
     <a class="btn btn-outline-light" href="<@spring.url '/'/>">
         Back
@@ -49,6 +47,13 @@
             <button class="btn btn-success" type="submit">
                 <i class="fa fa-plus"></i> Create
             </button>
+            <br>
+            <br>
+            <#if errorMessage??>
+                <p>Error created topic ${topicName}: ${errorMessage}</p>
+            <#elseif topicName??>
+                <p>Succefully created topic <a href="<@spring.url '/topic/${topicName}'/>">${topicName}</a> </p>
+            </#if>
         </form>
     </div>
 </div>
