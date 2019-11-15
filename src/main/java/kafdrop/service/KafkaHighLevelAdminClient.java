@@ -113,6 +113,23 @@ public final class KafkaHighLevelAdminClient {
     return configsByTopic;
   }
 
+  /**
+   * Create topic or throw ${@code KafkaAdminClientException}
+   *
+   * @param newTopic topic to create
+   * @throws KafkaAdminClientException if computation threw an Exception
+   */
+  void createTopic(NewTopic newTopic) {
+    final var creationResult = adminClient.createTopics(List.of(newTopic));
+    try {
+      creationResult.all().get();
+      LOG.info("Topic {} successfully created", newTopic.name());
+    } catch (InterruptedException | ExecutionException e) {
+      LOG.error("Error while creating topic", e);
+      throw new KafkaAdminClientException(e);
+    }
+  }
+
   private void printAcls() {
     try {
       final var acls = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY, AccessControlEntryFilter.ANY)).values().get();

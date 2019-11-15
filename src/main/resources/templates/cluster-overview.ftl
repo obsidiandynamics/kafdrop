@@ -149,6 +149,9 @@
             </#list>
             </tbody>
         </table>
+        <a class="btn btn-outline-light" href="<@spring.url '/topic/create'/>">
+            New
+        </a>
     </div>
 </div>
 

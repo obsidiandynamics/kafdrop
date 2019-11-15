@@ -203,6 +203,14 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     return convert(consumerGroupOffsets, topicVos);
   }
 
+  @Override
+  public void createTopic(CreateTopicVO createTopicDto) {
+    var newTopic = new NewTopic(
+            createTopicDto.getName(), createTopicDto.getPartitionsNumber(), (short) createTopicDto.getReplicationFactor()
+    );
+    highLevelAdminClient.createTopic(newTopic);
+  }
+
   private static List<ConsumerVO> convert(List<ConsumerGroupOffsets> consumerGroupOffsets, Collection<TopicVO> topicVos) {
     final var topicVoMap = topicVos.stream().collect(Collectors.toMap(TopicVO::getName, Function.identity()));
     final var groupTopicPartitionOffsetMap = new TreeMap<String, Map<String, Map<Integer, Long>>>();

@@ -47,6 +47,17 @@ public final class TopicController {
     return "topic-detail";
   }
 
+  /**
+   * Topic create page
+   * @param model
+   * @return creation page
+   */
+  @RequestMapping("/create")
+  public String createTopicPage(Model model) {
+    model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
+    return "topic-create";
+  }
+
   @ApiOperation(value = "getTopic", notes = "Get details for a topic")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Success", response = TopicVO.class),
@@ -65,5 +76,23 @@ public final class TopicController {
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody List<TopicVO> getAllTopics() {
     return kafkaMonitor.getTopics();
+  }
+
+  /**
+   * API for topic creation
+   * @param createTopicVO request
+   */
+  @ApiOperation(value = "createTopic", notes = "Create topic")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Success", response = String.class)
+  })
+  @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  public String createTopic(CreateTopicVO createTopicVO, Model model) {
+      try { kafkaMonitor.createTopic(createTopicVO); } catch (Exception ex) {
+          model.addAttribute("errorMessage", ex.getMessage());
+      }
+      model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
+      model.addAttribute("topicName", createTopicVO.getName());
+      return "topic-create";
   }
 }
