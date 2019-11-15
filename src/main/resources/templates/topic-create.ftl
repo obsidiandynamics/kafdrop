@@ -52,7 +52,7 @@
             <#if errorMessage??>
                 <p>Error created topic ${topicName}: ${errorMessage}</p>
             <#elseif topicName??>
-                <p>Succefully created topic <a href="<@spring.url '/topic/${topicName}'/>">${topicName}</a> </p>
+                <p>Successfully created topic <a href="<@spring.url '/topic/${topicName}'/>">${topicName}</a> </p>
             </#if>
         </form>
     </div>
