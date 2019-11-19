@@ -35,7 +35,7 @@
                     <td align="center"><input type="text" name="name" required></td>
                 </tr>
                 <tr>
-                    <td>Partitions number</td>
+                    <td>Number of partitions</td>
                     <td align="center"><input type="number" name="partitionsNumber" value="1" required></td>
                 </tr>
                 <tr>
@@ -50,7 +50,7 @@
             <br>
             <br>
             <#if errorMessage??>
-                <p>Error created topic ${topicName}: ${errorMessage}</p>
+                <p>Error creating topic ${topicName}: ${errorMessage}</p>
             <#elseif topicName??>
                 <p>Successfully created topic <a href="<@spring.url '/topic/${topicName}'/>">${topicName}</a> </p>
             </#if>

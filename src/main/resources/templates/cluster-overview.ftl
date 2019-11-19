@@ -150,7 +150,7 @@
             </tbody>
         </table>
         <a class="btn btn-outline-light" href="<@spring.url '/topic/create'/>">
-            New
+            <i class="fa fa-plus"></i> New
         </a>
     </div>
 </div>

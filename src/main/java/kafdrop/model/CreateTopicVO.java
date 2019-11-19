@@ -9,12 +9,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @ApiModel("Create topic model")
 public final class CreateTopicVO {
-    @ApiParam("Topic name")
-    String name;
+  @ApiParam("Topic name")
+  String name;
 
-    @ApiParam("Number of partitions")
-    int partitionsNumber;
+  @ApiParam("Number of partitions")
+  int partitionsNumber;
 
-    @ApiParam("Replications factor")
-    int replicationFactor;
+  @ApiParam("Replication factor")
+  int replicationFactor;
 }

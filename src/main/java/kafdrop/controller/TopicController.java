@@ -88,8 +88,10 @@ public final class TopicController {
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
   public String createTopic(CreateTopicVO createTopicVO, Model model) {
-      try { kafkaMonitor.createTopic(createTopicVO); } catch (Exception ex) {
-          model.addAttribute("errorMessage", ex.getMessage());
+      try {
+        kafkaMonitor.createTopic(createTopicVO);
+      } catch (Exception ex) {
+        model.addAttribute("errorMessage", ex.getMessage());
       }
       model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
       model.addAttribute("topicName", createTopicVO.getName());
