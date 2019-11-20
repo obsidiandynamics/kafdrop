@@ -98,6 +98,36 @@
         </table>
     </div>
 
+    <div id="acls">
+        <h3>ACL</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Pattern Name</th>
+                <th><i class="fa fa-user"></i>&nbsp;&nbsp;Principal</th>
+                <th><i class="fa fa-user"></i>&nbsp;&nbsp;Ressource Type</th>
+                <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Pattern Type</th>
+                <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Operation</th>
+                <th><i class="fa fa-server"></i>&nbsp;&nbsp;Host</th>
+                <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Permission Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <#list acls as a>
+                <tr>
+                    <td>${a.name}</td>
+                    <td>${a.principal}</td>
+                    <td>${a.resourceType}</td>
+                    <td>${a.patternType}</td>
+                    <td>${a.operation}</td>
+                    <td>${a.host}</td>
+                    <td>${a.permissionType}</td>
+                </tr>
+            </#list>
+            </tbody>
+        </table>
+    </div>
+
     <div id="topics">
         <h3>Topics</h3>
         <table class="table table-bordered">

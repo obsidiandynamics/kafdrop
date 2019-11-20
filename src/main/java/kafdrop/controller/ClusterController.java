@@ -66,6 +66,7 @@ public final class ClusterController {
     final var brokers = kafkaMonitor.getBrokers();
     final var topics = kafkaMonitor.getTopics();
     final var clusterSummary = kafkaMonitor.getClusterSummary(topics);
+    final var acls = kafkaMonitor.getAcls();
 
     final var missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
         .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
@@ -75,6 +76,7 @@ public final class ClusterController {
     model.addAttribute("missingBrokerIds", missingBrokerIds);
     model.addAttribute("topics", topics);
     model.addAttribute("clusterSummary", clusterSummary);
+    model.addAttribute("acls", acls);
 
     if (filter != null) {
       model.addAttribute("filter", filter);
@@ -93,6 +95,7 @@ public final class ClusterController {
     vo.brokers = kafkaMonitor.getBrokers();
     vo.topics = kafkaMonitor.getTopics();
     vo.summary = kafkaMonitor.getClusterSummary(vo.topics);
+    vo.acls = kafkaMonitor.getAcls();
     return vo;
   }
 
@@ -114,6 +117,7 @@ public final class ClusterController {
   public static final class ClusterInfoVO {
     ClusterSummaryVO summary;
     List<BrokerVO> brokers;
+    List<AclVO> acls;
     List<TopicVO> topics;
   }
 }

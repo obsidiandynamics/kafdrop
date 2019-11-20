@@ -211,6 +211,19 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     highLevelAdminClient.createTopic(newTopic);
   }
 
+  @Override
+  public List<AclVO> getAcls() {
+    final var acls = highLevelAdminClient.listAcls();
+    final var aclVos = new ArrayList<AclVO>(acls.size());
+    for (var aclRessourcePattern : acls.keySet()) {
+      aclVos.add(new AclVO(aclRessourcePattern.resourceType().toString(), aclRessourcePattern.name(),
+              aclRessourcePattern.patternType().toString(), acls.get(aclRessourcePattern).principal(),
+              acls.get(aclRessourcePattern).host(), acls.get(aclRessourcePattern).operation().toString(),
+              acls.get(aclRessourcePattern).permissionType().toString()));
+    }
+    return aclVos;
+  }
+
   private static List<ConsumerVO> convert(List<ConsumerGroupOffsets> consumerGroupOffsets, Collection<TopicVO> topicVos) {
     final var topicVoMap = topicVos.stream().collect(Collectors.toMap(TopicVO::getName, Function.identity()));
     final var groupTopicPartitionOffsetMap = new TreeMap<String, Map<String, Map<Integer, Long>>>();
