@@ -221,6 +221,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
               acls.get(aclRessourcePattern).host(), acls.get(aclRessourcePattern).operation().toString(),
               acls.get(aclRessourcePattern).permissionType().toString()));
     }
+    Collections.sort(aclVos);
     return aclVos;
   }
 

@@ -18,7 +18,7 @@
 
 package kafdrop.model;
 
-public final class AclVO {
+public final class AclVO implements Comparable<AclVO>{
     private final String name;
     private final String resourceType;
     private final String patternType;
@@ -65,4 +65,7 @@ public final class AclVO {
     public String getPermissionType() {
         return permissionType;
     }
+
+    @Override
+    public int compareTo(AclVO that) { return this.name.compareTo(that.name) ; }
 }
