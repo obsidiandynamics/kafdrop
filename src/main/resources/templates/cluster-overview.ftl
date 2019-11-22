@@ -99,7 +99,7 @@
     </div>
 
     <div id="topics">
-        <h3>Topics</h3>
+        <h3>Topics <a href="<@spring.url '/acl'/>"><i class="fa fa-lock"></i> Acls</a></h3>
         <table class="table table-bordered">
             <thead>
             <tr>

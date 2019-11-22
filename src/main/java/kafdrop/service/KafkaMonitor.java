@@ -51,4 +51,6 @@ public interface KafkaMonitor {
    * @param createTopicDto topic params
    */
   void createTopic(CreateTopicVO createTopicDto);
+
+  List<AclVO> getAcls();
 }
