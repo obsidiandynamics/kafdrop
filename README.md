@@ -13,6 +13,14 @@
 
 This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the world of JDK 11+, Kafka 2.x, Helm and Kubernetes. It's a lightweight application that runs on Spring Boot and is dead-easy to configure, supporting SASL and TLS-secured brokers.
 
+# Features
+* **View Kafka brokers** — topic and partition assignments, and controller status
+* **View topics** — partition count, replication status, and custom configuration
+* **Browse messages** — JSON, plain text and Avro encoding
+* **View consumer groups** — per-partition parked offsets, combined and per-partition lag
+* **Create new topics**
+* **View ACLs**
+
 # Requirements
 
 * Java 11 or newer
