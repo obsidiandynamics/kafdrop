@@ -10,8 +10,7 @@ import org.apache.kafka.common.acl.AccessControlEntryFilter;
 import org.apache.kafka.common.acl.AclBindingFilter;
 import org.apache.kafka.common.config.*;
 import org.apache.kafka.common.config.ConfigResource.*;
-import org.apache.kafka.common.errors.GroupAuthorizationException;
-import org.apache.kafka.common.errors.TopicAuthorizationException;
+import org.apache.kafka.common.errors.*;
 import org.apache.kafka.common.resource.ResourcePattern;
 import org.apache.kafka.common.resource.ResourcePatternFilter;
 import org.slf4j.Logger;
@@ -135,13 +134,18 @@ public final class KafkaHighLevelAdminClient {
   Map<ResourcePattern, AccessControlEntry> listAcls() {
     final Map<ResourcePattern, AccessControlEntry> aclsByPattern;
     try {
-      final var aclsBindings = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY, AccessControlEntryFilter.ANY)).values().get();
+      final var aclsBindings = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY, AccessControlEntryFilter.ANY))
+          .values().get();
       aclsByPattern = new HashMap<>(aclsBindings.size(), 1f);
       for (var acl : aclsBindings) {
         aclsByPattern.put(acl.pattern(), acl.entry());
       }
     } catch (InterruptedException | ExecutionException e) {
-      throw new KafkaAdminClientException(e);
+      if (e.getCause() instanceof SecurityDisabledException) {
+        return Map.of();
+      } else {
+        throw new KafkaAdminClientException(e);
+      }
     }
     return aclsByPattern;
   }

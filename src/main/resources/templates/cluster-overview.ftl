@@ -53,7 +53,7 @@
     </div>
 
     <div id="brokers">
-        <h3>Brokers</h3>
+        <h3><i class="fa fa-server"></i> Brokers</h3>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -99,7 +99,7 @@
     </div>
 
     <div id="topics">
-        <h3>Topics <a href="<@spring.url '/acl'/>"><i class="fa fa-lock"></i> Acls</a></h3>
+        <h3><i class="fa fa-database"></i> Topics&nbsp;&nbsp;&nbsp;<a href="<@spring.url '/acl'/>"><i class="fa fa-lock"></i> ACLs</a></h3>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -108,8 +108,8 @@
 
                     <span style="font-weight:normal;">
                             &nbsp;<INPUT id='filter' size=25 NAME='searchRow' title='Just type to filter the rows'>&nbsp;
-                            <span id="rowCount"></span>
-                        </span>
+                        <span id="rowCount"></span>
+                    </span>
                 </th>
                 <th>
                     Partitions

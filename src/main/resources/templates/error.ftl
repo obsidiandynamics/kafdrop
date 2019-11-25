@@ -5,8 +5,11 @@
 <div id="errorHeader">
 A ${error.status} error has occurred: <span id="errorMessage">${error.message}</span>
 </div>
-<div id="stackTraceTitle">Stack trace</div>
-<div id="stackTrace">
-${error.trace}
-</div>
+<#if error.trace??>
+    <div id="stackTraceTitle">Stack trace</div>
+    <div id="stackTrace">
+    ${error.trace}
+    </div>
+<#else>
+</#if>
 <@template.footer/>

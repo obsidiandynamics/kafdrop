@@ -15,7 +15,7 @@
 -->
 <#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
-<@template.header "Acl List">
+<@template.header "ACLs">
     <style type="text/css">
         .bs-table.overview td {
             white-space: nowrap;
@@ -29,7 +29,7 @@
 
 <#setting number_format="0">
 
-<h2>Acl List</h2>
+<h2>ACLs</h2>
 
 <div id="acl-overview">
     <table class="table table-bordered">
@@ -37,7 +37,7 @@
         <tr>
             <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Pattern Name</th>
             <th><i class="fa fa-user"></i>&nbsp;&nbsp;Principal</th>
-            <th><i class="fa fa-user"></i>&nbsp;&nbsp;Ressource Type</th>
+            <th><i class="fa fa-user"></i>&nbsp;&nbsp;Resource Type</th>
             <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Pattern Type</th>
             <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Operation</th>
             <th><i class="fa fa-server"></i>&nbsp;&nbsp;Host</th>
