@@ -78,6 +78,18 @@ public final class TopicController {
     return kafkaMonitor.getTopics();
   }
 
+  @ApiOperation(value = "getConsumers", notes = "Get consumers for a topic")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List"),
+      @ApiResponse(code = 404, message = "Invalid topic name")
+  })
+  @RequestMapping(path = "/{name:.+}/consumers", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  public @ResponseBody List<ConsumerVO> getConsumers(@PathVariable("name") String topicName) {
+    final var topic = kafkaMonitor.getTopic(topicName)
+        .orElseThrow(() -> new TopicNotFoundException(topicName));
+    return kafkaMonitor.getConsumers(Collections.singleton(topic));
+  }
+
   /**
    * API for topic creation
    * @param createTopicVO request
