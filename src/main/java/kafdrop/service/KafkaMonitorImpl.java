@@ -215,11 +215,11 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   public List<AclVO> getAcls() {
     final var acls = highLevelAdminClient.listAcls();
     final var aclVos = new ArrayList<AclVO>(acls.size());
-    for (var aclRessourcePattern : acls.keySet()) {
-      aclVos.add(new AclVO(aclRessourcePattern.resourceType().toString(), aclRessourcePattern.name(),
-              aclRessourcePattern.patternType().toString(), acls.get(aclRessourcePattern).principal(),
-              acls.get(aclRessourcePattern).host(), acls.get(aclRessourcePattern).operation().toString(),
-              acls.get(aclRessourcePattern).permissionType().toString()));
+    for (var acl : acls) {
+      aclVos.add(new AclVO(acl.pattern().resourceType().toString(), acl.pattern().name(),
+              acl.pattern().patternType().toString(), acl.entry().principal(),
+              acl.entry().host(), acl.entry().operation().toString(),
+              acl.entry().permissionType().toString()));
     }
     Collections.sort(aclVos);
     return aclVos;
