@@ -28,7 +28,7 @@
                     </h1>
                 </div>
                 <div id="github-star" class="col-md-1">
-                    <a class="github-button" href="https://github.com/obsidiandynamics/kafdrop" data-show-count="true"
+                    <a class="github-button" href="https://github.com/obsidiandynamics/kafdrop" data-show-count="false"
                        aria-label="Star Kafdrop on GitHub" data-color-scheme="dark">Star</a>
                 </div>
                 <script>
