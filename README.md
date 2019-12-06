@@ -26,8 +26,6 @@ This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the 
 * Java 11 or newer
 * Kafka (version 0.11.0 or newer)
 
-> Note: DO NOT offer backwards compatibility for older version of Kafka.
-
 Optional, additional integration:
 
 * Schema Registry
