@@ -154,7 +154,8 @@ public final class MessageController {
       @PathVariable("name") String topicName,
       @RequestParam(name = "partition", required = false) Integer partition,
       @RequestParam(name = "offset", required = false) Long offset,
-      @RequestParam(name = "count", required = false) Integer count
+      @RequestParam(name = "count", required = false) Integer count,
+      @RequestParam(name = "format", required = false) String format
   ) {
     if (partition == null || offset == null || count == null) {
       final TopicVO topic = kafkaMonitor.getTopic(topicName)
@@ -165,7 +166,7 @@ public final class MessageController {
 
       return partitionList;
     } else {
-      final var deserializer = getDeserializer(topicName, MessageFormat.DEFAULT);
+      final var deserializer = getDeserializer(topicName, ("AVRO".equalsIgnoreCase(format) ? MessageFormat.AVRO : MessageFormat.DEFAULT) );
       List<Object> messages = new ArrayList<>();
       List<MessageVO> vos = messageInspector.getMessages(
           topicName,
