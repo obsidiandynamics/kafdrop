@@ -27,10 +27,13 @@
     </style>
 </@template.header>
 
+<script src="<@spring.url '/js/powerFilter.js'/>"></script>
+
 <#setting number_format="0">
 
 <h2>ACLs</h2>
-
+<div id="searchFilter">Search filter&nbsp;&nbsp;<INPUT id='filter' size=30 NAME='searchRow' title='Just type to filter the rows'></div>
+<br/>
 <div id="acl-overview">
     <table class="table table-bordered">
         <thead>
@@ -46,7 +49,7 @@
         </thead>
         <tbody>
         <#list acls as a>
-            <tr>
+            <tr class="dataRow">
                 <td>${a.name}</td>
                 <td>${a.principal}</td>
                 <td>${a.resourceType}</td>
