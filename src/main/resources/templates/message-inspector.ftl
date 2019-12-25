@@ -40,6 +40,28 @@
     </style>
 
     <script src="<@spring.url '/js/message-inspector.js'/>"></script>
+    
+    <script type="text/javascript">
+	$( document ).ready(updateProtobufPanel);
+	function updateProtobufPanel()   
+	{   	   
+	   if ($("#format").val() != "PROTOBUF")
+	    {
+	        $('#protobufDescriptor').hide();
+	        $('#protobufMsgType').hide();
+	    }
+	    else
+	    {
+	    	$('#protobufDescriptor').show();
+	        $('#protobufMsgType').show();
+	    }
+	}  
+	$(document).ready(function(){
+	    $("#format").change(function() {
+	    	updateProtobufPanel();
+	    });
+	});
+	</script>
 </@template.header>
 <#setting number_format="0">
 
@@ -96,8 +118,8 @@
             </select>
         </div>
         &nbsp;&nbsp;        
-        <div class="form-group">
-            <label for="format">protobuf descriptor</label>
+        <div class="form-group" id="protobufDescriptor">
+            <label for="format">Protobuf descriptor</label>
             <select class="form-control" id="descFile" name="descFile">
                 <#list descFiles as f>
                     <option value="${f}">${f}</option>
@@ -105,8 +127,8 @@
             </select>
         </div>
         &nbsp;&nbsp;
-        <div class="form-group">
-            <label class=control-label" for="format">protobuf message type name</label>
+        <div class="form-group" id="protobufMsgType">
+            <label class=control-label" for="format">Protobuf message type name</label>
             <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
         </div>
         &nbsp;&nbsp;  
