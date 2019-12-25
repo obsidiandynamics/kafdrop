@@ -16,6 +16,7 @@
         <!-- name of parameter changed in latest mvn javadoc plugin version-->
         <additionalOptions>-Xdoclint:none</additionalOptions>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <protobuf.version>3.11.1</protobuf.version>
     </properties>
 
     <scm>
@@ -57,6 +58,18 @@
     </dependencyManagement>
 
     <dependencies>
+    	<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+		<dependency>
+		    <groupId>com.google.protobuf</groupId>
+		    <artifactId>protobuf-java</artifactId>
+		    <version>${protobuf.version}</version>
+		</dependency>		    
+		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
+		<dependency>
+		    <groupId>com.google.protobuf</groupId>
+		    <artifactId>protobuf-java-util</artifactId>
+		    <version>${protobuf.version}</version>		    
+		</dependency>	
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

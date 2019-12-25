@@ -18,23 +18,51 @@
 
 package kafdrop.controller;
 
-import com.fasterxml.jackson.annotation.*;
-import io.swagger.annotations.*;
-import kafdrop.config.*;
-import kafdrop.config.MessageFormatConfiguration.*;
-import kafdrop.config.SchemaRegistryConfiguration.*;
-import kafdrop.model.*;
-import kafdrop.service.*;
-import kafdrop.util.*;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.ui.*;
-import org.springframework.validation.*;
-import org.springframework.web.bind.annotation.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-import javax.validation.*;
-import javax.validation.constraints.*;
-import java.util.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import kafdrop.config.MessageFormatConfiguration;
+import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
+import kafdrop.config.ProtobufDescriptorConfiguration;
+import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
+import kafdrop.config.SchemaRegistryConfiguration;
+import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
+import kafdrop.model.MessageVO;
+import kafdrop.model.TopicPartitionVO;
+import kafdrop.model.TopicVO;
+import kafdrop.service.KafkaMonitor;
+import kafdrop.service.MessageInspector;
+import kafdrop.service.TopicNotFoundException;
+import kafdrop.util.AvroMessageDeserializer;
+import kafdrop.util.DefaultMessageDeserializer;
+import kafdrop.util.MessageDeserializer;
+import kafdrop.util.MessageFormat;
+import kafdrop.util.ProtobufMessageDeserializer;
 
 @Controller
 public final class MessageController {
@@ -45,12 +73,15 @@ public final class MessageController {
   private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
 
   private final SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
+  
+  private final ProtobufDescriptorConfiguration.ProtobufDescriptorProperties protobufProperties;
 
-  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, SchemaRegistryProperties schemaRegistryProperties) {
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
     this.schemaRegistryProperties = schemaRegistryProperties;
+    this.protobufProperties = protobufProperties; 
   }
 
   /**
@@ -70,8 +101,9 @@ public final class MessageController {
     model.addAttribute("topic", topic);
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
+    model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
-    final var deserializer = getDeserializer(topicName, defaultFormat);
+    final var deserializer = getDeserializer(topicName, defaultFormat, "", "");
     final List<MessageVO> messages = messageInspector.getMessages(topicName, size, deserializer);
 
     for (TopicPartitionVO partition : topic.getPartitions()) {
@@ -120,9 +152,10 @@ public final class MessageController {
 
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
+    model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
     if (!messageForm.isEmpty() && !errors.hasErrors()) {
-      final var deserializer = getDeserializer(topicName, messageForm.getFormat());
+      final var deserializer = getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName());
 
       model.addAttribute("messages",
                          messageInspector.getMessages(topicName,
@@ -155,7 +188,9 @@ public final class MessageController {
       @RequestParam(name = "partition", required = false) Integer partition,
       @RequestParam(name = "offset", required = false) Long offset,
       @RequestParam(name = "count", required = false) Integer count,
-      @RequestParam(name = "format", required = false) String format
+      @RequestParam(name = "format", required = false) String format,
+      @RequestParam(name = "descFile", required = false) String descFile,
+      @RequestParam(name = "msgTypeName", required = false) String msgTypeName
   ) {
     if (partition == null || offset == null || count == null) {
       final TopicVO topic = kafkaMonitor.getTopic(topicName)
@@ -166,7 +201,16 @@ public final class MessageController {
 
       return partitionList;
     } else {
-      final var deserializer = getDeserializer(topicName, ("AVRO".equalsIgnoreCase(format) ? MessageFormat.AVRO : MessageFormat.DEFAULT) );
+      final MessageFormat selectedFormat;
+      if ("AVRO".equalsIgnoreCase(format)) {
+    	  selectedFormat =  MessageFormat.AVRO;
+      } else if ("PROTOBUF".equalsIgnoreCase(format)) {
+      	selectedFormat = MessageFormat.PROTOBUF;
+      } else {
+      	selectedFormat = MessageFormat.DEFAULT;
+      }
+      
+      final var deserializer = getDeserializer(topicName, selectedFormat, descFile, msgTypeName);
       List<Object> messages = new ArrayList<>();
       List<MessageVO> vos = messageInspector.getMessages(
           topicName,
@@ -183,12 +227,16 @@ public final class MessageController {
     }
   }
 
-  private MessageDeserializer getDeserializer(String topicName, MessageFormat format) {
+  private MessageDeserializer getDeserializer(String topicName, MessageFormat format, String descFile, String msgTypeName) {
     final MessageDeserializer deserializer;
 
     if (format == MessageFormat.AVRO) {
       final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
       deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl);
+    } else if (format == MessageFormat.PROTOBUF) {
+    	
+    	final String fullDescFile = protobufProperties.getDirectory() + File.separator + descFile;
+    	deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
     } else {
       deserializer = new DefaultMessageDeserializer();
     }
@@ -226,6 +274,10 @@ public final class MessageController {
     private Long count;
 
     private MessageFormat format;
+    
+    private String descFile;
+    
+    private String msgTypeName;
 
     public PartitionOffsetInfo(int partition, long offset, long count, MessageFormat format) {
       this.partition = partition;
@@ -278,5 +330,22 @@ public final class MessageController {
     public void setFormat(MessageFormat format) {
       this.format = format;
     }
+
+		public String getDescFile() {
+			return descFile;
+		}
+
+		public void setDescFile(String descFile) {
+			this.descFile = descFile;
+		}
+
+		public String getMsgTypeName() {
+			return msgTypeName;
+		}
+
+		public void setMsgTypeName(String msgTypeName) {
+			this.msgTypeName = msgTypeName;
+		}   
+    
   }
 }

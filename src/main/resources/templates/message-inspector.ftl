@@ -95,7 +95,21 @@
                 </#list>
             </select>
         </div>
+        &nbsp;&nbsp;        
+        <div class="form-group">
+            <label for="format">protobuf descriptor</label>
+            <select class="form-control" id="descFile" name="descFile">
+                <#list descFiles as f>
+                    <option value="${f}">${f}</option>
+                </#list>
+            </select>
+        </div>
         &nbsp;&nbsp;
+        <div class="form-group">
+            <label class=control-label" for="format">protobuf message type name</label>
+            <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
+        </div>
+        &nbsp;&nbsp;  
 
         <button class="btn btn-success" type="submit"><i class="fa fa-search"></i> View Messages</button>
     </form>
