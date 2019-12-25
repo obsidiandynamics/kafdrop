@@ -47,9 +47,9 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
 
 	@Override
 	public String deserializeMessage(ByteBuffer buffer) {	
-		try {
+		
+		try (InputStream input = new FileInputStream(new File(fullDescFile))) {
 			//LOG.info("decoding message: " + Base64.getEncoder().encodeToString(buffer.array()));
-			InputStream input = new FileInputStream(new File(fullDescFile));
 			
 			FileDescriptorSet set = FileDescriptorSet.parseFrom(input);
 			String protoFileName = descFileName.replace(".desc", ".proto");
