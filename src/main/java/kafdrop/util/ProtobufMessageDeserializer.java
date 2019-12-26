@@ -74,7 +74,7 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
 			
 			var msgTypes = fd.getMessageTypes().stream().filter(byMsgTypeName).collect(Collectors.toList());
 			if(CollectionUtils.isEmpty(msgTypes)) {
-				LOG.error("Can't find specific message: " + msgTypeName);
+				LOG.error("Can't find specific message type: " + msgTypeName);
 				return null;
 			}
 			Descriptor messageType = msgTypes.get(0);
@@ -82,7 +82,7 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
 			DynamicMessage dMsg = DynamicMessage.parseFrom(messageType, CodedInputStream.newInstance(buffer));
 			Printer printer = JsonFormat.printer();
 			
-			return printer.print(dMsg);
+			return printer.print(dMsg).replaceAll("\n", ""); // must remove line break so it defaults to collapse mode
 		} catch (FileNotFoundException e) {
 			LOG.error("Couldn't open descriptor file: " + fullDescFile, e);			
 		} catch (IOException e) {
