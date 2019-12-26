@@ -234,8 +234,10 @@ public final class MessageController {
       final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
       deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl);
     } else if (format == MessageFormat.PROTOBUF) {
-    	
-    	final String fullDescFile = protobufProperties.getDirectory() + File.separator + descFile;
+    	//filter the input file name
+    	String descFileName = descFile.replace(".desc", "");
+    	descFileName = descFileName.replaceAll("\\.", "").replaceAll("/", "");
+    	final String fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
     	deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
     } else {
       deserializer = new DefaultMessageDeserializer();
