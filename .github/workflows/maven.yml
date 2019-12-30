@@ -15,3 +15,5 @@ jobs:
         java-version: 11
     - name: Build with Maven
       run: mvn clean package
+    - name: push to github
+      run: mvn deploy -Dregistry=https://maven.pkg.github.com/ctrongduc -Dtoken=15449d1a6834bdedf4b5ae1ffd5c0f4ab974da65
