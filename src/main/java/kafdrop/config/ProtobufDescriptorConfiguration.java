@@ -16,43 +16,44 @@ import org.springframework.stereotype.Component;
 
 @Configuration
 public class ProtobufDescriptorConfiguration {
-	@Component
-	@ConfigurationProperties(prefix = "protobufdesc")
-	public static final class ProtobufDescriptorProperties {
-		private static final Logger LOG = LoggerFactory.getLogger(ProtobufDescriptorProperties.class);
-		//the idea is to let user specifying a directory stored all descriptor file
-		//the program will load and .desc file and show as an option on the message detail screen 
-		private String directory;
+  @Component
+  @ConfigurationProperties(prefix = "protobufdesc")
+  public static final class ProtobufDescriptorProperties {
+    private static final Logger LOG = LoggerFactory.getLogger(ProtobufDescriptorProperties.class);
+    // the idea is to let user specifying a directory stored all descriptor file
+    // the program will load and .desc file and show as an option on the message
+    // detail screen
+    private String directory;
 
-		public String getDirectory() {
-			return directory;
-		}
+    public String getDirectory() {
+      return directory;
+    }
 
-		public void setDirectory(String directory) {
-			this.directory = directory;
-		}
-		
-		public List<String> getDescFilesList(){
-			//getting file list
-			if(directory==null || Files.notExists(Path.of(directory))) {
-				LOG.error("No descriptor folder configured, skip the setting!!");
-				return Collections.emptyList();
-			}
-			String[] pathnames;
-			File path = new File(directory);
-			
-			//apply filter for listing only .desc file
-			FilenameFilter filter = new FilenameFilter() {
+    public void setDirectory(String directory) {
+      this.directory = directory;
+    }
 
-				@Override
-				public boolean accept(File dir, String name) {				
-					return name.endsWith(".desc");
-				}
-				
-			};
-			
-			pathnames = path.list(filter);
-			return Arrays.asList(pathnames);
-		}
-	}
+    public List<String> getDescFilesList() {
+      // getting file list
+      if (directory == null || Files.notExists(Path.of(directory))) {
+        LOG.info("No descriptor folder configured, skip the setting!!");
+        return Collections.emptyList();
+      }
+      String[] pathnames;
+      File path = new File(directory);
+
+      // apply filter for listing only .desc file
+      FilenameFilter filter = new FilenameFilter() {
+
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.endsWith(".desc");
+        }
+
+      };
+
+      pathnames = path.list(filter);
+      return Arrays.asList(pathnames);
+    }
+  }
 }

@@ -203,13 +203,13 @@ public final class MessageController {
     } else {
       final MessageFormat selectedFormat;
       if ("AVRO".equalsIgnoreCase(format)) {
-    	  selectedFormat =  MessageFormat.AVRO;
+        selectedFormat = MessageFormat.AVRO;
       } else if ("PROTOBUF".equalsIgnoreCase(format)) {
-      	selectedFormat = MessageFormat.PROTOBUF;
+        selectedFormat = MessageFormat.PROTOBUF;
       } else {
-      	selectedFormat = MessageFormat.DEFAULT;
+        selectedFormat = MessageFormat.DEFAULT;
       }
-      
+
       final var deserializer = getDeserializer(topicName, selectedFormat, descFile, msgTypeName);
       List<Object> messages = new ArrayList<>();
       List<MessageVO> vos = messageInspector.getMessages(
@@ -234,11 +234,11 @@ public final class MessageController {
       final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
       deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl);
     } else if (format == MessageFormat.PROTOBUF) {
-    	//filter the input file name
-    	String descFileName = descFile.replace(".desc", "");
-    	descFileName = descFileName.replaceAll("\\.", "").replaceAll("/", "");
-    	final String fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
-    	deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
+      // filter the input file name
+      String descFileName = descFile.replace(".desc", "");
+      descFileName = descFileName.replaceAll("\\.", "").replaceAll("/", "");
+      final String fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
+      deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
     } else {
       deserializer = new DefaultMessageDeserializer();
     }
@@ -333,21 +333,21 @@ public final class MessageController {
       this.format = format;
     }
 
-		public String getDescFile() {
-			return descFile;
-		}
+    public String getDescFile() {
+      return descFile;
+    }
 
-		public void setDescFile(String descFile) {
-			this.descFile = descFile;
-		}
+    public void setDescFile(String descFile) {
+      this.descFile = descFile;
+    }
 
-		public String getMsgTypeName() {
-			return msgTypeName;
-		}
+    public String getMsgTypeName() {
+      return msgTypeName;
+    }
 
-		public void setMsgTypeName(String msgTypeName) {
-			this.msgTypeName = msgTypeName;
-		}   
-    
+    public void setMsgTypeName(String msgTypeName) {
+      this.msgTypeName = msgTypeName;
+    }
+
   }
 }
