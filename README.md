@@ -54,16 +54,25 @@ Optionally, configure a schema registry connection with:
 ```
 --schemaregistry.connect=http://localhost:8081
 ```
-or configure a folder which stores protobuf descriptor file (.desc) for protobuf message deserializer as follow:
-```
---protobufdesc.directory=/var/protobuf_desc
-```
 
 Finally, a default message format (e.g. to deserialize Avro messages) can optionally be configured as follows:
 ```
 --message.format=AVRO
 ```
 Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
+
+## Configure Protobuf message type
+In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). Kafdrop will allow user to select descriptor  and well as specifying name of one of the message type provided by the descriptor at runtime. 
+
+To Configure a folder stores protobuf descriptor file(s) (.desc) follow:
+```
+--protobufdesc.directory=/var/protobuf_desc
+```
+
+If preferred the message type could be set to default as follow:
+```
+--message.format=PROTOBUF
+```
 
 ## Running with Docker
 Images are hosted at [hub.docker.com/r/obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop).
