@@ -37,6 +37,7 @@ public final class KafkaHighLevelAdminClient {
   public void init() {
     final var properties = new Properties();
     kafkaConfiguration.applyCommon(properties);
+    properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafdrop-admin");
     adminClient = AdminClient.create(properties);
   }
 
