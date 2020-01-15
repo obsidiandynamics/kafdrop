@@ -17,6 +17,7 @@ public class SchemaRegistryConfiguration {
     static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
 
     private String connect;
+    private String auth;
 
     public String getConnect() {
       return connect;
@@ -25,6 +26,10 @@ public class SchemaRegistryConfiguration {
     public void setConnect(String connect) {
       this.connect = connect;
     }
+
+    public String getAuth() { return auth; }
+
+    public void setAuth(String auth) { this.auth = auth; }
 
     public List<String> getConnectList() {
       return CONNECT_SEPARATOR.splitAsStream(this.connect)

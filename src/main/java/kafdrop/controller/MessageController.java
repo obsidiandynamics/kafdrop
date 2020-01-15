@@ -231,13 +231,16 @@ public final class MessageController {
     final MessageDeserializer deserializer;
 
     if (format == MessageFormat.AVRO) {
-      final String schemaRegistryUrl = schemaRegistryProperties.getConnect();
-      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl);
+      final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
+      final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
+
+      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
     } else if (format == MessageFormat.PROTOBUF) {
       // filter the input file name
-      String descFileName = descFile.replace(".desc", "");
-      descFileName = descFileName.replaceAll("\\.", "").replaceAll("/", "");
-      final String fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
+      final var descFileName = descFile.replace(".desc", "")
+          .replaceAll("\\.", "")
+          .replaceAll("/", "");
+      final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
       deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
     } else {
       deserializer = new DefaultMessageDeserializer();
