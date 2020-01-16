@@ -86,6 +86,16 @@ docker run -d --rm -p 9000:9000 \
     obsidiandynamics/kafdrop
 ```
 
+Launch container in background with protobuff definitions:
+```sh
+docker run -d --rm -v <path_to_protobuff_definitions_files>:/var/protobuf_desc -p 9000:9000 \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e JVM_OPTS="-Xms32M -Xmx64M" \
+    -e SERVER_SERVLET_CONTEXTPATH="/" \
+    -e CMD_ARGS="--message.format=PROTOBUF --protobufdesc.directory=/var/protobuf_desc" \
+    obsidiandynamics/kafdrop
+```
+
 Then access the web UI at [http://localhost:9000](http://localhost:9000).
 
 > **Hey there!** We hope you really like Kafdrop! Please take a moment to [⭐](https://github.com/obsidiandynamics/kafdrop)the repo or [Tweet](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fobsidiandynamics%2Fkafdrop&text=Get%20Kafdrop%20%E2%80%94%20a%20web-based%20UI%20for%20viewing%20%23ApacheKafka%20topics%20and%20browsing%20consumers%20) about it.
@@ -211,6 +221,7 @@ docker run -d --rm -p 9000:9000 \
 |`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
+|`CMD_ARGS`             |Command line arguments to kafkdrop like `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
 |Name                   |Description
