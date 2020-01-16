@@ -88,7 +88,7 @@ docker run -d --rm -p 9000:9000 \
 
 Launch container in background with protobuff definitions:
 ```sh
-docker run -d --rm -v <path_to_protobuff_definitions_files>:/var/protobuf_desc -p 9000:9000 \
+docker run -d --rm -v <path_to_protobuff_descriptor_files>:/var/protobuf_desc -p 9000:9000 \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
     -e JVM_OPTS="-Xms32M -Xmx64M" \
     -e SERVER_SERVLET_CONTEXTPATH="/" \
