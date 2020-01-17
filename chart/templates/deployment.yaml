@@ -44,7 +44,6 @@ spec:
             value: "{{ .Values.host }}"
           - name: SERVER_SERVLET_CONTEXTPATH
             value: "{{ .Values.server.servlet.contextPath | trimSuffix "/" }}"
-            value: "{{ .Values.server.servlet.contextPath }}"
           - name: KAFKA_PROPERTIES_FILE
             value: "{{ .Values.kafka.propertiesFile }}"
           - name: KAFKA_TRUSTSTORE_FILE
