@@ -20,11 +20,12 @@ This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the 
 * **View consumer groups** — per-partition parked offsets, combined and per-partition lag
 * **Create new topics**
 * **View ACLs**
+* **Support for Azure Event Hubs**
 
 # Requirements
 
 * Java 11 or newer
-* Kafka (version 0.11.0 or newer)
+* Kafka (version 0.11.0 or newer) or Azure Event Hubs
 
 Optional, additional integration:
 
@@ -221,7 +222,7 @@ docker run -d --rm -p 9000:9000 \
 |`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
-|`CMD_ARGS`             |Command line arguments to kafkdrop like `--message.format` or `--protobufdesc.directory` or `--server.port`. 
+|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
 |Name                   |Description

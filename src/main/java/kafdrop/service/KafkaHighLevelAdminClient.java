@@ -108,8 +108,7 @@ public final class KafkaHighLevelAdminClient {
     } catch (InterruptedException | ExecutionException e) {
       if (e.getCause() instanceof UnsupportedVersionException) {
         return Map.of();
-      }
-      if (e.getCause() instanceof TopicAuthorizationException) {
+      } else if (e.getCause() instanceof TopicAuthorizationException) {
         printAcls();
       }
       throw new KafkaAdminClientException(e);
