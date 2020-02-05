@@ -112,6 +112,7 @@ Apply the chart:
 helm upgrade -i kafdrop chart --set image.tag=3.x.x \
     --set kafka.brokerConnect=<host:port,host:port> \
     --set server.servlet.contextPath="/" \
+    --set cmdArgs="--message.format=AVRO --schemaregistry.connect=http://localhost:8080" \ #optional
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
 
