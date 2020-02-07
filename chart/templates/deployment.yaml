@@ -52,6 +52,8 @@ spec:
             value: "{{ .Values.kafka.keystoreFile }}"
           - name: SERVER_PORT
             value: "{{ .Values.server.port }}"
+          - name: CMD_ARGS
+            value: "{{ .Values.cmdArgs }}"
           ports:
             - name: http
               containerPort: 9000

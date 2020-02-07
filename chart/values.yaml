@@ -24,6 +24,8 @@ jmx:
 nameOverride: ""
 fullnameOverride: ""
 
+cmdArgs: ""
+
 server:
   port: 9000
   servlet:
