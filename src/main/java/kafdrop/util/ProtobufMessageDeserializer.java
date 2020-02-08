@@ -84,7 +84,11 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
       Descriptor messageType = msgTypes.get(0);
 
       DynamicMessage dMsg = DynamicMessage.parseFrom(messageType, CodedInputStream.newInstance(buffer));
-      Printer printer = JsonFormat.printer();
+
+      JsonFormat.TypeRegistry typeRegistry = JsonFormat.TypeRegistry.newBuilder()
+        .add(descs.stream().flatMap(desc -> desc.getMessageTypes().stream()).collect(Collectors.toList()))
+        .build();
+      Printer printer = JsonFormat.printer().usingTypeRegistry(typeRegistry);
 
       return printer.print(dMsg).replaceAll("\n", ""); // must remove line break so it defaults to collapse mode
     } catch (FileNotFoundException e) {
