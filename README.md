@@ -223,6 +223,7 @@ docker run -d --rm -p 9000:9000 \
 |`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
+|`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro message
 |`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
