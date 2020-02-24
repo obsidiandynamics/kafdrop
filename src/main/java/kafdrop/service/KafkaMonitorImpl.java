@@ -116,27 +116,31 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   }
 
   private Map<String, TopicVO> getTopicMetadata(String... topics) {
-    final var topicInfos = highLevelConsumer.getTopicInfos(topics);
-    final var retrievedTopicNames = topicInfos.keySet();
-    final var topicConfigs = highLevelAdminClient.describeTopicConfigs(retrievedTopicNames);
-
-    for (var topicVo : topicInfos.values()) {
-      final var config = topicConfigs.get(topicVo.getName());
-      if (config != null) {
-        final var configMap = new TreeMap<String, String>();
-        for (var configEntry : config.entries()) {
-          if (configEntry.source() != ConfigSource.DEFAULT_CONFIG &&
-              configEntry.source() != ConfigSource.STATIC_BROKER_CONFIG) {
-            configMap.put(configEntry.name(), configEntry.value());
-          }
-        }
-        topicVo.setConfig(configMap);
-      } else {
-        LOG.warn("Missing config for topic {}", topicVo.getName());
-      }
-    }
-    return topicInfos;
-  }
+		final var topicInfos = highLevelConsumer.getTopicInfos(topics);
+		final var retrievedTopicNames = topicInfos.keySet();
+		try {
+			final var topicConfigs = highLevelAdminClient.describeTopicConfigs(retrievedTopicNames);
+			for (var topicVo : topicInfos.values()) {
+				final var config = topicConfigs.get(topicVo.getName());
+				if (config != null) {
+					final var configMap = new TreeMap<String, String>();
+					for (var configEntry : config.entries()) {
+						if (configEntry.source() != ConfigSource.DEFAULT_CONFIG
+								&& configEntry.source() != ConfigSource.STATIC_BROKER_CONFIG) {
+							configMap.put(configEntry.name(), configEntry.value());
+						}
+					}
+					topicVo.setConfig(configMap);
+				} else {
+					LOG.warn("Missing config for topic {}", topicVo.getName());
+				}
+			}
+		} catch (KafkaAdminClientException exc) {
+			LOG.warn(
+					"Ignoring KafkaAdminClientException in highLevelAdminClient.describeTopicConfigs. This require write ACL enabled on topics");
+		}
+		return topicInfos;
+	}
 
   @Override
   public List<MessageVO> getMessages(String topic, int count,
