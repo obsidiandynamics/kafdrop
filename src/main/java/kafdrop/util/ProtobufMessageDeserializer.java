@@ -49,19 +49,8 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
   public String deserializeMessage(ByteBuffer buffer) {
 
     try (InputStream input = new FileInputStream(new File(fullDescFile))) {
-      // LOG.info("decoding message: " +
-      // Base64.getEncoder().encodeToString(buffer.array()));
-
       FileDescriptorSet set = FileDescriptorSet.parseFrom(input);
       String protoFileName = descFileName.replace(".desc", ".proto");
-
-      Predicate<FileDescriptorProto> byName = desc -> protoFileName.equals(desc.getName());
-      var results = set.getFileList().stream().filter(byName).collect(Collectors.toList());
-      if (CollectionUtils.isEmpty(results)) {
-        final String errorMsg = "Can't find descriptor in provided descriptor file: " + protoFileName;
-        LOG.error(errorMsg);
-        throw new DeserializationException(errorMsg);
-      }
       List<FileDescriptor> descs = new ArrayList<>();
 
       for (FileDescriptorProto ffdp : set.getFileList()) {
