@@ -32,6 +32,7 @@ server:
     contextPath: /
 
 service:
+  annotations: {}
   type: NodePort
   port: 9000
   nodePort: 30900
