@@ -20,11 +20,12 @@ This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the 
 * **View consumer groups** — per-partition parked offsets, combined and per-partition lag
 * **Create new topics**
 * **View ACLs**
+* **Support for Azure Event Hubs**
 
 # Requirements
 
 * Java 11 or newer
-* Kafka (version 0.11.0 or newer)
+* Kafka (version 0.11.0 or newer) or Azure Event Hubs
 
 Optional, additional integration:
 
@@ -111,6 +112,7 @@ Apply the chart:
 helm upgrade -i kafdrop chart --set image.tag=3.x.x \
     --set kafka.brokerConnect=<host:port,host:port> \
     --set server.servlet.contextPath="/" \
+    --set cmdArgs="--message.format=AVRO --schemaregistry.connect=http://localhost:8080" \ #optional
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
 
@@ -221,7 +223,8 @@ docker run -d --rm -p 9000:9000 \
 |`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
-|`CMD_ARGS`             |Command line arguments to kafkdrop like `--message.format` or `--protobufdesc.directory` or `--server.port`. 
+|`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro message
+|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
 |Name                   |Description

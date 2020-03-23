@@ -24,12 +24,15 @@ jmx:
 nameOverride: ""
 fullnameOverride: ""
 
+cmdArgs: ""
+
 server:
   port: 9000
   servlet:
     contextPath: /
 
 service:
+  annotations: {}
   type: NodePort
   port: 9000
   nodePort: 30900
