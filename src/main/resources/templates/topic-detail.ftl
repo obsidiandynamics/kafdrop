@@ -55,7 +55,7 @@
                     <td <#if topic.underReplicatedPartitions?size gt 0>class="warning"</#if>>${topic.underReplicatedPartitions?size}</td>
                 </tr>
                 <tr>
-                    <td>Total size</td>
+                    <td>Total number of msgs published, ever</td>
                     <td>${topic.totalSize}</td>
                 </tr>
                 <tr>
