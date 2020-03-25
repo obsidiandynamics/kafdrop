@@ -145,6 +145,11 @@
                     <td <#if t.preferredReplicaPercent lt 1.0>class="warning"</#if>>${t.preferredReplicaPercent?string.percent}</td>
                     <td <#if t.underReplicatedPartitions?size gt 0>class="warning"</#if>>${t.underReplicatedPartitions?size}</td>
                     <td><@template.yn t.config?size gt 0/></td>
+                    <td>
+                        <form action="<@spring.url '/topic/delete/${t.name}'></@spring.url>" method=post>
+                            <button type="submit" value="Delete">Delete</button>
+                        </form>
+                    </td>
                 </tr>
             </#list>
             </tbody>

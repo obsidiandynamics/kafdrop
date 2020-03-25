@@ -52,5 +52,7 @@ public interface KafkaMonitor {
    */
   void createTopic(CreateTopicVO createTopicDto);
 
+  void deleteTopic(DeleteTopicVO deleteTopicDto);
+
   List<AclVO> getAcls();
 }

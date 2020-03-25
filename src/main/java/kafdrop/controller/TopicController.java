@@ -25,6 +25,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.ui.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.*;
 
@@ -108,5 +109,20 @@ public final class TopicController {
       model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
       model.addAttribute("topicName", createTopicVO.getName());
       return "topic-create";
+  }
+
+  @ApiOperation(value = "deleteTopic", notes = "Delete a topic")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Success", response = String.class)
+  })
+  @RequestMapping(path = "delete/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  public RedirectView deleteTopic(@PathVariable("name") String name, Model model) {
+    try {
+      var deleteTopicValue = new DeleteTopicVO(name);
+      kafkaMonitor.deleteTopic(deleteTopicValue);
+    } catch (Exception ex) {
+      model.addAttribute("errorMessage", ex.getMessage());
+    }
+    return new RedirectView("/");
   }
 }
