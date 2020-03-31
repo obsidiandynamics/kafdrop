@@ -201,14 +201,16 @@ public final class KafkaHighLevelConsumer {
 
   synchronized Map<String, TopicVO> getTopicInfos(String[] topics) {
     initializeClient();
+    final var topicSet = kafkaConsumer.listTopics().keySet();
     if (topics.length == 0) {
-      final var topicSet = kafkaConsumer.listTopics().keySet();
       topics = Arrays.copyOf(topicSet.toArray(), topicSet.size(), String[].class);
     }
     final var topicVos = new HashMap<String, TopicVO>(topics.length, 1f);
 
     for (var topic : topics) {
-      topicVos.put(topic, getTopicInfo(topic));
+      if (topicSet.contains(topic)) {
+        topicVos.put(topic, getTopicInfo(topic));
+      }
     }
 
     return topicVos;
