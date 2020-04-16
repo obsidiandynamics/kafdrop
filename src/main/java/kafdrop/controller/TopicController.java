@@ -19,8 +19,11 @@
 package kafdrop.controller;
 
 import io.swagger.annotations.*;
+import kafdrop.config.KafkaConfiguration;
 import kafdrop.model.*;
 import kafdrop.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.ui.*;
@@ -31,6 +34,8 @@ import java.util.*;
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
+  private static final Logger LOG = LoggerFactory.getLogger(TopicController.class);
+
   private final KafkaMonitor kafkaMonitor;
 
   public TopicController(KafkaMonitor kafkaMonitor) {
@@ -45,6 +50,13 @@ public final class TopicController {
     model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
 
     return "topic-detail";
+  }
+
+  @RequestMapping(value = "/{name:.+}/delete", method = RequestMethod.POST)
+  public String deleteTopic(@PathVariable("name") String topicName, Model model) {
+    LOG.info("Removing topic with name: {}", topicName);
+
+    return topicDetails(topicName, model);
   }
 
   /**
