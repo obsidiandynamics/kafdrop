@@ -52,5 +52,11 @@ public interface KafkaMonitor {
    */
   void createTopic(CreateTopicVO createTopicDto);
 
+  /**
+   * Delete the given topic
+   * @param topic name of the topic to delete
+   */
+  void deleteTopic(String topic);
+
   List<AclVO> getAcls();
 }

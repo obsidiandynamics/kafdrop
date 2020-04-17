@@ -36,6 +36,10 @@
 
 <h2>Topic: ${topic.name}</h2>
 
+<#if deleteErrorMessage??>
+    <p>Error deleting topic ${topic.name}: ${deleteErrorMessage}</p>
+</#if>
+
 <div id="action-bar" class="container pl-0">
     <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
     <form id="delete-topic-form" action="<@spring.url '/topic/${topic.name}/delete'/>" method="POST">

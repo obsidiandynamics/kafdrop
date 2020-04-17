@@ -34,8 +34,6 @@ import java.util.*;
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
-  private static final Logger LOG = LoggerFactory.getLogger(TopicController.class);
-
   private final KafkaMonitor kafkaMonitor;
 
   public TopicController(KafkaMonitor kafkaMonitor) {
@@ -54,9 +52,13 @@ public final class TopicController {
 
   @RequestMapping(value = "/{name:.+}/delete", method = RequestMethod.POST)
   public String deleteTopic(@PathVariable("name") String topicName, Model model) {
-    LOG.info("Removing topic with name: {}", topicName);
-
-    return topicDetails(topicName, model);
+    try {
+      kafkaMonitor.deleteTopic(topicName);
+      return "redirect:/";
+    } catch (Exception ex) {
+      model.addAttribute("deleteErrorMessage", ex.getMessage());
+      return topicDetails(topicName, model);
+    }
   }
 
   /**
