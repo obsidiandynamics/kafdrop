@@ -19,11 +19,8 @@
 package kafdrop.controller;
 
 import io.swagger.annotations.*;
-import kafdrop.config.KafkaConfiguration;
 import kafdrop.model.*;
 import kafdrop.service.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.ui.*;
