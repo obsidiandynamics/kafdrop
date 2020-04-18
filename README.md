@@ -20,11 +20,12 @@ This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the 
 * **View consumer groups** — per-partition parked offsets, combined and per-partition lag
 * **Create new topics**
 * **View ACLs**
+* **Support for Azure Event Hubs**
 
 # Requirements
 
 * Java 11 or newer
-* Kafka (version 0.11.0 or newer)
+* Kafka (version 0.11.0 or newer) or Azure Event Hubs
 
 Optional, additional integration:
 
@@ -54,16 +55,25 @@ Optionally, configure a schema registry connection with:
 ```
 --schemaregistry.connect=http://localhost:8081
 ```
-or configure a folder which stores protobuf descriptor file (.desc) for protobuf message deserializer as follow:
-```
---protobufdesc.directory=/var/protobuf_desc
-```
 
 Finally, a default message format (e.g. to deserialize Avro messages) can optionally be configured as follows:
 ```
 --message.format=AVRO
 ```
 Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
+
+## Configure Protobuf message type
+In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). Kafdrop will allow user to select descriptor  and well as specifying name of one of the message type provided by the descriptor at runtime. 
+
+To Configure a folder stores protobuf descriptor file(s) (.desc) follow:
+```
+--protobufdesc.directory=/var/protobuf_desc
+```
+
+If preferred the message type could be set to default as follow:
+```
+--message.format=PROTOBUF
+```
 
 ## Running with Docker
 Images are hosted at [hub.docker.com/r/obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop).
@@ -74,6 +84,16 @@ docker run -d --rm -p 9000:9000 \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
     -e JVM_OPTS="-Xms32M -Xmx64M" \
     -e SERVER_SERVLET_CONTEXTPATH="/" \
+    obsidiandynamics/kafdrop
+```
+
+Launch container in background with protobuff definitions:
+```sh
+docker run -d --rm -v <path_to_protobuff_descriptor_files>:/var/protobuf_desc -p 9000:9000 \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e JVM_OPTS="-Xms32M -Xmx64M" \
+    -e SERVER_SERVLET_CONTEXTPATH="/" \
+    -e CMD_ARGS="--message.format=PROTOBUF --protobufdesc.directory=/var/protobuf_desc" \
     obsidiandynamics/kafdrop
 ```
 
@@ -92,6 +112,7 @@ Apply the chart:
 helm upgrade -i kafdrop chart --set image.tag=3.x.x \
     --set kafka.brokerConnect=<host:port,host:port> \
     --set server.servlet.contextPath="/" \
+    --set cmdArgs="--message.format=AVRO --schemaregistry.connect=http://localhost:8080" \ #optional
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
 
@@ -99,7 +120,7 @@ For all Helm configuration options, have a peek into [chart/values.yaml](chart/v
 
 Replace `3.x.x` with the image tag of [obsidiandynamics/kafdrop](https://hub.docker.com/r/obsidiandynamics/kafdrop). Services will be bound on port 9000 by default (node port 30900).
 
-**Note:** The context path _must_ end with a slash.
+**Note:** The context path _must_ begin with a slash.
 
 Proxy to the Kubernetes cluster:
 ```sh
@@ -202,6 +223,8 @@ docker run -d --rm -p 9000:9000 \
 |`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
+|`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro message
+|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
 |Name                   |Description

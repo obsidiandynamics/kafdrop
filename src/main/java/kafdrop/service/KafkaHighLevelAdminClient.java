@@ -37,6 +37,7 @@ public final class KafkaHighLevelAdminClient {
   public void init() {
     final var properties = new Properties();
     kafkaConfiguration.applyCommon(properties);
+    properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafdrop-admin");
     adminClient = AdminClient.create(properties);
   }
 
@@ -105,7 +106,9 @@ public final class KafkaHighLevelAdminClient {
         configsByTopic.put(entry.getKey().name(), entry.getValue());
       }
     } catch (InterruptedException | ExecutionException e) {
-      if (e.getCause() instanceof TopicAuthorizationException) {
+      if (e.getCause() instanceof UnsupportedVersionException) {
+        return Map.of();
+      } else if (e.getCause() instanceof TopicAuthorizationException) {
         printAcls();
       }
       throw new KafkaAdminClientException(e);

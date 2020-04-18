@@ -41,7 +41,8 @@ public final class KafkaHighLevelConsumer {
       properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
       properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
       properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-      properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafdrop-client");
+      properties.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafdrop-consumer");
+      properties.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
       kafkaConfiguration.applyCommon(properties);
 
       kafkaConsumer = new KafkaConsumer<>(properties);
@@ -92,6 +93,7 @@ public final class KafkaHighLevelConsumer {
                                                                      MessageDeserializer deserializer) {
     initializeClient();
     final var partitions = Collections.singletonList(partition);
+    final var maxEmptyPolls = 3; // caps the number of empty polls
     kafkaConsumer.assign(partitions);
     kafkaConsumer.seek(partition, offset);
 
@@ -102,12 +104,16 @@ public final class KafkaHighLevelConsumer {
     var currentOffset = offset - 1;
 
     // stop if got to count or get to the latest offset
+    var emptyPolls = 0;
     while (rawRecords.size() < count && currentOffset < latestOffset) {
       final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(partition);
 
-      if (!polled.isEmpty()) {
+      if (! polled.isEmpty()) {
         rawRecords.addAll(polled);
         currentOffset = polled.get(polled.size() - 1).offset();
+        emptyPolls = 0;
+      } else if (++emptyPolls == maxEmptyPolls) {
+        break;
       }
     }
 
@@ -195,14 +201,16 @@ public final class KafkaHighLevelConsumer {
 
   synchronized Map<String, TopicVO> getTopicInfos(String[] topics) {
     initializeClient();
+    final var topicSet = kafkaConsumer.listTopics().keySet();
     if (topics.length == 0) {
-      final var topicSet = kafkaConsumer.listTopics().keySet();
       topics = Arrays.copyOf(topicSet.toArray(), topicSet.size(), String[].class);
     }
     final var topicVos = new HashMap<String, TopicVO>(topics.length, 1f);
 
     for (var topic : topics) {
-      topicVos.put(topic, getTopicInfo(topic));
+      if (topicSet.contains(topic)) {
+        topicVos.put(topic, getTopicInfo(topic));
+      }
     }
 
     return topicVos;

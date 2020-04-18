@@ -29,68 +29,59 @@ import com.google.protobuf.util.JsonFormat;
 import com.google.protobuf.util.JsonFormat.Printer;
 
 public class ProtobufMessageDeserializer implements MessageDeserializer {
-	
-	private String topic;
-	private String fullDescFile;
-	private String msgTypeName;
-	private String descFileName;
-	
-	private static final Logger LOG = LoggerFactory.getLogger(ProtobufMessageDeserializer.class);
-	
-	public ProtobufMessageDeserializer(String topic, String fullDescFile, String msgTypeName) {
-		this.topic = topic;
-		this.fullDescFile = fullDescFile;
-		Path path = Paths.get(fullDescFile);
-		descFileName = path.getFileName().toString();
-		this.msgTypeName = msgTypeName;
-	}
 
-	@Override
-	public String deserializeMessage(ByteBuffer buffer) {	
-		
-		try (InputStream input = new FileInputStream(new File(fullDescFile))) {
-			//LOG.info("decoding message: " + Base64.getEncoder().encodeToString(buffer.array()));
-			
-			FileDescriptorSet set = FileDescriptorSet.parseFrom(input);
-			String protoFileName = descFileName.replace(".desc", ".proto");
-			
-			Predicate<FileDescriptorProto> byName = desc -> protoFileName.equals(desc.getName());
-			var results = set.getFileList().stream().filter(byName).collect(Collectors.toList());
-			if (CollectionUtils.isEmpty(results)) {
-				LOG.error("Can't find descriptor in provided descriptor file: " + protoFileName );
-				return null;
-			}
-			List<FileDescriptor> descs = new ArrayList<>();
-			
-			for(FileDescriptorProto ffdp : set.getFileList()) {
-				FileDescriptor fd = Descriptors.FileDescriptor.buildFrom(ffdp, (FileDescriptor[]) descs.toArray(new FileDescriptor[descs.size()]));
-				descs.add(fd);
-			}	
-			
-			Predicate<FileDescriptor> fdByName = desc -> protoFileName.equals(desc.getName());
-			var fd = descs.stream().filter(fdByName).collect(Collectors.toList()).get(0);
-			
-			Predicate<Descriptor> byMsgTypeName = desc -> msgTypeName.equals(desc.getName());
-			
-			var msgTypes = fd.getMessageTypes().stream().filter(byMsgTypeName).collect(Collectors.toList());
-			if(CollectionUtils.isEmpty(msgTypes)) {
-				LOG.error("Can't find specific message type: " + msgTypeName);
-				return null;
-			}
-			Descriptor messageType = msgTypes.get(0);
-							
-			DynamicMessage dMsg = DynamicMessage.parseFrom(messageType, CodedInputStream.newInstance(buffer));
-			Printer printer = JsonFormat.printer();
-			
-			return printer.print(dMsg).replaceAll("\n", ""); // must remove line break so it defaults to collapse mode
-		} catch (FileNotFoundException e) {
-			LOG.error("Couldn't open descriptor file: " + fullDescFile, e);			
-		} catch (IOException e) {
-			LOG.error("Can't decode Protobuf message", e);
-		} catch (DescriptorValidationException e) {
-			LOG.error("Can't compile proto message type", e);
-		}
-		return null;
-	}
+  private String topic;
+  private String fullDescFile;
+  private String msgTypeName;
+
+  private static final Logger LOG = LoggerFactory.getLogger(ProtobufMessageDeserializer.class);
+
+  public ProtobufMessageDeserializer(String topic, String fullDescFile, String msgTypeName) {
+    this.topic = topic;
+    this.fullDescFile = fullDescFile;
+    this.msgTypeName = msgTypeName;
+  }
+
+  @Override
+  public String deserializeMessage(ByteBuffer buffer) {
+
+    try (InputStream input = new FileInputStream(new File(fullDescFile))) {
+      FileDescriptorSet set = FileDescriptorSet.parseFrom(input);
+
+      List<FileDescriptor> descs = new ArrayList<>();
+      for (FileDescriptorProto ffdp : set.getFileList()) {
+        FileDescriptor fd = Descriptors.FileDescriptor.buildFrom(ffdp,
+            (FileDescriptor[]) descs.toArray(new FileDescriptor[descs.size()]));
+        descs.add(fd);
+      }
+
+      final var descriptors = descs.stream().flatMap(desc -> desc.getMessageTypes().stream()).collect(Collectors.toList());
+
+      final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeName.equals(desc.getName())).findFirst();
+      if (messageDescriptor.isEmpty()) {
+        final String errorMsg = "Can't find specific message type: " + msgTypeName;
+        LOG.error(errorMsg);
+        throw new DeserializationException(errorMsg);
+      }
+      DynamicMessage message = DynamicMessage.parseFrom(messageDescriptor.get(), CodedInputStream.newInstance(buffer));
+
+      JsonFormat.TypeRegistry typeRegistry = JsonFormat.TypeRegistry.newBuilder().add(descriptors).build();
+      Printer printer = JsonFormat.printer().usingTypeRegistry(typeRegistry);
+
+      return printer.print(message).replaceAll("\n", ""); // must remove line break so it defaults to collapse mode
+    } catch (FileNotFoundException e) {
+      final String errorMsg = "Couldn't open descriptor file: " + fullDescFile;
+      LOG.error(errorMsg, e);
+      throw new DeserializationException(errorMsg);
+    } catch (IOException e) {
+      final String errorMsg = "Can't decode Protobuf message";
+      LOG.error(errorMsg, e);
+      throw new DeserializationException(errorMsg);
+    } catch (DescriptorValidationException e) {
+      final String errorMsg = "Can't compile proto message type: " + msgTypeName;
+      LOG.error(errorMsg, e);
+      throw new DeserializationException(errorMsg);
+    }
+  }
 
 }
