@@ -86,7 +86,7 @@ public final class KafkaHighLevelConsumer {
    * @param partition Topic partition
    * @param offset Offset to seek from
    * @param count Maximum number of records returned
-   * @param deserializer Message deserialiser
+   * @param deserializers Key and Value deserialiser
    * @return Latest records
    */
   synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition partition, long offset, int count,
@@ -138,8 +138,8 @@ public final class KafkaHighLevelConsumer {
   /**
    * Gets records from all partitions of a given topic.
    * @param count The maximum number of records getting back.
-   * @param deserializer Message deserializer
-   * @return A list of consumer records for a given topic.
+   * @param deserializers Key and Value deserializers
+   * @return A list of consumer records for a given tosic.
    */
   synchronized List<ConsumerRecord<String, String>> getLatestRecords(String topic,
                                                                      int count,
