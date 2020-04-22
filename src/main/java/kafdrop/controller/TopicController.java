@@ -47,6 +47,17 @@ public final class TopicController {
     return "topic-detail";
   }
 
+  @RequestMapping(value = "/{name:.+}/delete", method = RequestMethod.POST)
+  public String deleteTopic(@PathVariable("name") String topicName, Model model) {
+    try {
+      kafkaMonitor.deleteTopic(topicName);
+      return "redirect:/";
+    } catch (Exception ex) {
+      model.addAttribute("deleteErrorMessage", ex.getMessage());
+      return topicDetails(topicName, model);
+    }
+  }
+
   /**
    * Topic create page
    * @param model

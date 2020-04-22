@@ -24,6 +24,11 @@
         th {
             word-break: break-all;
         }
+
+        #delete-topic-form {
+            display: inline-block;
+            float: right;
+        }
     </style>
 </@template.header>
 
@@ -31,8 +36,15 @@
 
 <h2>Topic: ${topic.name}</h2>
 
+<#if deleteErrorMessage??>
+    <p>Error deleting topic ${topic.name}: ${deleteErrorMessage}</p>
+</#if>
+
 <div id="action-bar" class="container pl-0">
-  <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
+    <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>"><i class="fa fa-eye"></i> View Messages</a>
+    <form id="delete-topic-form" action="<@spring.url '/topic/${topic.name}/delete'/>" method="POST">
+        <button class="btn btn-danger" type="submit"><i class="fa fa-remove"></i> Delete topic</button>
+    </form>
 </div>
 <br/>
 <div class="container-fluid pl-0">
@@ -146,3 +158,19 @@
     </div>
 </div>
 <@template.footer/>
+
+<script>
+  $(document).ready(function () {
+    let removalConfirmed = false;
+
+    $('#delete-topic-form').submit(function (event) {
+      if (!removalConfirmed) {
+        event.preventDefault();
+        if(confirm('Are you sure you want to delete the topic?')) {
+          removalConfirmed = true;
+          $('#delete-topic-form').submit();
+        }
+      }
+    });
+  });
+</script>

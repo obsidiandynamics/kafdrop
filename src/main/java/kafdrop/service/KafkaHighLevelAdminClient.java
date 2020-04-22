@@ -133,6 +133,25 @@ public final class KafkaHighLevelAdminClient {
     }
   }
 
+  /**
+   * Delete topic or throw ${@code KafkaAdminClientException}
+   *
+   * @param topic name of the topic to delete
+   * @throws KafkaAdminClientException if computation threw an Exception
+   */
+  void deleteTopic(String topic) {
+    DeleteTopicsOptions options = new DeleteTopicsOptions();
+    options.timeoutMs(5000); // timeout after 5 seconds
+    final var deleteTopicsResult = adminClient.deleteTopics(List.of(topic), options);
+    try {
+      deleteTopicsResult.all().get();
+      LOG.info("Topic {} successfully deleted", topic);
+    } catch (InterruptedException | ExecutionException e) {
+      LOG.error("Error while deleting topic", e);
+      throw new KafkaAdminClientException(e);
+    }
+  }
+
   Collection<AclBinding> listAcls() {
     final Collection<AclBinding> aclsBindings;
     try {
