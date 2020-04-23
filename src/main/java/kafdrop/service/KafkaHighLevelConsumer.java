@@ -24,7 +24,7 @@ public final class KafkaHighLevelConsumer {
 
   private static final Logger LOG = LoggerFactory.getLogger(KafkaHighLevelConsumer.class);
 
-  private KafkaConsumer<String, byte[]> kafkaConsumer;
+  private KafkaConsumer<byte[], byte[]> kafkaConsumer;
 
   private final KafkaConfiguration kafkaConfiguration;
 
@@ -37,7 +37,7 @@ public final class KafkaHighLevelConsumer {
     if (kafkaConsumer == null) {
       final var properties = new Properties();
       properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-      properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+      properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
       properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
       properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
       properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -86,18 +86,18 @@ public final class KafkaHighLevelConsumer {
    * @param partition Topic partition
    * @param offset Offset to seek from
    * @param count Maximum number of records returned
-   * @param deserializer Message deserialiser
+   * @param deserializers Key and Value deserialiser
    * @return Latest records
    */
   synchronized List<ConsumerRecord<String, String>> getLatestRecords(TopicPartition partition, long offset, int count,
-                                                                     MessageDeserializer deserializer) {
+                                                                     Deserializers deserializers) {
     initializeClient();
     final var partitions = Collections.singletonList(partition);
     final var maxEmptyPolls = 3; // caps the number of empty polls
     kafkaConsumer.assign(partitions);
     kafkaConsumer.seek(partition, offset);
 
-    final var rawRecords = new ArrayList<ConsumerRecord<String, byte[]>>(count);
+    final var rawRecords = new ArrayList<ConsumerRecord<byte[], byte[]>>(count);
     final var earliestOffset = kafkaConsumer.beginningOffsets(partitions).get(partition);
     final var latestOffset = kafkaConsumer.endOffsets(partitions).get(partition) - 1;
     if (earliestOffset > latestOffset) return Collections.emptyList();
@@ -128,8 +128,8 @@ public final class KafkaHighLevelConsumer {
                                          0L,
                                          rec.serializedKeySize(),
                                          rec.serializedValueSize(),
-                                         rec.key(),
-                                         deserialize(deserializer, rec.value()),
+                                         deserialize(deserializers.getKeyDeserializer(),rec.key()),
+                                         deserialize(deserializers.getValueDeserializer(), rec.value()),
                                          rec.headers(),
                                          rec.leaderEpoch()))
         .collect(Collectors.toList());
@@ -138,12 +138,12 @@ public final class KafkaHighLevelConsumer {
   /**
    * Gets records from all partitions of a given topic.
    * @param count The maximum number of records getting back.
-   * @param deserializer Message deserializer
+   * @param deserializers Key and Value deserializers
    * @return A list of consumer records for a given topic.
    */
   synchronized List<ConsumerRecord<String, String>> getLatestRecords(String topic,
                                                                      int count,
-                                                                     MessageDeserializer deserializer) {
+                                                                     Deserializers deserializers) {
     initializeClient();
     final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
     final var partitions = partitionInfoSet.stream()
@@ -159,7 +159,7 @@ public final class KafkaHighLevelConsumer {
     }
 
     final var totalCount = count * partitions.size();
-    final Map<TopicPartition, List<ConsumerRecord<String, byte[]>>> rawRecords
+    final Map<TopicPartition, List<ConsumerRecord<byte[], byte[]>>> rawRecords
         = partitions.stream().collect(Collectors.toMap(p -> p , p -> new ArrayList<>(count)));
 
     var moreRecords = true;
@@ -188,8 +188,8 @@ public final class KafkaHighLevelConsumer {
             0L,
             rec.serializedKeySize(),
             rec.serializedValueSize(),
-            rec.key(),
-            deserialize(deserializer, rec.value()),
+            deserialize(deserializers.getKeyDeserializer(), rec.key()),
+            deserialize(deserializers.getValueDeserializer(), rec.value()),
             rec.headers(),
             rec.leaderEpoch()))
         .collect(Collectors.toList());

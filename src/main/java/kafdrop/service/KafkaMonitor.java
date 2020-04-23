@@ -35,10 +35,10 @@ public interface KafkaMonitor {
    * Returns messages for a given topic.
    */
   List<MessageVO> getMessages(String topic, int count,
-                              MessageDeserializer deserializer);
+                              Deserializers deserializers);
 
   List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
-                              MessageDeserializer deserializer);
+                              Deserializers deserializers);
 
   Optional<TopicVO> getTopic(String topic);
 

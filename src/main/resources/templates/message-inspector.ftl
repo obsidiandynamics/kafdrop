@@ -70,6 +70,7 @@
 
 <#assign selectedPartition=messageForm.partition!0?number>
 <#assign selectedFormat=messageForm.format!defaultFormat>
+<#assign selectedKeyFormat=messageForm.keyFormat!defaultFormat>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
@@ -94,7 +95,7 @@
         <@spring.bind path="messageForm.offset"/>
         <div class="form-group ${spring.status.error?string("has-error", "")}">
             <label class="control-label" for="offset">Offset</label>
-            <@spring.formInput path="messageForm.offset" attributes='class="form-control"'/>
+            <@spring.formInput path="messageForm.offset" attributes='class="form-control" size="10"'/>
             <#if spring.status.error>
                 <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
             </#if>
@@ -103,10 +104,19 @@
         <@spring.bind path="messageForm.count"/>
         <div class="form-group ${spring.status.error?string("has-error", "")}">
             <label class=control-label" for="count"># messages</label>
-            <@spring.formInput path="messageForm.count" attributes='class="form-control ${spring.status.error?string("has-error", "")}"'/>
+            <@spring.formInput path="messageForm.count" attributes='class="form-control ${spring.status.error?string("has-error", "")}" size="10"'/>
             <#if spring.status.error>
                 <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
             </#if>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group">
+            <label for="format">Key format</label>
+            <select class="form-control" id="keyFormat" name="keyFormat">
+                <#list keyFormats as kf>
+                    <option value="${kf}" <#if kf == selectedKeyFormat>selected="selected"</#if>>${kf}</option>
+                </#list>
+            </select>
         </div>
         &nbsp;&nbsp;
         <div class="form-group">
@@ -117,7 +127,7 @@
                 </#list>
             </select>
         </div>
-        &nbsp;&nbsp;        
+        &nbsp;&nbsp;
         <div class="form-group" id="protobufDescriptor">
             <label for="format">Protobuf descriptor</label>
             <select class="form-control" id="descFile" name="descFile">

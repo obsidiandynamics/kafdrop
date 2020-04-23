@@ -140,8 +140,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<MessageVO> getMessages(String topic, int count,
-                                     MessageDeserializer deserializer) {
-    final var records = highLevelConsumer.getLatestRecords(topic, count, deserializer);
+                                     Deserializers deserializers) {
+    final var records = highLevelConsumer.getLatestRecords(topic, count, deserializers);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
       for (var record : records) {
@@ -162,8 +162,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
-                                     MessageDeserializer deserializer) {
-    final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);
+                                     Deserializers deserializers) {
+    final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializers);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
       for (var record : records) {
