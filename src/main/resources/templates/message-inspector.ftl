@@ -1,6 +1,6 @@
 <#ftl output_format="HTML">
 <#--
- Copytright 2016 Kafdrop contributors.
+ Copyright 2016 Kafdrop contributors.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.

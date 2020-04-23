@@ -139,7 +139,7 @@ public final class KafkaHighLevelConsumer {
    * Gets records from all partitions of a given topic.
    * @param count The maximum number of records getting back.
    * @param deserializers Key and Value deserializers
-   * @return A list of consumer records for a given tosic.
+   * @return A list of consumer records for a given topic.
    */
   synchronized List<ConsumerRecord<String, String>> getLatestRecords(String topic,
                                                                      int count,
@@ -187,7 +187,8 @@ public final class KafkaHighLevelConsumer {
             rec.timestampType(),
             0L,
             rec.serializedKeySize(),
-            rec.serializedValueSize(), deserialize(deserializers.getKeyDeserializer(), rec.key()),
+            rec.serializedValueSize(),
+            deserialize(deserializers.getKeyDeserializer(), rec.key()),
             deserialize(deserializers.getValueDeserializer(), rec.value()),
             rec.headers(),
             rec.leaderEpoch()))
