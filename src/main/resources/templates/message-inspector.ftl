@@ -54,6 +54,7 @@
 	    {
 	        $('#protobufDescriptor').show();
 	        $('#protobufMsgType').show();
+	        $('#descFile').prop('required',true);
 	    }
 	}  
 	$(document).ready(function(){
@@ -120,7 +121,7 @@
         &nbsp;&nbsp;        
         <div class="form-group" id="protobufDescriptor">
             <label for="format">Protobuf descriptor</label>
-            <select class="form-control" id="descFile" name="descFile" required>
+            <select class="form-control" id="descFile" name="descFile">
                 <#list descFiles as f>
                     <option value="${f}" <#if !descFiles.isEmpty()></#if> >${f}</option>
                 </#list>
@@ -129,7 +130,7 @@
         &nbsp;&nbsp;
         <div class="form-group" id="protobufMsgType">
             <label class=control-label" for="format">Protobuf message type name</label>
-            <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control" required'/>
+            <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
         </div>
         &nbsp;&nbsp;
         <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
