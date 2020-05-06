@@ -5,7 +5,7 @@
 
     <groupId>com.obsidiandynamics.kafdrop</groupId>
     <artifactId>kafdrop</artifactId>
-    <version>3.25.1</version>
+    <version>3.26.0</version>
 
     <description>For when you have a Kafka cluster to monitor</description>
 
