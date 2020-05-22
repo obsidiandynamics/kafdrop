@@ -130,17 +130,23 @@
         </div>
         &nbsp;&nbsp;
         <div class="form-group" id="protobufDescriptor">
-            <label for="format">Protobuf descriptor</label>
-            <select class="form-control" id="descFile" name="descFile">
-                <#list descFiles as f>
-                    <option value="${f}" <#if !descFiles.isEmpty()></#if> >${f}</option>
-                </#list>
-            </select>
+        <#if descFiles?size != 0>
+          <label for="format">Protobuf descriptor</label>
+	        <select class="form-control" id="descFile" name="descFile">
+	          <#list descFiles as f>
+	           <option value="${f}">${f}</option>
+	          </#list>
+	        </select>
+        <#else>
+          <span class="errorMessage">No available descriptor, please check.</span>
+        </#if>
         </div>
         &nbsp;&nbsp;
         <div class="form-group" id="protobufMsgType">
-            <label class=control-label" for="format">Protobuf message type name</label>
-            <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
+            <#if descFiles?size != 0>
+              <label class=control-label" for="format">Protobuf message type name</label>
+              <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
+            </#if>
         </div>
         &nbsp;&nbsp;
         <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
