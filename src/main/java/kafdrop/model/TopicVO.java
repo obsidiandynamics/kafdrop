@@ -22,6 +22,8 @@ import java.util.*;
 import java.util.stream.*;
 
 public final class TopicVO implements Comparable<TopicVO> {
+  public static final TopicPartitionVO ANY_PARTITION = new TopicPartitionVO(-1);
+
   private final String name;
 
   private Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
@@ -30,6 +32,7 @@ public final class TopicVO implements Comparable<TopicVO> {
 
   public TopicVO(String name) {
     this.name = name;
+    
   }
 
   public String getName() {
@@ -57,6 +60,9 @@ public final class TopicVO implements Comparable<TopicVO> {
   }
 
   public Optional<TopicPartitionVO> getPartition(int partitionId) {
+	if(partitionId == ANY_PARTITION.getId()) {
+		return Optional.of(ANY_PARTITION);
+	}
     return Optional.ofNullable(partitions.get(partitionId));
   }
 

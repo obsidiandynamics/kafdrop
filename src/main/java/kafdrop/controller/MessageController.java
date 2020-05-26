@@ -21,6 +21,7 @@ package kafdrop.controller;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -144,7 +145,7 @@ public final class MessageController {
 
       defaultForm.setCount(100l);
       defaultForm.setOffset(0l);
-      defaultForm.setPartition(0);
+      defaultForm.setPartition(TopicVO.ANY_PARTITION.getId());
       defaultForm.setFormat(defaultFormat);
       defaultForm.setKeyFormat(defaultFormat);
 
@@ -161,6 +162,7 @@ public final class MessageController {
     model.addAttribute("keyFormats",KeyFormat.values());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
+    
     if (!messageForm.isEmpty() && !errors.hasErrors()) {
 
       final var deserializers = new Deserializers(
@@ -168,12 +170,23 @@ public final class MessageController {
           getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName())
       );
 
-      model.addAttribute("messages",
-                         messageInspector.getMessages(topicName,
-                                                      messageForm.getPartition(),
-                                                      messageForm.getOffset(),
-                                                      messageForm.getCount().intValue(),
-                                                      deserializers));
+	  List<MessageVO> messages = null;
+	  if (messageForm.getPartition().intValue() == TopicVO.ANY_PARTITION.getId()) {
+		  // avoiding MessageInspector#getMessages(String, int, deserializers) because it doesn't seem to work :(
+	  	  messages = new LinkedList<>();
+	      for (TopicPartitionVO partition : topic.getPartitions()) {
+	          messages.addAll(messageInspector.getMessages(topicName,
+	              partition.getId(),
+	              partition.getSize() - messageForm.getCount().intValue(), /* yes, 'Size' appears to be 'Last Offset' */
+	              messageForm.getCount().intValue(),
+	              deserializers));
+	        }
+		  messages.sort(Comparator.comparing(MessageVO::getTimestamp));
+	  } else {
+		  messages = messageInspector.getMessages(topicName, messageForm.getPartition(), messageForm.getOffset(),
+				messageForm.getCount().intValue(), deserializers);
+	  }
+	  model.addAttribute("messages", messages);
 
     }
 
@@ -280,7 +293,7 @@ public final class MessageController {
    */
   public static class PartitionOffsetInfo {
     @NotNull
-    @Min(0)
+    @Min(-1)
     private Integer partition;
 
     /**

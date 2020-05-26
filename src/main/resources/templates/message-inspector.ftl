@@ -86,6 +86,8 @@
         <div class="form-group">
             <label for="partition">Partition</label>
             <select class="form-control" id="partition" name="partition">
+                    <option value="-1" data-first-offset="-1" data-last-offset="-1"
+                            <#if -1 == selectedPartition>selected="selected"</#if>>any</option>            
                 <#list topic.partitions as p>
                     <option value="${p.id}" data-first-offset="${p.firstOffset}" data-last-offset="${p.size}"
                             <#if p.id == selectedPartition>selected="selected"</#if>>${p.id}</option>
