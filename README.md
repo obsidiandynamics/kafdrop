@@ -53,7 +53,7 @@ Open a browser and navigate to [http://localhost:9000](http://localhost:9000). T
 
 Optionally, configure a schema registry connection with:
 ```
---schemaregistry.connect=http://localhost:8081
+--schemaregistry.connect=http://localhost:8081 --schemaregistry.auth=username:password
 ```
 
 Finally, a default message format (e.g. to deserialize Avro messages) can optionally be configured as follows:
@@ -61,6 +61,11 @@ Finally, a default message format (e.g. to deserialize Avro messages) can option
 --message.format=AVRO
 ```
 Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
+
+If you encounter performance issues on a cluster with many partitions or consumers, you can reduce the topic information that is shown by default throughout the application to improve the application's overall performance, using:
+```
+--kafdrop.reducedTopicInfo=true
+```
 
 ## Configure Protobuf message type
 In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). Kafdrop will allow user to select descriptor  and well as specifying name of one of the message type provided by the descriptor at runtime. 

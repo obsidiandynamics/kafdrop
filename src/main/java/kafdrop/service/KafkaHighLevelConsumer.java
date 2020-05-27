@@ -1,22 +1,37 @@
 package kafdrop.service;
 
-import kafdrop.config.*;
-import kafdrop.model.*;
-import kafdrop.util.*;
-import org.apache.kafka.clients.*;
-import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.common.Node;
-import org.apache.kafka.common.*;
-import org.apache.kafka.common.config.*;
-import org.apache.kafka.common.serialization.*;
-import org.slf4j.*;
-import org.springframework.stereotype.*;
+import java.nio.ByteBuffer;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
-import javax.annotation.*;
-import java.nio.*;
-import java.time.*;
-import java.util.*;
-import java.util.stream.*;
+import javax.annotation.PostConstruct;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.Node;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import kafdrop.config.KafdropConfiguration.KafdropProperties;
+import kafdrop.config.KafkaConfiguration;
+import kafdrop.model.TopicPartitionVO;
+import kafdrop.model.TopicVO;
+import kafdrop.util.Deserializers;
+import kafdrop.util.MessageDeserializer;
 
 @Service
 public final class KafkaHighLevelConsumer {
@@ -27,9 +42,12 @@ public final class KafkaHighLevelConsumer {
   private KafkaConsumer<byte[], byte[]> kafkaConsumer;
 
   private final KafkaConfiguration kafkaConfiguration;
+  
+  private final KafdropProperties kafdropProperties;
 
-  public KafkaHighLevelConsumer(KafkaConfiguration kafkaConfiguration) {
+  public KafkaHighLevelConsumer(KafkaConfiguration kafkaConfiguration, KafdropProperties kafdropProperties) {
     this.kafkaConfiguration = kafkaConfiguration;
+    this.kafdropProperties = kafdropProperties;
   }
 
   @PostConstruct
@@ -209,7 +227,11 @@ public final class KafkaHighLevelConsumer {
 
     for (var topic : topics) {
       if (topicSet.contains(topic)) {
-        topicVos.put(topic, getTopicInfo(topic));
+      	if (kafdropProperties.getReducedTopicInfo()) {
+      	  topicVos.put(topic, new TopicVO(topic));
+      	} else {
+          topicVos.put(topic, getTopicInfo(topic));
+      	}
       }
     }
 

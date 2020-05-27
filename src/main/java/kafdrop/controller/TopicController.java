@@ -18,23 +18,37 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.*;
-import kafdrop.model.*;
-import kafdrop.service.*;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.ui.*;
-import org.springframework.web.bind.annotation.*;
+import java.util.Collections;
+import java.util.List;
 
-import java.util.*;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import kafdrop.config.KafdropConfiguration.KafdropProperties;
+import kafdrop.model.ConsumerVO;
+import kafdrop.model.CreateTopicVO;
+import kafdrop.model.TopicVO;
+import kafdrop.service.KafkaMonitor;
+import kafdrop.service.TopicNotFoundException;
 
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
   private final KafkaMonitor kafkaMonitor;
+  
+  private final KafdropProperties kafdropProperties;
 
-  public TopicController(KafkaMonitor kafkaMonitor) {
+  public TopicController(KafkaMonitor kafkaMonitor, KafdropProperties kafdropProperties) {
     this.kafkaMonitor = kafkaMonitor;
+    this.kafdropProperties = kafdropProperties;
   }
 
   @RequestMapping("/{name:.+}")
@@ -42,7 +56,9 @@ public final class TopicController {
     final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
-    model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
+    if (!kafdropProperties.getReducedTopicInfo()) {
+      model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
+    }
 
     return "topic-detail";
   }

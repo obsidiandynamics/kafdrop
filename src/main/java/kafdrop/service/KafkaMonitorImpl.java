@@ -18,6 +18,7 @@
 
 package kafdrop.service;
 
+import kafdrop.config.KafdropConfiguration.KafdropProperties;
 import kafdrop.model.*;
 import kafdrop.util.*;
 import org.apache.kafka.clients.admin.*;
@@ -42,10 +43,13 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   private final KafkaHighLevelConsumer highLevelConsumer;
 
   private final KafkaHighLevelAdminClient highLevelAdminClient;
+  
+  private final KafdropProperties kafdropProperties;
 
-  public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelAdminClient highLevelAdminClient) {
+  public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelAdminClient highLevelAdminClient, KafdropProperties kafdropProperties) {
     this.highLevelConsumer = highLevelConsumer;
     this.highLevelAdminClient = highLevelAdminClient;
+    this.kafdropProperties = kafdropProperties;
   }
 
   @Override
@@ -102,8 +106,10 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     final var topicVos = getTopicMetadata().values().stream()
         .sorted(Comparator.comparing(TopicVO::getName))
         .collect(Collectors.toList());
-    for (var topicVo : topicVos) {
-      topicVo.setPartitions(getTopicPartitionSizes(topicVo));
+    if (!kafdropProperties.getReducedTopicInfo()) {
+      for (var topicVo : topicVos) {
+    	topicVo.setPartitions(getTopicPartitionSizes(topicVo));
+      }
     }
     return topicVos;
   }
