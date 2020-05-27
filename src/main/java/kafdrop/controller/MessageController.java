@@ -177,7 +177,7 @@ public final class MessageController {
 	      for (TopicPartitionVO partition : topic.getPartitions()) {
 	          messages.addAll(messageInspector.getMessages(topicName,
 	              partition.getId(),
-	              partition.getSize() - messageForm.getCount().intValue(), /* yes, 'Size' appears to be 'Last Offset' */
+	              Math.max(0, partition.getSize() - messageForm.getCount().intValue()), /* yes, 'Size' appears to be 'Last Offset' */
 	              messageForm.getCount().intValue(),
 	              deserializers));
 	        }
@@ -313,7 +313,7 @@ public final class MessageController {
      */
     @NotNull
     @Min(1)
-    @Max(100)
+    @Max(99999)
     @JsonProperty("lastOffset")
     private Long count;
 
