@@ -38,7 +38,7 @@ public interface KafkaMonitor {
                               Deserializers deserializers);
 
   List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
-                              Deserializers deserializers);
+                              Deserializers deserializers, MessageFilter filter);
 
   Optional<TopicVO> getTopic(String topic);
 

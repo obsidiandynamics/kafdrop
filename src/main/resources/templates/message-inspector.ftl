@@ -112,7 +112,7 @@
                 <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
             </#if>
         </div>
-        &nbsp;&nbsp;
+        &nbsp;&nbsp;       
         <div class="form-group">
             <label for="format">Key format</label>
             <select class="form-control" id="keyFormat" name="keyFormat">
@@ -145,6 +145,48 @@
             <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
         </div>
         &nbsp;&nbsp;
+        <div class="form-group ${spring.status.error?string("has-error", "")}">
+        	<table>
+        	<th>Filter</th>
+        	<tr>
+        		<td><label class=control-label" for="filterKey">key</label></td>
+        		<td>
+		            <@spring.formInput path="messageForm.filterKey" attributes='class="form-control ${spring.status.error?string("has-error", "")}" size="40"'/>
+		            <#if spring.status.error>
+		                <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
+		            </#if>        		
+        		</td>
+        	</tr>
+        	<tr>
+        		<td><label class=control-label" for="filterMessage">message</label></td>
+        		<td>            
+	        		<@spring.formInput path="messageForm.filterMessage" attributes='class="form-control ${spring.status.error?string("has-error", "")}" size="40"'/>
+		            <#if spring.status.error>
+		                <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
+		            </#if>
+            	</td>
+            </tr>
+        	<tr>
+        		<td><label class=control-label" for="filterHeaderName">header name</label></td>
+        		<td>            
+	        		<@spring.formInput path="messageForm.filterHeaderName" attributes='class="form-control ${spring.status.error?string("has-error", "")}" size="40"'/>
+		            <#if spring.status.error>
+		                <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
+		            </#if>
+            	</td>
+            </tr>           
+        	<tr>
+        		<td><label class=control-label" for="filterHeaderValue">header value</label></td>
+        		<td>            
+	        		<@spring.formInput path="messageForm.filterHeaderValue" attributes='class="form-control ${spring.status.error?string("has-error", "")}" size="40"'/>
+		            <#if spring.status.error>
+		                <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
+		            </#if>
+            	</td>
+            </tr>                         
+        	</table>
+        </div>        
+        &nbsp;&nbsp;    
         <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
     </form>
 </div>

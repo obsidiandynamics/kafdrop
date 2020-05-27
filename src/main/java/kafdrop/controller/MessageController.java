@@ -29,7 +29,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import kafdrop.util.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,8 +57,16 @@ import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
 import kafdrop.service.KafkaMonitor;
+import kafdrop.service.MessageFilter;
 import kafdrop.service.MessageInspector;
 import kafdrop.service.TopicNotFoundException;
+import kafdrop.util.AvroMessageDeserializer;
+import kafdrop.util.DefaultMessageDeserializer;
+import kafdrop.util.Deserializers;
+import kafdrop.util.KeyFormat;
+import kafdrop.util.MessageDeserializer;
+import kafdrop.util.MessageFormat;
+import kafdrop.util.ProtobufMessageDeserializer;
 
 @Controller
 public final class MessageController {
@@ -115,7 +122,7 @@ public final class MessageController {
           partition.getId(),
           partition.getFirstOffset(),
           size,
-          deserializers));
+          deserializers, null));
     }
 
     messages.sort(Comparator.comparing(MessageVO::getTimestamp));
@@ -173,18 +180,19 @@ public final class MessageController {
 	  List<MessageVO> messages = null;
 	  if (messageForm.getPartition().intValue() == TopicVO.ANY_PARTITION.getId()) {
 		  // avoiding MessageInspector#getMessages(String, int, deserializers) because it doesn't seem to work :(
-	  	  messages = new LinkedList<>();
+		  messages = new LinkedList<>();
+		  MessageFilter filter = messageForm.getMessageFilter();
 	      for (TopicPartitionVO partition : topic.getPartitions()) {
 	          messages.addAll(messageInspector.getMessages(topicName,
 	              partition.getId(),
 	              Math.max(0, partition.getSize() - messageForm.getCount().intValue()), /* yes, 'Size' appears to be 'Last Offset' */
 	              messageForm.getCount().intValue(),
-	              deserializers));
+	              deserializers, filter));
 	        }
 		  messages.sort(Comparator.comparing(MessageVO::getTimestamp));
 	  } else {
 		  messages = messageInspector.getMessages(topicName, messageForm.getPartition(), messageForm.getOffset(),
-				messageForm.getCount().intValue(), deserializers);
+				messageForm.getCount().intValue(), deserializers, messageForm.getMessageFilter());
 	  }
 	  model.addAttribute("messages", messages);
 
@@ -256,7 +264,7 @@ public final class MessageController {
           partition,
           offset,
           count,
-          deserializers);
+          deserializers, null);
 
       if (vos != null) {
         messages.addAll(vos);
@@ -316,6 +324,12 @@ public final class MessageController {
     @Max(99999)
     @JsonProperty("lastOffset")
     private Long count;
+    
+    
+    private String filterKey;
+    private String filterMessage;
+    private String filterHeaderName;
+    private String filterHeaderValue;
 
     private MessageFormat format;
 
@@ -332,7 +346,20 @@ public final class MessageController {
       this.format = format;
     }
 
-    public PartitionOffsetInfo(int partition, long offset, long count) {
+    public MessageFilter getMessageFilter() {
+    	MessageFilter mf = new MessageFilter();
+		mf.setKey(filterKey);
+		mf.setMessage(filterMessage);
+		mf.setHeaderName(filterHeaderName);
+		mf.setHeaderValue(filterHeaderValue);
+		if(mf.initialized()) {
+			return mf; 
+		} else {
+			return null;
+		}
+	}
+
+	public PartitionOffsetInfo(int partition, long offset, long count) {
       this(partition, offset, count, MessageFormat.DEFAULT);
     }
 
@@ -398,6 +425,38 @@ public final class MessageController {
     public void setMsgTypeName(String msgTypeName) {
       this.msgTypeName = msgTypeName;
     }
+
+	public String getFilterKey() {
+		return filterKey;
+	}
+
+	public void setFilterKey(String filter) {
+		this.filterKey = filter;
+	}
+
+	public String getFilterMessage() {
+		return filterMessage;
+	}
+
+	public void setFilterMessage(String filtermessage) {
+		this.filterMessage = filtermessage;
+	}
+
+	public String getFilterHeaderName() {
+		return filterHeaderName;
+	}
+
+	public void setFilterHeaderName(String filterHeaderName) {
+		this.filterHeaderName = filterHeaderName;
+	}
+
+	public String getFilterHeaderValue() {
+		return filterHeaderValue;
+	}
+
+	public void setFilterHeaderValue(String filterHeaderValue) {
+		this.filterHeaderValue = filterHeaderValue;
+	}
 
   }
 }

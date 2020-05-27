@@ -37,9 +37,9 @@ public final class MessageInspector {
    * Gets messages for a given partition.
    */
   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, int count,
-                                     Deserializers deserializers) {
+                                     Deserializers deserializers, MessageFilter filter) {
     final var topicPartition = new TopicPartition(topicName, partitionId);
-    return kafkaMonitor.getMessages(topicPartition, offset, count, deserializers);
+    return kafkaMonitor.getMessages(topicPartition, offset, count, deserializers, filter);
   }
 
   /**
