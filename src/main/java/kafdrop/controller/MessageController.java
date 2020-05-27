@@ -189,7 +189,7 @@ public final class MessageController {
 	              messageForm.getCount().intValue(),
 	              deserializers, filter));
 	        }
-		  messages.sort(Comparator.comparing(MessageVO::getTimestamp));
+		  messages.sort(Comparator.comparing(MessageVO::getTimestamp).reversed());
 	  } else {
 		  messages = messageInspector.getMessages(topicName, messageForm.getPartition(), messageForm.getOffset(),
 				messageForm.getCount().intValue(), deserializers, messageForm.getMessageFilter());
