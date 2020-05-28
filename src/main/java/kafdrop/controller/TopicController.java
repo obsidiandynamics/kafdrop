@@ -41,7 +41,7 @@ import kafdrop.service.TopicNotFoundException;
 
 @Controller
 @RequestMapping("/topic")
-public final class TopicController {
+public final class TopicController {	
   private final KafkaMonitor kafkaMonitor;
   
   private final KafdropProperties kafdropProperties;
@@ -59,6 +59,8 @@ public final class TopicController {
     if (!kafdropProperties.getReducedTopicInfo()) {
       model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
     }
+    
+    model.addAttribute("showDeleteTopic", !kafdropProperties.getHideDeleteTopic());
 
     return "topic-detail";
   }

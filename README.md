@@ -56,6 +56,11 @@ Optionally, configure a schema registry connection with:
 --schemaregistry.connect=http://localhost:8081 --schemaregistry.auth=username:password
 ```
 
+and hide the 'Delete Topic' button with:
+```
+--kafdrop.hideDeleteTopic=true
+```
+
 Finally, a default message format (e.g. to deserialize Avro messages) can optionally be configured as follows:
 ```
 --message.format=AVRO

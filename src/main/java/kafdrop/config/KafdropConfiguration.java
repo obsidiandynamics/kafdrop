@@ -18,12 +18,20 @@ public class KafdropConfiguration {
 		 * E.g., doesn't show consumer info or detailed topic (partition) info unless absolutely required.
 		 */
 	    private Boolean reducedTopicInfo;
+	    
+	    /**
+	     * Hides the 'Delete Topic' button in the UI.
+	     */
+	    private Boolean hideDeleteTopic;
 
 		@PostConstruct
 	    public void init() {
 	      // Set defaults if not configured.
 	      if (reducedTopicInfo == null) {
 	    	  reducedTopicInfo = false;
+	      }
+	      if (hideDeleteTopic == null) {
+	    	  hideDeleteTopic = false;
 	      }
 	    }
 
@@ -33,6 +41,14 @@ public class KafdropConfiguration {
 
 		public void setReducedTopicInfo(Boolean reducedTopicInfo) {
 			this.reducedTopicInfo = reducedTopicInfo;
+		}
+
+		public Boolean getHideDeleteTopic() {
+			return hideDeleteTopic;
+		}
+
+		public void setHideDeleteTopic(Boolean hideDeleteTopic) {
+			this.hideDeleteTopic = hideDeleteTopic;
 		}
 	  }
 }
