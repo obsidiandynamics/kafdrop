@@ -169,6 +169,9 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
                                      Deserializers deserializers, MessageFilter filter) {
+	if(filter == null) {
+		filter = MessageFilter.DEFAULT;
+	}
     final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializers);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
@@ -180,7 +183,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         messageVo.setMessage(record.value());
         messageVo.setHeaders(headersToMap(record.headers()));
         messageVo.setTimestamp(new Date(record.timestamp()));
-        if(MessageFilter.accepts(filter, messageVo)) {
+        if(filter.accepts(messageVo)) {
         	messageVos.add(messageVo);        	
         }
       }

@@ -58,6 +58,7 @@ import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
 import kafdrop.service.KafkaMonitor;
 import kafdrop.service.MessageFilter;
+import kafdrop.service.ContainsMessageFilter;
 import kafdrop.service.MessageInspector;
 import kafdrop.service.TopicNotFoundException;
 import kafdrop.util.AvroMessageDeserializer;
@@ -346,13 +347,15 @@ public final class MessageController {
       this.format = format;
     }
 
+    /** @return MessageFilter that is constrained using the UI input, or null if there are no constraints */
     public MessageFilter getMessageFilter() {
-    	MessageFilter mf = new MessageFilter();
+    	ContainsMessageFilter mf = new ContainsMessageFilter();
 		mf.setKey(filterKey);
 		mf.setMessage(filterMessage);
 		mf.setHeaderName(filterHeaderName);
 		mf.setHeaderValue(filterHeaderValue);
-		if(mf.initialized()) {
+		
+		if(mf.isConstrained()) {
 			return mf; 
 		} else {
 			return null;
