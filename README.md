@@ -200,6 +200,13 @@ You can also disable CORS entirely with the following configuration:
 cors.enabled=false
 ```
 
+## Topic Configuration
+By default, you could delete a topic. If you don't want this feature, you could disable it with:
+
+```
+--topic.deleteEnabled=false
+```
+
 ## Actuator
 Health and info endpoints are available at the following path: `/actuator`
 
