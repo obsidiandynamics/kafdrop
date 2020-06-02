@@ -185,7 +185,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   private static Map<String, String> headersToMap(Headers headers) {
     final var map = new TreeMap<String, String>();
     for (var header : headers) {
-      map.put(header.key(), new String(header.value()));
+      final var value = header.value();
+      map.put(header.key(), (value == null) ? null : new String(value));
     }
     return map;
   }
