@@ -98,29 +98,34 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   }
 
   @Override
-  public List<TopicVO> getTopics() {
-    final var topicVos = getTopicMetadata().values().stream()
-        .sorted(Comparator.comparing(TopicVO::getName))
-        .collect(Collectors.toList());
-    for (var topicVo : topicVos) {
-      topicVo.setPartitions(getTopicPartitionSizes(topicVo));
-    }
-    return topicVos;
+  public List<TopicVO> getTopics(TopicEnrichMode... topicEnrichModes) {
+    final var topicVos = highLevelConsumer.getTopicInfos();
+    enrichTopics(topicVos, topicEnrichModes);
+    return topicVos.values().stream()
+            .sorted(Comparator.comparing(TopicVO::getName))
+            .collect(Collectors.toList());
   }
 
   @Override
-  public Optional<TopicVO> getTopic(String topic) {
-    final var topicVo = Optional.ofNullable(getTopicMetadata(topic).get(topic));
-    topicVo.ifPresent(vo -> vo.setPartitions(getTopicPartitionSizes(vo)));
+  public Optional<TopicVO> getTopic(String topicName, TopicEnrichMode... topicEnrichModes) {
+    final var topicVo = Optional.ofNullable(highLevelConsumer.getTopicInfo(topicName));
+    topicVo.ifPresent(topic -> enrichTopics(Collections.singletonMap(topic.getName(), topic), topicEnrichModes));
     return topicVo;
   }
 
-  private Map<String, TopicVO> getTopicMetadata(String... topics) {
-    final var topicInfos = highLevelConsumer.getTopicInfos(topics);
-    final var retrievedTopicNames = topicInfos.keySet();
-    final var topicConfigs = highLevelAdminClient.describeTopicConfigs(retrievedTopicNames);
+  private void enrichTopics(Map<String, TopicVO> topicVos, TopicEnrichMode[] topicEnrichModes) {
+    var topicEnrichModeSet = Set.of(topicEnrichModes);
+    if (topicEnrichModeSet.contains(TopicEnrichMode.PartitionSize)) {
+      topicVos.values().forEach(highLevelConsumer::fillPartitionSize);
+    }
+    if (topicEnrichModeSet.contains(TopicEnrichMode.TopicConfig)) {
+      fillTopicConfig(topicVos);
+    }
+  }
 
-    for (var topicVo : topicInfos.values()) {
+  private void fillTopicConfig(Map<String, TopicVO> topicVos) {
+    final var topicConfigs = highLevelAdminClient.describeTopicConfigs(topicVos.keySet());
+    for (var topicVo : topicVos.values()) {
       final var config = topicConfigs.get(topicVo.getName());
       if (config != null) {
         final var configMap = new TreeMap<String, String>();
@@ -135,40 +140,28 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         LOG.warn("Missing config for topic {}", topicVo.getName());
       }
     }
-    return topicInfos;
   }
 
   @Override
   public List<MessageVO> getMessages(String topic, int count,
                                      Deserializers deserializers) {
     final var records = highLevelConsumer.getLatestRecords(topic, count, deserializers);
-    if (records != null) {
-      final var messageVos = new ArrayList<MessageVO>();
-      for (var record : records) {
-        final var messageVo = new MessageVO();
-        messageVo.setPartition(record.partition());
-        messageVo.setOffset(record.offset());
-        messageVo.setKey(record.key());
-        messageVo.setMessage(record.value());
-        messageVo.setHeaders(headersToMap(record.headers()));
-        messageVo.setTimestamp(new Date(record.timestamp()));
-        messageVos.add(messageVo);
-      }
-      return messageVos;
-    } else {
-      return Collections.emptyList();
-    }
+    return convertRecortsToMessageVos(records);
   }
 
   @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
                                      Deserializers deserializers) {
     final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializers);
+    return convertRecortsToMessageVos(records);
+  }
+
+  private List<MessageVO> convertRecortsToMessageVos(List<ConsumerRecord<String, String>> records) {
     if (records != null) {
-      final var messageVos = new ArrayList<MessageVO>();
+      final var messageVos = new ArrayList<MessageVO>(records.size());
       for (var record : records) {
         final var messageVo = new MessageVO();
-        messageVo.setPartition(topicPartition.partition());
+        messageVo.setPartition(record.partition());
         messageVo.setOffset(record.offset());
         messageVo.setKey(record.key());
         messageVo.setMessage(record.value());
@@ -189,10 +182,6 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
       map.put(header.key(), (value == null) ? null : new String(value));
     }
     return map;
-  }
-
-  private Map<Integer, TopicPartitionVO> getTopicPartitionSizes(TopicVO topic) {
-    return highLevelConsumer.getPartitionSize(topic.getName());
   }
 
   @Override

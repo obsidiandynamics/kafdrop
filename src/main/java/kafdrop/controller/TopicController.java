@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+import static kafdrop.service.KafkaMonitor.ALL_TOPIC_ENRICH_MODES;
+
 /**
  * Handles requests for the topic page.
  */
@@ -49,7 +51,7 @@ public final class TopicController {
 
   @RequestMapping("/{name:.+}")
   public String topicDetails(@PathVariable("name") String topicName, Model model) {
-    final var topic = kafkaMonitor.getTopic(topicName)
+    final var topic = kafkaMonitor.getTopic(topicName, ALL_TOPIC_ENRICH_MODES)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
     model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
@@ -92,7 +94,7 @@ public final class TopicController {
   })
   @RequestMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody TopicVO getTopic(@PathVariable("name") String topicName) {
-    return kafkaMonitor.getTopic(topicName)
+    return kafkaMonitor.getTopic(topicName, ALL_TOPIC_ENRICH_MODES)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
   }
 
@@ -102,7 +104,7 @@ public final class TopicController {
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody List<TopicVO> getAllTopics() {
-    return kafkaMonitor.getTopics();
+    return kafkaMonitor.getTopics(TopicEnrichMode.TopicConfig);
   }
 
   @ApiOperation(value = "getConsumers", notes = "Get consumers for a topic")
@@ -112,7 +114,7 @@ public final class TopicController {
   })
   @RequestMapping(path = "/{name:.+}/consumers", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody List<ConsumerVO> getConsumers(@PathVariable("name") String topicName) {
-    final var topic = kafkaMonitor.getTopic(topicName)
+    final var topic = kafkaMonitor.getTopic(topicName, TopicEnrichMode.PartitionSize)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     return kafkaMonitor.getConsumers(Collections.singleton(topic));
   }

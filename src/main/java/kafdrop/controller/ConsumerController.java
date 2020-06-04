@@ -37,7 +37,7 @@ public final class ConsumerController {
 
   @RequestMapping("/{groupId:.+}")
   public String consumerDetail(@PathVariable("groupId") String groupId, Model model) throws ConsumerNotFoundException {
-    final var topicVos = kafkaMonitor.getTopics();
+    final var topicVos = kafkaMonitor.getTopics(TopicEnrichMode.PartitionSize);
     final var consumer = kafkaMonitor.getConsumers(topicVos)
         .stream()
         .filter(c -> c.getGroupId().equals(groupId))
@@ -53,7 +53,7 @@ public final class ConsumerController {
   })
   @RequestMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId) throws ConsumerNotFoundException {
-    final var topicVos = kafkaMonitor.getTopics();
+    final var topicVos = kafkaMonitor.getTopics(TopicEnrichMode.PartitionSize);
     final var consumer = kafkaMonitor.getConsumers(topicVos)
         .stream()
         .filter(c -> c.getGroupId().equals(groupId))

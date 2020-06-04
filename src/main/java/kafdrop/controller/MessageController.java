@@ -28,6 +28,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import kafdrop.service.TopicEnrichMode;
 import kafdrop.util.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -94,7 +95,7 @@ public final class MessageController {
     final int size = (count != null? count : 100);
     final MessageFormat defaultFormat = messageFormatProperties.getFormat();
     final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
-    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+    final TopicVO topic = kafkaMonitor.getTopic(topicName, TopicEnrichMode.PartitionSize)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
 
     model.addAttribute("topic", topic);
@@ -151,7 +152,7 @@ public final class MessageController {
       model.addAttribute("messageForm", defaultForm);
     }
 
-    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+    final TopicVO topic = kafkaMonitor.getTopic(topicName, TopicEnrichMode.PartitionSize)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
 
@@ -224,7 +225,7 @@ public final class MessageController {
       @RequestParam(name = "msgTypeName", required = false) String msgTypeName
   ) {
     if (partition == null || offset == null || count == null) {
-      final TopicVO topic = kafkaMonitor.getTopic(topicName)
+      final TopicVO topic = kafkaMonitor.getTopic(topicName, TopicEnrichMode.PartitionSize)
           .orElseThrow(() -> new TopicNotFoundException(topicName));
 
       List<Object> partitionList = new ArrayList<>();

@@ -25,11 +25,16 @@ import org.apache.kafka.common.*;
 import java.util.*;
 
 public interface KafkaMonitor {
+  TopicEnrichMode[] ALL_TOPIC_ENRICH_MODES = new TopicEnrichMode[]{
+          TopicEnrichMode.PartitionSize,
+          TopicEnrichMode.TopicConfig
+  };
+
   List<BrokerVO> getBrokers();
 
   Optional<BrokerVO> getBroker(int id);
 
-  List<TopicVO> getTopics();
+  List<TopicVO> getTopics(TopicEnrichMode... topicEnrichModes);
 
   /**
    * Returns messages for a given topic.
@@ -40,7 +45,7 @@ public interface KafkaMonitor {
   List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
                               Deserializers deserializers);
 
-  Optional<TopicVO> getTopic(String topic);
+  Optional<TopicVO> getTopic(String topic, TopicEnrichMode... topicEnrichModes);
 
   ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
 

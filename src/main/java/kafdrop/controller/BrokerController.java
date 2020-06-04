@@ -40,7 +40,7 @@ public final class BrokerController {
   public String brokerDetails(@PathVariable("id") int brokerId, Model model) {
     model.addAttribute("broker", kafkaMonitor.getBroker(brokerId)
         .orElseThrow(() -> new BrokerNotFoundException("No such broker " + brokerId)));
-    model.addAttribute("topics", kafkaMonitor.getTopics());
+    model.addAttribute("topics", kafkaMonitor.getTopics(TopicEnrichMode.TopicConfig));
     return "broker-detail";
   }
 

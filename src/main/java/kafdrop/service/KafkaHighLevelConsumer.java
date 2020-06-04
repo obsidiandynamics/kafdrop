@@ -49,19 +49,16 @@ public final class KafkaHighLevelConsumer {
     }
   }
 
-  synchronized Map<Integer, TopicPartitionVO> getPartitionSize(String topic) {
+  synchronized void fillPartitionSize(TopicVO topicVo) {
     initializeClient();
 
-    final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
-    kafkaConsumer.assign(partitionInfoSet.stream()
-                             .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
-                                                                      partitionInfo.partition()))
+    kafkaConsumer.assign(topicVo.getPartitions().stream()
+                             .map(partitionInfo -> new TopicPartition(topicVo.getName(), partitionInfo.getId()))
                              .collect(Collectors.toList()));
-
     kafkaConsumer.poll(Duration.ofMillis(0));
+
     final Set<TopicPartition> assignedPartitionList = kafkaConsumer.assignment();
-    final TopicVO topicVO = getTopicInfo(topic);
-    final Map<Integer, TopicPartitionVO> partitionsVo = topicVO.getPartitionMap();
+    final Map<Integer, TopicPartitionVO> partitionsVo = topicVo.getPartitionMap();
 
     kafkaConsumer.seekToBeginning(assignedPartitionList);
     assignedPartitionList.forEach(topicPartition -> {
@@ -78,7 +75,6 @@ public final class KafkaHighLevelConsumer {
       final TopicPartitionVO partitionVo = partitionsVo.get(topicPartition.partition());
       partitionVo.setSize(latestOffset);
     });
-    return partitionsVo;
   }
 
   /**
@@ -199,29 +195,25 @@ public final class KafkaHighLevelConsumer {
     return bytes != null ? deserializer.deserializeMessage(ByteBuffer.wrap(bytes)) : "empty";
   }
 
-  synchronized Map<String, TopicVO> getTopicInfos(String[] topics) {
+  synchronized TopicVO getTopicInfo(String topicName) {
     initializeClient();
-    final var topicSet = kafkaConsumer.listTopics().keySet();
-    if (topics.length == 0) {
-      topics = Arrays.copyOf(topicSet.toArray(), topicSet.size(), String[].class);
-    }
-    final var topicVos = new HashMap<String, TopicVO>(topics.length, 1f);
+    var partitionInfos = kafkaConsumer.partitionsFor(topicName);
+    return (partitionInfos == null) ? null : createTopicVo(topicName, partitionInfos);
+  }
 
-    for (var topic : topics) {
-      if (topicSet.contains(topic)) {
-        topicVos.put(topic, getTopicInfo(topic));
-      }
-    }
-
+  synchronized Map<String, TopicVO> getTopicInfos() {
+    initializeClient();
+    final var topics = kafkaConsumer.listTopics();
+    final var topicVos = new HashMap<String, TopicVO>(topics.size(), 1f);
+    topics.forEach((topicName, partitionInfos) -> topicVos.put(topicName, createTopicVo(topicName, partitionInfos)));
     return topicVos;
   }
 
-  private TopicVO getTopicInfo(String topic) {
-    final var partitionInfoList = kafkaConsumer.partitionsFor(topic);
-    final var topicVo = new TopicVO(topic);
+  private TopicVO createTopicVo(String topicName, List<PartitionInfo> partitionInfos) {
+    final var topicVo = new TopicVO(topicName);
     final var partitions = new TreeMap<Integer, TopicPartitionVO>();
 
-    for (var partitionInfo : partitionInfoList) {
+    for (var partitionInfo : partitionInfos) {
       final var topicPartitionVo = new TopicPartitionVO(partitionInfo.partition());
       final var inSyncReplicaIds = Arrays.stream(partitionInfo.inSyncReplicas()).map(Node::id).collect(Collectors.toSet());
       final var offlineReplicaIds = Arrays.stream(partitionInfo.offlineReplicas()).map(Node::id).collect(Collectors.toSet());

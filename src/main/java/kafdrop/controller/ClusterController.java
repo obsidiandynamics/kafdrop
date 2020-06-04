@@ -64,7 +64,7 @@ public final class ClusterController {
     model.addAttribute("buildProperties", buildProperties);
 
     final var brokers = kafkaMonitor.getBrokers();
-    final var topics = kafkaMonitor.getTopics();
+    final var topics = kafkaMonitor.getTopics(TopicEnrichMode.TopicConfig);
     final var clusterSummary = kafkaMonitor.getClusterSummary(topics);
 
     final var missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
@@ -91,7 +91,7 @@ public final class ClusterController {
   public @ResponseBody ClusterInfoVO getCluster() {
     final var vo = new ClusterInfoVO();
     vo.brokers = kafkaMonitor.getBrokers();
-    vo.topics = kafkaMonitor.getTopics();
+    vo.topics = kafkaMonitor.getTopics(TopicEnrichMode.TopicConfig);
     vo.summary = kafkaMonitor.getClusterSummary(vo.topics);
     return vo;
   }
