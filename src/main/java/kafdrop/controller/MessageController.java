@@ -147,9 +147,8 @@ public final class MessageController {
     }
 
     final TopicVO topic = kafkaMonitor.getTopic(topicName)
-        .orElseThrow(() -> new TopicNotFoundException(topicName));
+        .orElseThrow(() -> new TopicNotFoundException(topicName));    
     model.addAttribute("topic", topic);
-
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
@@ -168,6 +167,7 @@ public final class MessageController {
 
     return "message-inspector";
   }
+
 
   /**
    * Return a JSON list of all partition offset info for the given topic. If specific partition
@@ -254,7 +254,7 @@ public final class MessageController {
    */
   public static class PartitionOffsetInfo {
     @NotNull
-    @Min(0)
+    @Min(-1)
     private Integer partition;
 
     /**

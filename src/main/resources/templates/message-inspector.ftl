@@ -73,10 +73,13 @@
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
-    <span class="badge badge-light">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>&nbsp;
-    <span class="badge badge-light">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>&nbsp;
+	<#assign firstOffset=curPartition.firstOffset>
+	<#assign lastOffset=curPartition.size>
+	<#assign availableSize=curPartition.size - curPartition.firstOffset>
+    <span class="badge badge-light">First Offset:</span> <span id="firstOffset">${firstOffset}</span>&nbsp;
+    <span class="badge badge-light">Last Offset:</span> <span id="lastOffset">${lastOffset}</span>&nbsp;
     <span class="badge badge-light">Size:</span> <span
-            id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
+            id="partitionSize">${availableSize}</span>
 </div>
 
 <div id="messageFormPanel" class="card">
@@ -86,7 +89,7 @@
             <select class="form-control" id="partition" name="partition">
                 <#list topic.partitions as p>
                     <option value="${p.id}" data-first-offset="${p.firstOffset}" data-last-offset="${p.size}"
-                            <#if p.id == selectedPartition>selected="selected"</#if>>${p.id}</option>
+                            <#if p.id == selectedPartition>selected="selected"</#if>> <#if p.id == -1>All<#else>${p.id}</#if></option>
                 </#list>
             </select>
         </div>
@@ -142,6 +145,7 @@
     <#if messages?? && messages?size gt 0>
         <#list messages as msg>
             <div class="message-detail">
+            	<span class="badge badge-light">partition:</span> ${msg.partition} &nbsp;
                 <span class="badge badge-light">Offset:</span> ${msg.offset} &nbsp;
                 <span class="badge badge-light">Key:</span> ${msg.key!''} &nbsp;
                 <span class="badge badge-light">Timestamp:</span> ${msg.timestamp?string('yyyy-MM-dd HH:mm:ss.SSS')}

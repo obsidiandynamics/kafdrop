@@ -163,12 +163,12 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
                                      MessageDeserializer deserializer) {
-    final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);
+    final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);    
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
       for (var record : records) {
         final var messageVo = new MessageVO();
-        messageVo.setPartition(topicPartition.partition());
+        messageVo.setPartition(record.partition());
         messageVo.setOffset(record.offset());
         messageVo.setKey(record.key());
         messageVo.setMessage(record.value());
