@@ -17,3 +17,4 @@ settings.xml
 kafka.properties*
 kafka.truststore.jks*
 kafka.keystore.jks*
+/bin/
