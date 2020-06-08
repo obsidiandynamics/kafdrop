@@ -28,7 +28,7 @@
             float: left;
         }
     </style>
-    <script src="<@spring.url '/js/message-inspector.js'/>"></script>
+    <script src="<@spring.url './js/message-inspector.js'/>"></script>
 </@template.header>
 <#setting number_format="0">
 
