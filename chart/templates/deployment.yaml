@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}
@@ -53,7 +53,12 @@ spec:
           - name: SERVER_PORT
             value: "{{ .Values.server.port }}"
           - name: CMD_ARGS
+{{- if .Values.mountProtoDesc }}
+            value: "--message.format=PROTOBUF --protobufdesc.directory=/protodesc/ {{ .Values.cmdArgs }}"
+{{- else }}
             value: "{{ .Values.cmdArgs }}"
+{{- end }}
+
           ports:
             - name: http
               containerPort: 9000
@@ -86,3 +91,15 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+{{- if .Values.mountProtoDesc.enabled }}
+          volumeMounts:
+            - mountPath: /protodesc/
+              name: proto-desc
+      volumes:
+        - name: proto-desc
+          hostPath:
+            path: {{ .Values.mountProtoDesc.hostPath }}
+            type: Directory
+{{- end }}
+
+

@@ -37,16 +37,16 @@ public final class MessageInspector {
    * Gets messages for a given partition.
    */
   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, int count,
-                                     MessageDeserializer deserializer) {
+                                     Deserializers deserializers) {
     final var topicPartition = new TopicPartition(topicName, partitionId);
-    return kafkaMonitor.getMessages(topicPartition, offset, count, deserializer);
+    return kafkaMonitor.getMessages(topicPartition, offset, count, deserializers);
   }
 
   /**
    * Gets all messages from all partitions of a given topic.
    */
   public List<MessageVO> getMessages(String topicName, int count,
-                                     MessageDeserializer deserializer) {
-    return kafkaMonitor.getMessages(topicName, count, deserializer);
+                                     Deserializers deserializers) {
+    return kafkaMonitor.getMessages(topicName, count, deserializers);
   }
 }

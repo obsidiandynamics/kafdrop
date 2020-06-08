@@ -21,6 +21,9 @@ package kafdrop.controller;
 import io.swagger.annotations.*;
 import kafdrop.model.*;
 import kafdrop.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.ui.*;
@@ -28,13 +31,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+/**
+ * Handles requests for the topic page.
+ */
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
+  private static final Logger LOG = LoggerFactory.getLogger(TopicController.class);
   private final KafkaMonitor kafkaMonitor;
+  private final boolean topicDeleteEnabled;
 
-  public TopicController(KafkaMonitor kafkaMonitor) {
+  public TopicController(KafkaMonitor kafkaMonitor,
+                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled) {
     this.kafkaMonitor = kafkaMonitor;
+    this.topicDeleteEnabled = topicDeleteEnabled;
   }
 
   @RequestMapping("/{name:.+}")
@@ -43,8 +53,25 @@ public final class TopicController {
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
     model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
+    model.addAttribute("topicDeleteEnabled", topicDeleteEnabled);
 
     return "topic-detail";
+  }
+
+  @RequestMapping(value = "/{name:.+}/delete", method = RequestMethod.POST)
+  public String deleteTopic(@PathVariable("name") String topicName, Model model) {
+    if (!topicDeleteEnabled) {
+      model.addAttribute("deleteErrorMessage", "Not configured to be deleted.");
+      return topicDetails(topicName, model);
+    }
+
+    try {
+      kafkaMonitor.deleteTopic(topicName);
+      return "redirect:/";
+    } catch (Exception ex) {
+      model.addAttribute("deleteErrorMessage", ex.getMessage());
+      return topicDetails(topicName, model);
+    }
   }
 
   /**

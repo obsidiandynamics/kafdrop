@@ -52,8 +52,9 @@
 	    }
 	    else
 	    {
-	    	$('#protobufDescriptor').show();
+	        $('#protobufDescriptor').show();
 	        $('#protobufMsgType').show();
+	        $('#descFile').prop('required',true);
 	    }
 	}  
 	$(document).ready(function(){
@@ -70,6 +71,7 @@
 
 <#assign selectedPartition=messageForm.partition!0?number>
 <#assign selectedFormat=messageForm.format!defaultFormat>
+<#assign selectedKeyFormat=messageForm.keyFormat!defaultFormat>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
@@ -97,7 +99,7 @@
         <@spring.bind path="messageForm.offset"/>
         <div class="form-group ${spring.status.error?string("has-error", "")}">
             <label class="control-label" for="offset">Offset</label>
-            <@spring.formInput path="messageForm.offset" attributes='class="form-control"'/>
+            <@spring.formInput path="messageForm.offset" attributes='class="form-control" size="10"'/>
             <#if spring.status.error>
                 <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
             </#if>
@@ -106,10 +108,19 @@
         <@spring.bind path="messageForm.count"/>
         <div class="form-group ${spring.status.error?string("has-error", "")}">
             <label class=control-label" for="count"># messages</label>
-            <@spring.formInput path="messageForm.count" attributes='class="form-control ${spring.status.error?string("has-error", "")}"'/>
+            <@spring.formInput path="messageForm.count" attributes='class="form-control ${spring.status.error?string("has-error", "")}" size="10"'/>
             <#if spring.status.error>
                 <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
             </#if>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group">
+            <label for="format">Key format</label>
+            <select class="form-control" id="keyFormat" name="keyFormat">
+                <#list keyFormats as kf>
+                    <option value="${kf}" <#if kf == selectedKeyFormat>selected="selected"</#if>>${kf}</option>
+                </#list>
+            </select>
         </div>
         &nbsp;&nbsp;
         <div class="form-group">
@@ -120,23 +131,28 @@
                 </#list>
             </select>
         </div>
-        &nbsp;&nbsp;        
+        &nbsp;&nbsp;
         <div class="form-group" id="protobufDescriptor">
-            <label for="format">Protobuf descriptor</label>
-            <select class="form-control" id="descFile" name="descFile">
-                <#list descFiles as f>
-                    <option value="${f}">${f}</option>
-                </#list>
-            </select>
+        <#if descFiles?size != 0>
+          <label for="format">Protobuf descriptor</label>
+	        <select class="form-control" id="descFile" name="descFile">
+	          <#list descFiles as f>
+	           <option value="${f}">${f}</option>
+	          </#list>
+	        </select>
+        <#else>
+          <span class="errorMessage">No available descriptor, please check.</span>
+        </#if>
         </div>
         &nbsp;&nbsp;
         <div class="form-group" id="protobufMsgType">
-            <label class=control-label" for="format">Protobuf message type name</label>
-            <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
+            <#if descFiles?size != 0>
+              <label class=control-label" for="format">Protobuf message type name</label>
+              <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
+            </#if>
         </div>
-        &nbsp;&nbsp;  
-
-        <button class="btn btn-success" type="submit"><i class="fa fa-search"></i> View Messages</button>
+        &nbsp;&nbsp;
+        <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
     </form>
 </div>
 

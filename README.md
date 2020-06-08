@@ -63,14 +63,14 @@ Finally, a default message format (e.g. to deserialize Avro messages) can option
 Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
 
 ## Configure Protobuf message type
-In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). Kafdrop will allow user to select descriptor  and well as specifying name of one of the message type provided by the descriptor at runtime. 
+In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime. 
 
-To Configure a folder stores protobuf descriptor file(s) (.desc) follow:
+To configure a folder with protobuf descriptor file(s) (.desc), follow:
 ```
 --protobufdesc.directory=/var/protobuf_desc
 ```
 
-If preferred the message type could be set to default as follow:
+If preferred the message type could be set to default as follows:
 ```
 --message.format=PROTOBUF
 ```
@@ -129,6 +129,20 @@ kubectl proxy
 
 Navigate to [http://localhost:8001/api/v1/namespaces/default/services/http:kafdrop:9000/proxy](http://localhost:8001/api/v1/namespaces/default/services/http:kafdrop:9000/proxy).
 
+
+### Protobuf support via helm chart:
+To install with protobuf support, a "facility" option is provided for the deployment, to mount the descriptor files folder, as well as passing the required CMD arguments, via option _mountProtoDesc_.
+Example:
+
+```sh
+helm upgrade -i kafdrop chart --set image.tag=3.x.x \
+    --set kafka.brokerConnect=<host:port,host:port> \
+    --set server.servlet.contextPath="/" \
+    --set mountProtoDesc.enabled=true \
+    --set mountProtoDesc.hostPath="<path/to/desc/folder>" \
+    --set jvm.opts="-Xms32M -Xmx64M"
+```
+
 ## Building
 After cloning the repository, building is just a matter of running a standard Maven build:
 ```sh
@@ -184,6 +198,13 @@ cors.allowHeaders (default is Origin,Accept,X-Requested-With,Content-Type,Access
 You can also disable CORS entirely with the following configuration:
 ```
 cors.enabled=false
+```
+
+## Topic Configuration
+By default, you could delete a topic. If you don't want this feature, you could disable it with:
+
+```
+--topic.deleteEnabled=false
 ```
 
 ## Actuator

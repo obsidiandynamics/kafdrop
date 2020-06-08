@@ -140,8 +140,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<MessageVO> getMessages(String topic, int count,
-                                     MessageDeserializer deserializer) {
-    final var records = highLevelConsumer.getLatestRecords(topic, count, deserializer);
+                                     Deserializers deserializers) {
+    final var records = highLevelConsumer.getLatestRecords(topic, count, deserializers);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
       for (var record : records) {
@@ -162,8 +162,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<MessageVO> getMessages(TopicPartition topicPartition, long offset, int count,
-                                     MessageDeserializer deserializer) {
-    final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializer);    
+                                     Deserializers deserializers) {
+    final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializers);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
       for (var record : records) {
@@ -185,7 +185,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   private static Map<String, String> headersToMap(Headers headers) {
     final var map = new TreeMap<String, String>();
     for (var header : headers) {
-      map.put(header.key(), new String(header.value()));
+      final var value = header.value();
+      map.put(header.key(), (value == null) ? null : new String(value));
     }
     return map;
   }
@@ -209,6 +210,11 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
             createTopicDto.getName(), createTopicDto.getPartitionsNumber(), (short) createTopicDto.getReplicationFactor()
     );
     highLevelAdminClient.createTopic(newTopic);
+  }
+
+  @Override
+  public void deleteTopic(String topic) {
+    highLevelAdminClient.deleteTopic(topic);
   }
 
   @Override

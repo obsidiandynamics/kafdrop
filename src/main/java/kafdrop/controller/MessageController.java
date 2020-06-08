@@ -28,6 +28,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import kafdrop.util.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,11 +59,6 @@ import kafdrop.model.TopicVO;
 import kafdrop.service.KafkaMonitor;
 import kafdrop.service.MessageInspector;
 import kafdrop.service.TopicNotFoundException;
-import kafdrop.util.AvroMessageDeserializer;
-import kafdrop.util.DefaultMessageDeserializer;
-import kafdrop.util.MessageDeserializer;
-import kafdrop.util.MessageFormat;
-import kafdrop.util.ProtobufMessageDeserializer;
 
 @Controller
 public final class MessageController {
@@ -71,15 +67,17 @@ public final class MessageController {
   private final MessageInspector messageInspector;
 
   private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
+  private final MessageFormatConfiguration.MessageFormatProperties keyFormatProperties;
 
   private final SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
   
   private final ProtobufDescriptorConfiguration.ProtobufDescriptorProperties protobufProperties;
 
-  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
+    this.keyFormatProperties = keyFormatProperties;
     this.schemaRegistryProperties = schemaRegistryProperties;
     this.protobufProperties = protobufProperties; 
   }
@@ -95,23 +93,28 @@ public final class MessageController {
                                 Model model, @RequestParam(name = "count", required = false) Integer count) {
     final int size = (count != null? count : 100);
     final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
     final TopicVO topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
 
     model.addAttribute("topic", topic);
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
+    model.addAttribute("keyFormats", KeyFormat.values());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
-    final var deserializer = getDeserializer(topicName, defaultFormat, "", "");
-    final List<MessageVO> messages = messageInspector.getMessages(topicName, size, deserializer);
+    final var deserializers = new Deserializers(
+          getDeserializer(topicName, defaultKeyFormat, "", ""),
+          getDeserializer(topicName, defaultFormat, "", ""));
+
+    final List<MessageVO> messages = messageInspector.getMessages(topicName, size, deserializers);
 
     for (TopicPartitionVO partition : topic.getPartitions()) {
       messages.addAll(messageInspector.getMessages(topicName,
           partition.getId(),
           partition.getFirstOffset(),
           size,
-          deserializer));
+          deserializers));
     }
 
     messages.sort(Comparator.comparing(MessageVO::getTimestamp));
@@ -134,6 +137,7 @@ public final class MessageController {
                                 BindingResult errors,
                                 Model model) {
     final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
 
     if (messageForm.isEmpty()) {
       final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
@@ -142,6 +146,7 @@ public final class MessageController {
       defaultForm.setOffset(0l);
       defaultForm.setPartition(0);
       defaultForm.setFormat(defaultFormat);
+      defaultForm.setKeyFormat(defaultFormat);
 
       model.addAttribute("messageForm", defaultForm);
     }
@@ -151,22 +156,46 @@ public final class MessageController {
     model.addAttribute("topic", topic);
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
+    model.addAttribute("defaultKeyFormat", defaultKeyFormat);
+    model.addAttribute("keyFormats",KeyFormat.values());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
     if (!messageForm.isEmpty() && !errors.hasErrors()) {
-      final var deserializer = getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName());
+
+      final var deserializers = new Deserializers(
+          getDeserializer(topicName, messageForm.getKeyFormat(), messageForm.getDescFile(),messageForm.getMsgTypeName()),
+          getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName())
+      );
 
       model.addAttribute("messages",
                          messageInspector.getMessages(topicName,
                                                       messageForm.getPartition(),
                                                       messageForm.getOffset(),
                                                       messageForm.getCount().intValue(),
-                                                      deserializer));
+                                                      deserializers));
 
     }
 
     return "message-inspector";
   }
+
+
+  /**
+   * Returns the selected nessagr format based on the
+   * form submission
+   * @param format String representation of format name
+   * @return
+   */
+  private MessageFormat getSelectedMessageFormat(String format) {
+    if ("AVRO".equalsIgnoreCase(format)) {
+      return MessageFormat.AVRO;
+    } else if ("PROTOBUF".equalsIgnoreCase(format)) {
+      return MessageFormat.PROTOBUF;
+    } else {
+      return MessageFormat.DEFAULT;
+    }
+  }
+
 
 
   /**
@@ -189,6 +218,7 @@ public final class MessageController {
       @RequestParam(name = "offset", required = false) Long offset,
       @RequestParam(name = "count", required = false) Integer count,
       @RequestParam(name = "format", required = false) String format,
+      @RequestParam(name = "keyFormat", required = false) String keyFormat,
       @RequestParam(name = "descFile", required = false) String descFile,
       @RequestParam(name = "msgTypeName", required = false) String msgTypeName
   ) {
@@ -201,23 +231,18 @@ public final class MessageController {
 
       return partitionList;
     } else {
-      final MessageFormat selectedFormat;
-      if ("AVRO".equalsIgnoreCase(format)) {
-        selectedFormat = MessageFormat.AVRO;
-      } else if ("PROTOBUF".equalsIgnoreCase(format)) {
-        selectedFormat = MessageFormat.PROTOBUF;
-      } else {
-        selectedFormat = MessageFormat.DEFAULT;
-      }
 
-      final var deserializer = getDeserializer(topicName, selectedFormat, descFile, msgTypeName);
+      final var deserializers = new Deserializers(
+              getDeserializer(topicName, getSelectedMessageFormat(keyFormat), descFile, msgTypeName),
+              getDeserializer(topicName, getSelectedMessageFormat(format), descFile, msgTypeName));
+
       List<Object> messages = new ArrayList<>();
       List<MessageVO> vos = messageInspector.getMessages(
           topicName,
           partition,
           offset,
           count,
-          deserializer);
+          deserializers);
 
       if (vos != null) {
         messages.addAll(vos);
@@ -279,6 +304,8 @@ public final class MessageController {
     private Long count;
 
     private MessageFormat format;
+
+    private MessageFormat keyFormat;
     
     private String descFile;
     
@@ -327,6 +354,12 @@ public final class MessageController {
     public void setCount(Long count) {
       this.count = count;
     }
+
+    public MessageFormat getKeyFormat() {
+      return keyFormat;
+    }
+
+    public void setKeyFormat(MessageFormat keyFormat) { this.keyFormat = keyFormat; }
 
     public MessageFormat getFormat() {
       return format;
