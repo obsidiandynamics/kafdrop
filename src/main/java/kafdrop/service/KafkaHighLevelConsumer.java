@@ -233,10 +233,10 @@ public final class KafkaHighLevelConsumer {
   
   /**
    * Gets records from all partitions of a given topic.
-   * @param name of topic to read from
-   * @offset starting offset
+   * @param topic The name of topic to read from
+   * @param offset starting offset
    * @param count The maximum number of records getting back.
-   * @param deserializer Message deserializer
+   * @param deserializers Message deserializers
    * @return A list of consumer records for a given topic.
    */
   synchronized List<ConsumerRecord<String, String>> getLatestRecords(String topic,
@@ -258,7 +258,7 @@ public final class KafkaHighLevelConsumer {
     var moreRecords = true;    
     int totalRead = 0;
     for (TopicPartition partition : partitions) {
-      long readRecords = 0;
+      int readRecords = 0;
       int emptyPolls = 0;
       
       while (readRecords < totalCount && moreRecords) {
