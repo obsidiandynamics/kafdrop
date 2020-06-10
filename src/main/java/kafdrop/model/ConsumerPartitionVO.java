@@ -25,6 +25,7 @@ public final class ConsumerPartitionVO {
   private long offset;
   private long size;
   private long firstOffset;
+  private String owner;
 
   public ConsumerPartitionVO(String groupId, String topic, int partitionId) {
     this.groupId = groupId;
@@ -56,6 +57,14 @@ public final class ConsumerPartitionVO {
     this.firstOffset = firstOffset;
   }
 
+  public String getOwner() {
+    return owner;
+  }
+
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
+
   public long getLag() {
     if (size < 0 || firstOffset < 0) {
       return 0;
@@ -78,6 +87,6 @@ public final class ConsumerPartitionVO {
   public String toString() {
     return ConsumerPartitionVO.class.getSimpleName() + " [groupId=" + groupId +
         ", topic=" + topic + ", partitionId=" + partitionId + ", offset=" + offset +
-        ", size=" + size + ", firstOffset=" + firstOffset + "]";
+        ", size=" + size + ", firstOffset=" + firstOffset + ", owner=" + owner + "]";
   }
 }

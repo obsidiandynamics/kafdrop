@@ -48,6 +48,7 @@
                         <th>First Offset</th>
                         <th>Last Offset</th>
                         <th>Consumer Offset</th>
+                        <th>Owner</th>
                         <th>Lag</th>
                     </tr>
                     </thead>
@@ -58,11 +59,12 @@
                             <td>${p.firstOffset}</td>
                             <td>${p.size}</td>
                             <td>${p.offset}</td>
+                            <td>${p.owner!""}</td>
                             <td>${p.lag}</td>
                         </tr>
                     </#list>
                     <tr>
-                        <td colspan="4"><b>Combined lag</b></td>
+                        <td colspan="5"><b>Combined lag</b></td>
                         <td><b>${consumerTopic.lag}</b></td>
                     </tr>
                     </tbody>
