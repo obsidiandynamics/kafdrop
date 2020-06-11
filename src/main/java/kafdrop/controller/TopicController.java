@@ -130,14 +130,18 @@ public final class TopicController {
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
   public String createTopic(CreateTopicVO createTopicVO, Model model) {
+    model.addAttribute("topicCreateEnabled", topicCreateEnabled);
+    model.addAttribute("topicName", createTopicVO.getName());
+    if (!topicCreateEnabled) {
+      model.addAttribute("errorMessage", "Not configured to be created.");
+      return createTopicPage(model);
+    }
     try {
         kafkaMonitor.createTopic(createTopicVO);
-      } catch (Exception ex) {
-        model.addAttribute("errorMessage", ex.getMessage());
-      }
-      model.addAttribute("topicCreateEnabled", topicCreateEnabled);
-      model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
-      model.addAttribute("topicName", createTopicVO.getName());
-      return "topic-create";
+    } catch (Exception ex) {
+      model.addAttribute("errorMessage", ex.getMessage());
+    }
+    model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
+    return "topic-create";
   }
 }

@@ -52,13 +52,13 @@
                 </button>
                 <br>
                 <br>
-                <#if errorMessage??>
-                    <p>Error creating topic ${topicName}: ${errorMessage}</p>
-                <#elseif topicName??>
-                    <p>Successfully created topic <a href="<@spring.url '/topic/${topicName}'/>">${topicName}</a> </p>
-                </#if>
             </form>
         </div>
+    </#if>
+    <#if errorMessage??>
+        <p>Error creating topic ${topicName}: ${errorMessage}</p>
+    <#elseif topicName??>
+        <p>Successfully created topic <a href="<@spring.url '/topic/${topicName}'/>">${topicName}</a> </p>
     </#if>
 </div>
 
