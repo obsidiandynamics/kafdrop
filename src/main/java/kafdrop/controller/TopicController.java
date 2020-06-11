@@ -40,11 +40,13 @@ public final class TopicController {
   private static final Logger LOG = LoggerFactory.getLogger(TopicController.class);
   private final KafkaMonitor kafkaMonitor;
   private final boolean topicDeleteEnabled;
+  private final boolean topicCreateEnabled;
 
   public TopicController(KafkaMonitor kafkaMonitor,
-                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled) {
+                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
     this.kafkaMonitor = kafkaMonitor;
     this.topicDeleteEnabled = topicDeleteEnabled;
+    this.topicCreateEnabled = topicCreateEnabled;
   }
 
   @RequestMapping("/{name:.+}")
@@ -81,6 +83,7 @@ public final class TopicController {
    */
   @RequestMapping("/create")
   public String createTopicPage(Model model) {
+    model.addAttribute("topicCreateEnabled", topicCreateEnabled);
     model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
     return "topic-create";
   }
@@ -127,13 +130,18 @@ public final class TopicController {
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
   public String createTopic(CreateTopicVO createTopicVO, Model model) {
-      try {
+    model.addAttribute("topicCreateEnabled", topicCreateEnabled);
+    model.addAttribute("topicName", createTopicVO.getName());
+    if (!topicCreateEnabled) {
+      model.addAttribute("errorMessage", "Not configured to be created.");
+      return createTopicPage(model);
+    }
+    try {
         kafkaMonitor.createTopic(createTopicVO);
-      } catch (Exception ex) {
-        model.addAttribute("errorMessage", ex.getMessage());
-      }
-      model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
-      model.addAttribute("topicName", createTopicVO.getName());
-      return "topic-create";
+    } catch (Exception ex) {
+      model.addAttribute("errorMessage", ex.getMessage());
+    }
+    model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
+    return "topic-create";
   }
 }

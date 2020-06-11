@@ -23,6 +23,7 @@ import kafdrop.config.*;
 import kafdrop.model.*;
 import kafdrop.service.*;
 import org.springframework.beans.factory.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.*;
 import org.springframework.http.*;
 import org.springframework.stereotype.*;
@@ -41,13 +42,17 @@ public final class ClusterController {
 
   private final BuildProperties buildProperties;
 
-  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ObjectProvider<BuildInfo> buildInfoProvider) {
+  private final boolean topicCreateEnabled;
+
+  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ObjectProvider<BuildInfo> buildInfoProvider,
+          @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
     this.kafkaConfiguration = kafkaConfiguration;
     this.kafkaMonitor = kafkaMonitor;
     this.buildProperties = buildInfoProvider.stream()
         .map(BuildInfo::getBuildProperties)
         .findAny()
         .orElseGet(ClusterController::blankBuildProperties);
+    this.topicCreateEnabled = topicCreateEnabled;
   }
 
   private static BuildProperties blankBuildProperties() {
@@ -75,6 +80,7 @@ public final class ClusterController {
     model.addAttribute("missingBrokerIds", missingBrokerIds);
     model.addAttribute("topics", topics);
     model.addAttribute("clusterSummary", clusterSummary);
+    model.addAttribute("topicCreateEnabled", topicCreateEnabled);
 
     if (filter != null) {
       model.addAttribute("filter", filter);
