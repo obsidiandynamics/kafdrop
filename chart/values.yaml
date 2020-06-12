@@ -59,3 +59,7 @@ tolerations: []
 affinity: {}
 
 podAnnotations: {}
+
+mountProtoDesc: 
+  enabled: false
+  hostPath:
