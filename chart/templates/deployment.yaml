@@ -53,7 +53,7 @@ spec:
           - name: SERVER_PORT
             value: "{{ .Values.server.port }}"
           - name: CMD_ARGS
-{{- if .Values.mountProtoDesc }}
+{{- if .Values.mountProtoDesc.enabled }}
             value: "--message.format=PROTOBUF --protobufdesc.directory=/protodesc/ {{ .Values.cmdArgs }}"
 {{- else }}
             value: "{{ .Values.cmdArgs }}"
