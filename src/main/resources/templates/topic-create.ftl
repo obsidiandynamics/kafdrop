@@ -17,7 +17,7 @@
 <#import "lib/template.ftl" as template>
 <@template.header "Topic create"/>
 
-<script src="<@spring.url '/js/powerFilter.js'/>"></script>
+<script src="<@spring.url './js/powerFilter.js'/>"></script>
 
 
 <#setting number_format="0">

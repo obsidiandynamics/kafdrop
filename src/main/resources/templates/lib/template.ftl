@@ -19,15 +19,15 @@
 <html>
 <head>
     <title>Kafdrop: ${title}</title>
-    <link type="text/css" rel="stylesheet" href="<@spring.url '/css/bootstrap.min.css'/>"/>
-    <link type="text/css" rel="stylesheet" href="<@spring.url '/css/font-awesome.min.css'/>"/>
-    <link type="text/css" rel="stylesheet" href="<@spring.url '/css/global.css'/>"/>
+    <link type="text/css" rel="stylesheet" href="<@spring.url './css/bootstrap.min.css'/>"/>
+    <link type="text/css" rel="stylesheet" href="<@spring.url './css/font-awesome.min.css'/>"/>
+    <link type="text/css" rel="stylesheet" href="<@spring.url './css/global.css'/>"/>
 
-    <script src="<@spring.url '/js/jquery.min.js'/>"></script>
-    <script src="<@spring.url '/js/popper.min.js'/>"></script>
-    <script src="<@spring.url '/js/bootstrap.min.js'/>"></script>
-    <script src="<@spring.url '/js/global.js'/>"></script>
-    <script async defer src="<@spring.url '/js/github-buttons.js'/>"></script>
+    <script src="<@spring.url './js/jquery.min.js'/>"></script>
+    <script src="<@spring.url './js/popper.min.js'/>"></script>
+    <script src="<@spring.url './js/bootstrap.min.js'/>"></script>
+    <script src="<@spring.url './js/global.js'/>"></script>
+    <script async defer src="<@spring.url './js/github-buttons.js'/>"></script>
 
     <#nested>
 </head>
