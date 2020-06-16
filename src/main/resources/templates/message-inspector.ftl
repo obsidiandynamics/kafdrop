@@ -39,7 +39,7 @@
         }
     </style>
 
-    <script src="<@spring.url './js/message-inspector.js'/>"></script>
+    <script src="<@spring.url '/js/message-inspector.js'/>"></script>
     
     <script type="text/javascript">
 	$( document ).ready(updateProtobufPanel);
