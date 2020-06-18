@@ -7,7 +7,7 @@
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/obsidiandynamics/kafdrop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/obsidiandynamics/kafdrop/context:java)
 
 
-<em>Kafdrop is a web UI for viewing Kafka topics and browsing consumer groups.</em> The tool displays information such as brokers, topics, partitions, consumers, and lets you view messages. 
+<em>Kafdrop is a web UI for viewing Kafka topics and browsing consumer groups.</em> The tool displays information such as brokers, topics, partitions, consumers, and lets you view messages.
 
 ![Overview Screenshot](docs/images/overview.png?raw=true)
 
@@ -63,7 +63,7 @@ Finally, a default message format (e.g. to deserialize Avro messages) can option
 Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
 
 ## Configure Protobuf message type
-In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime. 
+In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime.
 
 To configure a folder with protobuf descriptor file(s) (.desc), follow:
 ```
@@ -248,10 +248,11 @@ docker run -d --rm -p 9000:9000 \
 |`KAFKA_PROPERTIES`     |Additional properties to configure the broker connection (base-64 encoded).
 |`KAFKA_TRUSTSTORE`     |Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
 |`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
+|`BASE64_INPUT`         |Disable base64 decryption for `KAFKA_TRUSTSTORE`, `KAFKA_KEYSTORE` and `KAFKA_PROPERTIES` by setting `false` as value. Base64 decryption is enabled by default.
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
 |`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro message
-|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
+|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`.
 
 ##### Advanced configuration
 |Name                   |Description
@@ -299,7 +300,7 @@ Add a logout page in `/usr/local/opt/nginx/html/401.html`:
 Use the following snippet for `/usr/local/etc/nginx/nginx.conf`:
 ```
 worker_processes 4;
-  
+
 events {
   worker_connections 1024;
 }
