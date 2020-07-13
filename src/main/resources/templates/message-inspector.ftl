@@ -49,11 +49,13 @@
 	    {
 	        $('#protobufDescriptor').hide();
 	        $('#protobufMsgType').hide();
+	        $('#protobufIsDelimited').hide();
 	    }
 	    else
 	    {
 	        $('#protobufDescriptor').show();
 	        $('#protobufMsgType').show();
+	        $('#protobufIsDelimited').show();
 	        $('#descFile').prop('required',true);
 	    }
 	}  
@@ -146,6 +148,13 @@
             <#if descFiles?size != 0>
               <label class=control-label" for="format">Protobuf message type name</label>
               <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
+            </#if>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group" id="protobufIsDelimited">
+            <#if descFiles?size != 0>
+              <label class=control-label" for="isDelimited">Protobuf delimited encoding</label>
+              <@spring.formCheckbox path="messageForm.isDelimited" attributes='class="form-control"'/>
             </#if>
         </div>
         &nbsp;&nbsp;

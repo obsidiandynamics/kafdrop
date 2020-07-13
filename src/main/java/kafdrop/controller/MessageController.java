@@ -104,8 +104,8 @@ public final class MessageController {
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
     final var deserializers = new Deserializers(
-          getDeserializer(topicName, defaultKeyFormat, "", ""),
-          getDeserializer(topicName, defaultFormat, "", ""));
+          getDeserializer(topicName, defaultKeyFormat, "", "", false),
+          getDeserializer(topicName, defaultFormat, "", "", false));
 
     final List<MessageVO> messages = messageInspector.getMessages(topicName, size, deserializers);
 
@@ -164,8 +164,10 @@ public final class MessageController {
     if (!messageForm.isEmpty() && !errors.hasErrors()) {
 
       final var deserializers = new Deserializers(
-          getDeserializer(topicName, messageForm.getKeyFormat(), messageForm.getDescFile(),messageForm.getMsgTypeName()),
-          getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName())
+          getDeserializer(topicName, messageForm.getKeyFormat(), messageForm.getDescFile(),
+            messageForm.getMsgTypeName(), messageForm.getIsDelimited()),
+          getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(),
+            messageForm.getMsgTypeName(), messageForm.getIsDelimited())
       );
 
       model.addAttribute("messages",
@@ -221,7 +223,8 @@ public final class MessageController {
       @RequestParam(name = "format", required = false) String format,
       @RequestParam(name = "keyFormat", required = false) String keyFormat,
       @RequestParam(name = "descFile", required = false) String descFile,
-      @RequestParam(name = "msgTypeName", required = false) String msgTypeName
+      @RequestParam(name = "msgTypeName", required = false) String msgTypeName,
+      @RequestParam(name = "isDelimited", required = false) Boolean isDelimited
   ) {
     if (partition == null || offset == null || count == null) {
       final TopicVO topic = kafkaMonitor.getTopic(topicName)
@@ -234,8 +237,8 @@ public final class MessageController {
     } else {
 
       final var deserializers = new Deserializers(
-              getDeserializer(topicName, getSelectedMessageFormat(keyFormat), descFile, msgTypeName),
-              getDeserializer(topicName, getSelectedMessageFormat(format), descFile, msgTypeName));
+              getDeserializer(topicName, getSelectedMessageFormat(keyFormat), descFile, msgTypeName, isDelimited),
+              getDeserializer(topicName, getSelectedMessageFormat(format), descFile, msgTypeName, isDelimited));
 
       List<Object> messages = new ArrayList<>();
       List<MessageVO> vos = messageInspector.getMessages(
@@ -253,7 +256,7 @@ public final class MessageController {
     }
   }
 
-  private MessageDeserializer getDeserializer(String topicName, MessageFormat format, String descFile, String msgTypeName) {
+  private MessageDeserializer getDeserializer(String topicName, MessageFormat format, String descFile, String msgTypeName, Boolean isDelimited) {
     final MessageDeserializer deserializer;
 
     if (format == MessageFormat.AVRO) {
@@ -267,7 +270,7 @@ public final class MessageController {
           .replaceAll("\\.", "")
           .replaceAll("/", "");
       final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
-      deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
+      deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName, isDelimited);
     } else {
       deserializer = new DefaultMessageDeserializer();
     }
@@ -311,6 +314,8 @@ public final class MessageController {
     private String descFile;
     
     private String msgTypeName;
+
+    private Boolean isDelimited;
 
     public PartitionOffsetInfo(int partition, long offset, long count, MessageFormat format) {
       this.partition = partition;
@@ -384,6 +389,14 @@ public final class MessageController {
 
     public void setMsgTypeName(String msgTypeName) {
       this.msgTypeName = msgTypeName;
+    }
+
+    public Boolean getIsDelimited() {
+      return isDelimited;
+    }
+
+    public void setIsDelimited(Boolean isDelimited) {
+      this.isDelimited = isDelimited;
     }
 
   }

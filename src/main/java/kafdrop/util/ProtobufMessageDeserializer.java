@@ -33,13 +33,15 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
   private String topic;
   private String fullDescFile;
   private String msgTypeName;
+  private Boolean isDelimited;
 
   private static final Logger LOG = LoggerFactory.getLogger(ProtobufMessageDeserializer.class);
 
-  public ProtobufMessageDeserializer(String topic, String fullDescFile, String msgTypeName) {
+  public ProtobufMessageDeserializer(String topic, String fullDescFile, String msgTypeName, Boolean isDelimited) {
     this.topic = topic;
     this.fullDescFile = fullDescFile;
     this.msgTypeName = msgTypeName;
+    this.isDelimited = isDelimited;
   }
 
   @Override
@@ -63,7 +65,12 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
         LOG.error(errorMsg);
         throw new DeserializationException(errorMsg);
       }
-      DynamicMessage message = DynamicMessage.parseFrom(messageDescriptor.get(), CodedInputStream.newInstance(buffer));
+
+      final var inputStream = CodedInputStream.newInstance(buffer);
+      if (isDelimited) {
+        inputStream.readRawVarint32();
+      }
+      DynamicMessage message = DynamicMessage.parseFrom(messageDescriptor.get(), inputStream);
 
       JsonFormat.TypeRegistry typeRegistry = JsonFormat.TypeRegistry.newBuilder().add(descriptors).build();
       Printer printer = JsonFormat.printer().usingTypeRegistry(typeRegistry);
