@@ -63,3 +63,7 @@ podAnnotations: {}
 mountProtoDesc: 
   enabled: false
   hostPath:
+
+# Specify to run the container as non-root user 
+securityContext:
+  runAsUser:

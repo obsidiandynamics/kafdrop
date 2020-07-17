@@ -23,6 +23,10 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}        
     spec:
+      {{- if .Values.securityContext.runAsUser }}
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
