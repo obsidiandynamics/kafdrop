@@ -235,9 +235,9 @@ The three files above can be supplied to a Docker instance in base-64-encoded fo
 ```sh
 docker run -d --rm -p 9000:9000 \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
-    -e KAFKA_PROPERTIES=$(cat kafka.properties | base64) \
-    -e KAFKA_TRUSTSTORE=$(cat kafka.truststore.jks | base64) \   # optional
-    -e KAFKA_KEYSTORE=$(cat kafka.keystore.jks | base64) \       # optional
+    -e KAFKA_PROPERTIES="$(cat kafka.properties | base64)" \
+    -e KAFKA_TRUSTSTORE="$(cat kafka.truststore.jks | base64)" \   # optional
+    -e KAFKA_KEYSTORE="$(cat kafka.keystore.jks | base64)" \       # optional
     obsidiandynamics/kafdrop
 ```
 #### Environment Variables
