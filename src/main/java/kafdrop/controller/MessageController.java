@@ -47,11 +47,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import kafdrop.config.MessageFormatConfiguration;
 import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
-import kafdrop.config.ProtobufDescriptorConfiguration;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
-import kafdrop.config.SchemaRegistryConfiguration;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
 import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
@@ -66,12 +63,12 @@ public final class MessageController {
 
   private final MessageInspector messageInspector;
 
-  private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
-  private final MessageFormatConfiguration.MessageFormatProperties keyFormatProperties;
+  private final MessageFormatProperties messageFormatProperties;
+  private final MessageFormatProperties keyFormatProperties;
 
-  private final SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
-  
-  private final ProtobufDescriptorConfiguration.ProtobufDescriptorProperties protobufProperties;
+  private final SchemaRegistryProperties schemaRegistryProperties;
+
+  private final ProtobufDescriptorProperties protobufProperties;
 
   public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
     this.kafkaMonitor = kafkaMonitor;
