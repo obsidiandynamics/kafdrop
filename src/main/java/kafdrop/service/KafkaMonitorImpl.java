@@ -205,6 +205,28 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   }
 
   @Override
+  public List<MessageVO> searchMessages(String topic, String searchString, Deserializers deserializers) {
+    final int count = 10;
+    final var records = highLevelConsumer.searchRecords(topic, searchString, deserializers);
+    if (records != null) {
+      final var messageVos = new ArrayList<MessageVO>();
+      for (var record : records) {
+        final var messageVo = new MessageVO();
+        messageVo.setPartition(record.partition());
+        messageVo.setOffset(record.offset());
+        messageVo.setKey(record.key());
+        messageVo.setMessage(record.value());
+        messageVo.setHeaders(headersToMap(record.headers()));
+        messageVo.setTimestamp(new Date(record.timestamp()));
+        messageVos.add(messageVo);
+      }
+      return messageVos;
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  @Override
   public void createTopic(CreateTopicVO createTopicDto) {
     var newTopic = new NewTopic(
             createTopicDto.getName(), createTopicDto.getPartitionsNumber(), (short) createTopicDto.getReplicationFactor()

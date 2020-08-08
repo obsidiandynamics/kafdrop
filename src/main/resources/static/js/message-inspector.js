@@ -17,6 +17,10 @@
  */
 
 jQuery(document).ready(function () {
+    jQuery(document).on('click', '#searchMessagesBtn', function (e) {
+        jQuery(this).attr('disabled', true).html('<i class="spinner-border spinner-border-sm"></i> Searching...');
+    });
+
     jQuery(document).on('click', '.toggle-msg', function (e) {
         var link = jQuery(this),
             linkIcon = link.find('.fa'),

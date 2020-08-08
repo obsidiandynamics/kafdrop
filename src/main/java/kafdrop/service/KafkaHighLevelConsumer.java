@@ -21,6 +21,7 @@ import java.util.stream.*;
 @Service
 public final class KafkaHighLevelConsumer {
   private static final int POLL_TIMEOUT_MS = 200;
+  private static final int SEARCH_POLL_TIMEOUT_MS = 1000;
 
   private static final Logger LOG = LoggerFactory.getLogger(KafkaHighLevelConsumer.class);
 
@@ -193,6 +194,60 @@ public final class KafkaHighLevelConsumer {
             rec.headers(),
             rec.leaderEpoch()))
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Searches records from all partitions of a given topic containing a given text.
+   * @param searchString Searched text.
+   * @param deserializers Key and Value deserializers
+   * @return A list of consumer records for a given topic.
+   */
+  synchronized List<ConsumerRecord<String, String>> searchRecords(String topic,
+                                                                     String searchString,
+                                                                     Deserializers deserializers) {
+    initializeClient();
+    final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
+    final var partitions = partitionInfoSet.stream()
+        .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+            partitionInfo.partition()))
+        .collect(Collectors.toList());
+    kafkaConsumer.assign(partitions);
+    kafkaConsumer.seekToBeginning(partitions);
+
+    final List<ConsumerRecord<byte[], byte[]>> rawRecords = new ArrayList<>();
+
+    boolean moreRecords;
+    do {
+      final var polled = kafkaConsumer.poll(Duration.ofMillis(SEARCH_POLL_TIMEOUT_MS));
+
+      for (var partition : polled.partitions()) {
+        var records = polled.records(partition);
+        if (!records.isEmpty()) {
+          rawRecords.addAll(records);
+        }
+      }
+
+      moreRecords = !polled.isEmpty();
+    } while (moreRecords);
+
+    String loweredSearchString = searchString.toLowerCase();
+    return rawRecords
+            .stream()
+            .filter(rec -> deserialize(deserializers.getKeyDeserializer(), rec.key()).toLowerCase().contains(loweredSearchString))
+            .map(rec -> new ConsumerRecord<>(rec.topic(),
+                      rec.partition(),
+                      rec.offset(),
+                      rec.timestamp(),
+                      rec.timestampType(),
+                      0L,
+                      rec.serializedKeySize(),
+                      rec.serializedValueSize(),
+                      deserialize(deserializers.getKeyDeserializer(), rec.key()),
+                      deserialize(deserializers.getValueDeserializer(), rec.value()),
+                      rec.headers(),
+                      rec.leaderEpoch())
+            )
+            .collect(Collectors.toList());
   }
 
   private static String deserialize(MessageDeserializer deserializer, byte[] bytes) {

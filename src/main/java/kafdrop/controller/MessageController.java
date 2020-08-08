@@ -28,6 +28,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import kafdrop.form.SearchMessageForm;
+import kafdrop.service.MessageSearcher;
 import kafdrop.util.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -66,6 +68,8 @@ public final class MessageController {
 
   private final MessageInspector messageInspector;
 
+  private final MessageSearcher messageSearcher;
+
   private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
   private final MessageFormatConfiguration.MessageFormatProperties keyFormatProperties;
 
@@ -73,13 +77,14 @@ public final class MessageController {
   
   private final ProtobufDescriptorConfiguration.ProtobufDescriptorProperties protobufProperties;
 
-  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties, MessageSearcher messageSearcher) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
     this.keyFormatProperties = keyFormatProperties;
     this.schemaRegistryProperties = schemaRegistryProperties;
     this.protobufProperties = protobufProperties; 
+    this.messageSearcher = messageSearcher;
   }
 
   /**
@@ -178,6 +183,56 @@ public final class MessageController {
     }
 
     return "message-inspector";
+  }
+
+  /**
+   * Human friendly view of reading messages.
+   * @param topicName Name of topic
+   * @param searchMessageForm Message form for submitting requests to view messages.
+   * @param errors
+   * @param model
+   * @return View for seeing messages in a partition.
+   */
+  @GetMapping("/topic/{name:.+}/search-messages")
+  public String searchMessageForm(@PathVariable("name") String topicName,
+                                @Valid @ModelAttribute("searchMessageForm") SearchMessageForm searchMessageForm,
+                                BindingResult errors,
+                                Model model) {
+    final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
+
+    if (searchMessageForm.isEmpty()) {
+      final SearchMessageForm defaultForm = new SearchMessageForm();
+
+      defaultForm.setSearchText("");
+      defaultForm.setFormat(defaultFormat);
+      defaultForm.setKeyFormat(defaultFormat);
+
+      model.addAttribute("searchMessageForm", defaultForm);
+    }
+
+    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+            .orElseThrow(() -> new TopicNotFoundException(topicName));
+    model.addAttribute("topic", topic);
+    model.addAttribute("defaultFormat", defaultFormat);
+    model.addAttribute("messageFormats", MessageFormat.values());
+    model.addAttribute("defaultKeyFormat", defaultKeyFormat);
+    model.addAttribute("keyFormats",KeyFormat.values());
+    model.addAttribute("descFiles", protobufProperties.getDescFilesList());
+
+    if (!searchMessageForm.isEmpty() && !errors.hasErrors()) {
+
+      final var deserializers = new Deserializers(
+              getDeserializer(topicName, searchMessageForm.getKeyFormat(), searchMessageForm.getDescFile(),searchMessageForm.getMsgTypeName()),
+              getDeserializer(topicName, searchMessageForm.getFormat(), searchMessageForm.getDescFile(), searchMessageForm.getMsgTypeName())
+      );
+
+      model.addAttribute(
+              "messages",
+              messageSearcher.search(topicName, searchMessageForm.getSearchText(), deserializers));
+    }
+
+    return "search-message";
   }
 
 
