@@ -192,6 +192,8 @@ public final class MessageController {
       return MessageFormat.AVRO;
     } else if ("PROTOBUF".equalsIgnoreCase(format)) {
       return MessageFormat.PROTOBUF;
+    } else if ("MSGPACK".equalsIgnoreCase(format)){
+      return MessageFormat.MSGPACK;
     } else {
       return MessageFormat.DEFAULT;
     }
@@ -268,6 +270,8 @@ public final class MessageController {
           .replaceAll("/", "");
       final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
       deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
+    } else if (format == MessageFormat.MSGPACK) {
+      deserializer = new MsgPackMessageDeserializer();
     } else {
       deserializer = new DefaultMessageDeserializer();
     }

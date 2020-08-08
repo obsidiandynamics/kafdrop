@@ -1,5 +1,5 @@
 package kafdrop.util;
 
 public enum MessageFormat {
-  DEFAULT, AVRO, PROTOBUF
+  DEFAULT, AVRO, PROTOBUF, MSGPACK
 }

@@ -112,6 +112,11 @@
             <artifactId>avro</artifactId>
             <version>1.9.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>msgpack-core</artifactId>
+            <version>0.8.20</version>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>
