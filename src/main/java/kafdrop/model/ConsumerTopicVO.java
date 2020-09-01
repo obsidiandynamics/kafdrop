@@ -46,4 +46,8 @@ public final class ConsumerTopicVO {
   public Collection<ConsumerPartitionVO> getPartitions() {
     return offsets.values();
   }
+
+  public ConsumerPartitionVO getPartition(int partitionId) {
+    return offsets.get(partitionId);
+  }
 }

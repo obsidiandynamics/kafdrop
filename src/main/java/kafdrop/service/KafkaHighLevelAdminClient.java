@@ -69,6 +69,17 @@ public final class KafkaHighLevelAdminClient {
     return new ClusterDescription(nodes, controller, clusterId);
   }
 
+  Map<String, ConsumerGroupDescription> describeConsumerGroups(Collection<String> groupIds) {
+    final Map<String, ConsumerGroupDescription> groupDescriptionMap;
+
+    try {
+      groupDescriptionMap = adminClient.describeConsumerGroups(groupIds, new DescribeConsumerGroupsOptions()).all().get();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new KafkaAdminClientException(e);
+    }
+    return groupDescriptionMap;
+  }
+
   Set<String> listConsumerGroups() {
     final Collection<ConsumerGroupListing> groupListing;
     try {

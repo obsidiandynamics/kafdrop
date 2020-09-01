@@ -47,6 +47,10 @@ public final class ConsumerVO implements Comparable<ConsumerVO> {
     return topics.values();
   }
 
+  public boolean hasTopics(String topic) {
+    return topics.containsKey(topic);
+  }
+
   @Override
   public int compareTo(ConsumerVO that) {
     return this.groupId.compareTo(that.groupId);
