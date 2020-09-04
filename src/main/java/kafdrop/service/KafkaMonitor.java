@@ -46,6 +46,8 @@ public interface KafkaMonitor {
 
   List<ConsumerVO> getConsumers(Collection<TopicVO> topicVos);
 
+  List<MessageVO> searchMessages(String topic, String searchString, Deserializers deserializers);
+
   /**
    * Create topic
    * @param createTopicDto topic params
