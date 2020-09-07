@@ -18,6 +18,7 @@ public class SchemaRegistryConfiguration {
 
     private String connect;
     private String auth;
+    private String propertiesFile;
 
     public String getConnect() {
       return connect;
@@ -37,5 +38,10 @@ public class SchemaRegistryConfiguration {
           .filter(s -> s.length() > 0)
           .collect(Collectors.toList());
     }
+
+    public String getPropertyFile(){return propertiesFile;}
+
+    public void setPropertyFile(String propertiesFile) {this.propertiesFile = propertiesFile;}
+
   }
 }

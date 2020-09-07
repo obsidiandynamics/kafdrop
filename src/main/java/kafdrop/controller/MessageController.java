@@ -19,6 +19,8 @@
 package kafdrop.controller;
 
 import java.io.File;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -258,11 +260,13 @@ public final class MessageController {
   private MessageDeserializer getDeserializer(String topicName, MessageFormat format, String descFile, String msgTypeName) {
     final MessageDeserializer deserializer;
 
+
     if (format == MessageFormat.AVRO) {
       final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
       final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
+      final var schemaPropertyFile = schemaRegistryProperties.getPropertyFile();
 
-      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
+      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth, schemaPropertyFile);
     } else if (format == MessageFormat.PROTOBUF) {
       // filter the input file name
       final var descFileName = descFile.replace(".desc", "")

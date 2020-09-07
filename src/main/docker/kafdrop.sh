@@ -43,6 +43,14 @@ else
   rm $KAFKA_PROPERTIES_FILE |& > /dev/null | true
 fi
 
+SCHEMAREGISTRY_PROPERTIES_FILE=${SCHEMAREGISTRY_PROPERTIES_FILE:-schemaregistry.properties}
+if [ "$SCHEMAREGISTRY_PROPERTIES" != "" ]; then
+  echo Writing Kafka properties into $SCHEMAREGISTRY_PROPERTIES_FILE
+  echo "$SCHEMAREGISTRY_PROPERTIES" | base64 --decode --ignore-garbage > $SCHEMAREGISTRY_PROPERTIES_FILE
+else
+  rm $SCHEMAREGISTRY_PROPERTIES_FILE |& > /dev/null | true
+fi
+
 KAFKA_TRUSTSTORE_FILE=${KAFKA_TRUSTSTORE_FILE:-kafka.truststore.jks}
 if [ "$KAFKA_TRUSTSTORE" != "" ]; then
   echo Writing Kafka truststore into $KAFKA_TRUSTSTORE_FILE
