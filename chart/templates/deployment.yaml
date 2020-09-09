@@ -101,5 +101,7 @@ spec:
             path: {{ .Values.mountProtoDesc.hostPath }}
             type: Directory
 {{- end }}
-
-
+{{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.image.pullSecret }}
+{{- end }}
