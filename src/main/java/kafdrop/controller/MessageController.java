@@ -264,9 +264,9 @@ public final class MessageController {
     if (format == MessageFormat.AVRO) {
       final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
       final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
-      final var schemaPropertyFile = schemaRegistryProperties.getPropertyFile();
+      final var schemaPropertiesFile = schemaRegistryProperties.getPropertiesFile();
 
-      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth, schemaPropertyFile);
+      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth, schemaPropertiesFile);
     } else if (format == MessageFormat.PROTOBUF) {
       // filter the input file name
       final var descFileName = descFile.replace(".desc", "")

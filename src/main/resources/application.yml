@@ -34,3 +34,6 @@ kafka:
   truststoreFile: "${KAFKA_TRUSTSTORE_FILE:kafka.truststore.jks}"
   propertiesFile : "${KAFKA_PROPERTIES_FILE:kafka.properties}"
   keystoreFile: "${KAFKA_KEYSTORE_FILE:kafka.keystore.jks}"
+
+schemaregistry:
+  propertiesFile: "${SCHEMAREGISTRY_PROPERTIES_FILE:schemaregistry.properties}"

@@ -1,5 +1,7 @@
 package kafdrop.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
@@ -14,6 +16,7 @@ public class SchemaRegistryConfiguration {
   @Component
   @ConfigurationProperties(prefix = "schemaregistry")
   public static final class SchemaRegistryProperties {
+    private static final Logger LOG = LoggerFactory.getLogger(SchemaRegistryConfiguration.class);
     static final Pattern CONNECT_SEPARATOR = Pattern.compile("\\s*,\\s*");
 
     private String connect;
@@ -39,9 +42,12 @@ public class SchemaRegistryConfiguration {
           .collect(Collectors.toList());
     }
 
-    public String getPropertyFile(){return propertiesFile;}
+    public String getPropertiesFile(){
+      LOG.debug("Returning property path: {}", propertiesFile);
+      return propertiesFile;
+    }
 
-    public void setPropertyFile(String propertiesFile) {this.propertiesFile = propertiesFile;}
+    public void setPropertiesFile(String propertiesFile) {this.propertiesFile = propertiesFile;}
 
   }
 }

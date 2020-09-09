@@ -1,7 +1,13 @@
 package kafdrop.util;
 
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+
+import io.confluent.kafka.schemaregistry.client.rest.RestService;
 import io.confluent.kafka.serializers.*;
 import kafdrop.config.KafkaConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +20,8 @@ import java.util.*;
 public final class AvroMessageDeserializer implements MessageDeserializer {
   private final String topicName;
   private final KafkaAvroDeserializer deserializer;
+
+  private static final Logger LOG = LoggerFactory.getLogger(AvroMessageDeserializer.class);
 
   public AvroMessageDeserializer(
           String topicName,
@@ -36,6 +44,7 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
           String schemaRegistryAuth,
           String schemaPropertyFile) {
     final var config = new HashMap<String, Object>();
+    final var sslConfig = new HashMap<String, Object>();
     config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
 
     //Add TlS properties if connection is secured
@@ -49,7 +58,8 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
           throw new KafkaConfigurationException(e);
         }
         for (final String name : propertyOverrides.stringPropertyNames()){
-          config.put(name, propertyOverrides.getProperty(name));
+          LOG.debug("ssl Config Tag: {} - Value: {}",name, propertyOverrides.getProperty(name));
+          sslConfig.put(name, propertyOverrides.getProperty(name));
         }
       }
     }
@@ -58,8 +68,19 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
       config.put(AbstractKafkaAvroSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
       config.put(AbstractKafkaAvroSerDeConfig.USER_INFO_CONFIG, schemaRegistryAuth);
     }
-    final var kafkaAvroDeserializer = new KafkaAvroDeserializer();
-    kafkaAvroDeserializer.configure(config, false);
+
+
+    RestService restService = new RestService(schemaRegistryUrl);
+
+    SchemaRegistryClient schemaRegistry = new CachedSchemaRegistryClient(
+            restService,
+            1000,
+            sslConfig,
+            null
+    );
+
+    final var kafkaAvroDeserializer = new KafkaAvroDeserializer(schemaRegistry, config);
+
     return kafkaAvroDeserializer;
   }
 }
