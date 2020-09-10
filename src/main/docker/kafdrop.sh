@@ -45,7 +45,7 @@ fi
 
 SCHEMAREGISTRY_PROPERTIES_FILE=${SCHEMAREGISTRY_PROPERTIES_FILE:-schemaregistry.properties}
 if [ "$SCHEMAREGISTRY_PROPERTIES" != "" ]; then
-  echo Writing Kafka properties into $SCHEMAREGISTRY_PROPERTIES_FILE
+  echo Writing Schema Registry properties into $SCHEMAREGISTRY_PROPERTIES_FILE
   echo "$SCHEMAREGISTRY_PROPERTIES" | base64 --decode --ignore-garbage > $SCHEMAREGISTRY_PROPERTIES_FILE
 else
   rm $SCHEMAREGISTRY_PROPERTIES_FILE |& > /dev/null | true
