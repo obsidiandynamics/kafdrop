@@ -59,12 +59,28 @@ else
   rm $KAFKA_TRUSTSTORE_FILE |& > /dev/null | true
 fi
 
+SCHEMAREGISTRY_TRUSTSTORE_FILE=${SCHEMAREGISTRY_TRUSTSTORE_FILE:-schemaregistry.truststore.jks}
+if [ "$SCHEMAREGISTRY_TRUSTSTORE" != "" ]; then
+  echo Writing Schema Registry truststore into $SCHEMAREGISTRY_TRUSTSTORE_FILE
+  echo "$SCHEMAREGISTRY_TRUSTSTORE" | base64 --decode --ignore-garbage > $SCHEMAREGISTRY_TRUSTSTORE_FILE
+else
+  rm $SCHEMAREGISTRY_TRUSTSTORE_FILE |& > /dev/null | true
+fi
+
 KAFKA_KEYSTORE_FILE=${KAFKA_KEYSTORE_FILE:-kafka.keystore.jks}
 if [ "$KAFKA_KEYSTORE" != "" ]; then
   echo Writing Kafka keystore into $KAFKA_KEYSTORE_FILE
   echo "$KAFKA_KEYSTORE" | base64 --decode --ignore-garbage > $KAFKA_KEYSTORE_FILE
 else
   rm $KAFKA_KEYSTORE_FILE |& > /dev/null | true
+fi
+
+SCHEMAREGISTRY_KEYSTORE_FILE=${SCHEMAREGISTRY_KEYSTORE_FILE:-schemaregistry.keystore.jks}
+if [ "$SCHEMAREGISTRY_KEYSTORE" != "" ]; then
+  echo Writing Schema Registry keystore into $SCHEMAREGISTRY_KEYSTORE_FILE
+  echo "$SCHEMAREGISTRY_KEYSTORE" | base64 --decode --ignore-garbage > $SCHEMAREGISTRY_KEYSTORE_FILE
+else
+  rm $SCHEMAREGISTRY_KEYSTORE_FILE |& > /dev/null | true
 fi
 
 ARGS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED -Xss256K \
