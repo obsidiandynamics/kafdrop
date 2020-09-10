@@ -45,7 +45,7 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
           String schemaPropertyFile) {
     final var config = new HashMap<String, Object>();
     final var sslConfig = new HashMap<String, Object>();
-    config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+    config.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
 
     //Add TlS properties if connection is secured
     if(schemaRegistryUrl.toLowerCase().contains("https")){
@@ -65,8 +65,8 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
     }
 
     if (schemaRegistryAuth != null) {
-      config.put(AbstractKafkaAvroSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-      config.put(AbstractKafkaAvroSerDeConfig.USER_INFO_CONFIG, schemaRegistryAuth);
+      config.put(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+      config.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaRegistryAuth);
     }
 
 
