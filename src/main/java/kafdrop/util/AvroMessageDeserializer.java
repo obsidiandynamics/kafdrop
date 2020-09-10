@@ -74,7 +74,7 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
 
     SchemaRegistryClient schemaRegistry = new CachedSchemaRegistryClient(
             restService,
-            1000,
+            AbstractKafkaSchemaSerDeConfig.MAX_SCHEMAS_PER_SUBJECT_DEFAULT,
             sslConfig,
             null
     );
