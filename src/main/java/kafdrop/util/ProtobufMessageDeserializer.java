@@ -57,7 +57,7 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
 
       final var descriptors = descs.stream().flatMap(desc -> desc.getMessageTypes().stream()).collect(Collectors.toList());
 
-      final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeName.equals(desc.getName())).findFirst();
+      final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeName.equals(desc.getFullName())).findFirst();
       if (messageDescriptor.isEmpty()) {
         final String errorMsg = "Can't find specific message type: " + msgTypeName;
         LOG.error(errorMsg);
