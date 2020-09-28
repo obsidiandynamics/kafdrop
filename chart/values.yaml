@@ -60,6 +60,18 @@ affinity: {}
 
 podAnnotations: {}
 
-mountProtoDesc: 
-  enabled: false
-  hostPath:
+mountProtoDesc:
+  enabled: true
+  descFiles:
+    proto.desc: |-
+      
+      +lib/kafka_proto/keypay/keypay.webhook.protoKafkaProto.Keypay.Webhook"â
+      NotificationData
+      id (Rid'
+      updated_section (	RupdatedSection3
+      pay_condition_rule_set (	RpayConditionRuleSet%
+      leave_template (	RleaveTemplate9
+      super_fund1_member_number (	RsuperFund1MemberNumber"e
+      Notification
+      event (	Revent?
+      data (2+.KafkaProto.Keypay.Webhook.NotificationDataRdatabproto3

@@ -1,0 +1,18 @@
+{{- if .Values.mountProtoDesc.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ include "chart.name" . }}
+    helm.sh/chart: {{ include "chart.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  name: {{ template "chart.fullname" . }}
+data:
+{{- range $key, $value := .Values.mountProtoDesc.descFiles }}
+  {{- if $key | regexMatch ".*\\.desc$" }}
+  {{ $key }}: |
+{{ $value | default "{}" | b64enc | indent 4 }}
+  {{- end }}
+{{- end -}}
+{{- end -}}

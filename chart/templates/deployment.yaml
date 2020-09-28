@@ -54,7 +54,11 @@ spec:
             value: "{{ .Values.server.port }}"
           - name: CMD_ARGS
 {{- if .Values.mountProtoDesc.enabled }}
+  {{- if .Values.mountProtoDesc.hostPath }}
             value: "--message.format=PROTOBUF --protobufdesc.directory=/protodesc/ {{ .Values.cmdArgs }}"
+  {{- else }}
+            value: "--message.format=PROTOBUF --protobufdesc.directory=/etc/config-volume"
+  {{- end }}
 {{- else }}
             value: "{{ .Values.cmdArgs }}"
 {{- end }}
@@ -92,14 +96,23 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
 {{- if .Values.mountProtoDesc.enabled }}
+  {{- if .Values.mountProtoDesc.hostPath }}
           volumeMounts:
             - mountPath: /protodesc/
               name: proto-desc
       volumes:
         - name: proto-desc
-          hostPath:
-            path: {{ .Values.mountProtoDesc.hostPath }}
-            type: Directory
+          hostpath:
+            path: {{ .values.mountProtoDesc.hostpath }}
+            type: directory
+  {{- else }}
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config-volume
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ template "chart.fullname" . }}
+  {{- end }}
 {{- end }}
-
 
