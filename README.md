@@ -131,6 +131,7 @@ Navigate to [http://localhost:8001/api/v1/namespaces/default/services/http:kafdr
 
 
 ### Protobuf support via helm chart:
+
 To install with protobuf support, a "facility" option is provided for the deployment, to mount the descriptor files folder, as well as passing the required CMD arguments, via option _mountProtoDesc_.
 Example:
 
@@ -142,6 +143,21 @@ helm upgrade -i kafdrop chart --set image.tag=3.x.x \
     --set mountProtoDesc.hostPath="<path/to/desc/folder>" \
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
+
+#### Pass protobuf descriptor
+On some platform or in some automated deployment model, mounting protodesc with a path is not possible due to the deployment has no access to the node's hostpath or one cant simply upload the protodesc file to the hostpath. In such case, we can pass the Base64 encoded value of proto.desc to the deployment in values.yaml. For example:
+
+```yaml
+# in values.yaml
+mountProtoDesc:
+  enabled: true
+  descFiles:
+    proto.desc: |-
+      CrIDCjFsaWIva2Fma2FfcHJvdG8va2V5cGF5L3dlYmhvb2svbm90aWZpY2F0aW9u
+      LnByb3RvEhprYWZrYV9wcm90by5rZXlwYXkud2ViaG9vayLYAgoMTm90aWZpY2F0
+```
+
+With this, the chart will create a secret file containing proto desc and the deployment can mount to this file later.
 
 ## Building
 After cloning the repository, building is just a matter of running a standard Maven build:
