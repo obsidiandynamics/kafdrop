@@ -160,6 +160,12 @@ mountProtoDesc:
 
 With this, the chart will create a secret file containing proto desc and the deployment can mount to this file later.
 
+*Why do we have to base64 encode proto.desc?*
+- Because passing binary files into values.yaml will cause error converting YAML to JSON: control characters not allowed.
+
+*Why is proto.desc a secret, not configmap?*
+- Theoretically, configmap is the default way for such kind of data. However, in practice, when helm works on the template, it will have to decode the base64 encoded proto.desc to pass into configmap, which later cause YAML to contain invalid octet. Therefore, passing it to a k8s secret resource will delegate the decoding job to runtime, when the deployment needs to know the content of the file.  
+
 ## Building
 After cloning the repository, building is just a matter of running a standard Maven build:
 ```sh
