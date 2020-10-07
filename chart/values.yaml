@@ -6,7 +6,7 @@ image:
   pullPolicy: Always
 
 kafka:
-  brokerConnect: localhost:9092
+  brokerConnect: 192.168.65.2:9092
   properties: ""
   truststore: ""
   keystore: ""
@@ -64,14 +64,13 @@ mountProtoDesc:
   enabled: true
   descFiles:
     proto.desc: |-
-      
-      +lib/kafka_proto/keypay/keypay.webhook.protoKafkaProto.Keypay.Webhook"â
-      NotificationData
-      id (Rid'
-      updated_section (	RupdatedSection3
-      pay_condition_rule_set (	RpayConditionRuleSet%
-      leave_template (	RleaveTemplate9
-      super_fund1_member_number (	RsuperFund1MemberNumber"e
-      Notification
-      event (	Revent?
-      data (2+.KafkaProto.Keypay.Webhook.NotificationDataRdatabproto3
+      CrIDCjFsaWIva2Fma2FfcHJvdG8va2V5cGF5L3dlYmhvb2svbm90aWZpY2F0aW9u
+      LnByb3RvEhprYWZrYV9wcm90by5rZXlwYXkud2ViaG9vayLYAgoMTm90aWZpY2F0
+      aW9uEhQKBWV2ZW50GAQgASgJUgVldmVudBJNCgRkYXRhGAUgASgLMjkua2Fma2Ff
+      cHJvdG8ua2V5cGF5LndlYmhvb2suTm90aWZpY2F0aW9uLk5vdGlmaWNhdGlvbkRh
+      dGFSBGRhdGEa4gEKEE5vdGlmaWNhdGlvbkRhdGESDgoCaWQYASABKANSAmlkEicK
+      D3VwZGF0ZWRfc2VjdGlvbhgCIAEoCVIOdXBkYXRlZFNlY3Rpb24SMwoWcGF5X2Nv
+      bmRpdGlvbl9ydWxlX3NldBgDIAEoCVITcGF5Q29uZGl0aW9uUnVsZVNldBIlCg5s
+      ZWF2ZV90ZW1wbGF0ZRgEIAEoCVINbGVhdmVUZW1wbGF0ZRI5ChlzdXBlcl9mdW5k
+      MV9tZW1iZXJfbnVtYmVyGAUgASgJUhZzdXBlckZ1bmQxTWVtYmVyTnVtYmVyYgZw
+      cm90bzM=

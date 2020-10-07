@@ -21,7 +21,7 @@ spec:
       annotations:
 {{- if .Values.podAnnotations }}
 {{ toYaml .Values.podAnnotations | indent 8 }}
-{{- end }}        
+{{- end }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -57,7 +57,7 @@ spec:
   {{- if .Values.mountProtoDesc.hostPath }}
             value: "--message.format=PROTOBUF --protobufdesc.directory=/protodesc/ {{ .Values.cmdArgs }}"
   {{- else }}
-            value: "--message.format=PROTOBUF --protobufdesc.directory=/etc/config-volume"
+            value: "--message.format=PROTOBUF --protobufdesc.directory=/etc/protodesc-volume"
   {{- end }}
 {{- else }}
             value: "{{ .Values.cmdArgs }}"
@@ -107,12 +107,13 @@ spec:
             type: directory
   {{- else }}
           volumeMounts:
-            - mountPath: /etc/config
-              name: config-volume
+            - mountPath: /etc/protodesc-volume
+              name: protodesc-volume
+              readOnly: true
       volumes:
-        - name: config-volume
-          configMap:
-            name: {{ template "chart.fullname" . }}
+        - name: protodesc-volume
+          secret:
+            secretName: {{ template "chart.fullname" . }}
   {{- end }}
 {{- end }}
 
