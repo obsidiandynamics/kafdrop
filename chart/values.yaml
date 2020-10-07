@@ -6,7 +6,7 @@ image:
   pullPolicy: Always
 
 kafka:
-  brokerConnect: 192.168.65.2:9092
+  brokerConnect: localhost:9092
   properties: ""
   truststore: ""
   keystore: ""
