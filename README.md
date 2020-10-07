@@ -132,6 +132,7 @@ Navigate to [http://localhost:8001/api/v1/namespaces/default/services/http:kafdr
 
 ### Protobuf support via helm chart:
 
+#### Via custom mount path
 To install with protobuf support, a "facility" option is provided for the deployment, to mount the descriptor files folder, as well as passing the required CMD arguments, via option _mountProtoDesc_.
 Example:
 
@@ -144,7 +145,7 @@ helm upgrade -i kafdrop chart --set image.tag=3.x.x \
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
 
-#### Pass protobuf descriptor
+#### Via passing protobuf descriptor file content
 On some platform or in some automated deployment model, mounting protodesc with a path is not possible due to the deployment has no access to the node's hostpath or one cant simply upload the protodesc file to the hostpath. In such case, we can pass the Base64 encoded value of proto.desc to the deployment in values.yaml. For example:
 
 ```yaml
