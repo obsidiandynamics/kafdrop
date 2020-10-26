@@ -31,7 +31,9 @@ public final class KafkaConfiguration {
       properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
     }
 
-    properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
+    if(isSecured || securityProtocol.equals("SSL")) {
+      properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
+    }
 
     LOG.info("Checking truststore file {}", truststoreFile);
     if (new File(truststoreFile).isFile()) {
