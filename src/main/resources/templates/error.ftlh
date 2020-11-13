@@ -1,5 +1,5 @@
 <#import "/spring.ftl" as spring />
-<#import "lib/template.ftl" as template>
+<#import "lib/template.ftlh" as template>
 <@template.header "${error.error}"/>
 <h2>${error.error}</h2>
 <div id="errorHeader">

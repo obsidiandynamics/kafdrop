@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 <#import "/spring.ftl" as spring />
-<#import "lib/template.ftl" as template>
+<#import "lib/template.ftlh" as template>
 <@template.header "Broker: ${broker.id?string}">
     <style type="text/css">
         .bs-table.overview td {
