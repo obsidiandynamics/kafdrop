@@ -39,7 +39,7 @@ public class HealthCheckConfiguration {
 
     @ManagedAttribute
     public Map getHealth() {
-      final var health = healthEndpoint.health();
+      final var health = (Health) healthEndpoint.health();
       final var healthMap = new LinkedHashMap<String, Object>();
       healthMap.put("status", getStatus(health));
       healthMap.put("detail", getDetails(health.getDetails()));

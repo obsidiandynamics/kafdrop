@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<#import "lib/template.ftl" as template>
+<#import "lib/template.ftlh" as template>
 <@template.header "Initializing...">
     <meta http-equiv="refresh" content="5">
 </@template.header>
