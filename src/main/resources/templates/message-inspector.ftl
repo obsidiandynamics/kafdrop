@@ -29,6 +29,11 @@
         #partitionSizes {
             margin-left: 16px;
         }
+        
+        #allMessages{
+        	margin-left: 16px;
+        	margin-top: 16px;	
+        }
 
         .badge {
             margin-right: 5px;
@@ -80,6 +85,12 @@
     <span class="badge badge-light">Size:</span> <span
             id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
 </div>
+
+<div>
+<a id="allMessages" class="btn btn-success" href="<@spring.url '/topic/${topic.name}/allmessages'/>">
+        <i class="fa fa-eye"></i> All Messages
+    </a>
+    </div>
 
 <div id="messageFormPanel" class="card">
     <form method="GET" action="<@spring.url '/topic/${topic.name}/messages'/>" id="messageForm" class="form-inline card-body">
@@ -149,7 +160,7 @@
             </#if>
         </div>
         &nbsp;&nbsp;
-        <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
+        <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> Search </button>
     </form>
 </div>
 
