@@ -39,14 +39,9 @@ import java.util.*;
 public final class TopicController {
   private static final Logger LOG = LoggerFactory.getLogger(TopicController.class);
   private final KafkaMonitor kafkaMonitor;
-  private final boolean topicDeleteEnabled;
-  private final boolean topicCreateEnabled;
 
-  public TopicController(KafkaMonitor kafkaMonitor,
-                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
+  public TopicController(KafkaMonitor kafkaMonitor) {
     this.kafkaMonitor = kafkaMonitor;
-    this.topicDeleteEnabled = topicDeleteEnabled;
-    this.topicCreateEnabled = topicCreateEnabled;
   }
 
   @RequestMapping("/{name:.+}")
@@ -55,14 +50,14 @@ public final class TopicController {
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
     model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
-    model.addAttribute("topicDeleteEnabled", topicDeleteEnabled);
+    model.addAttribute("topicDeleteEnabled", kafkaMonitor.isTopicDeleteEnabled());
 
     return "topic-detail";
   }
 
   @RequestMapping(value = "/{name:.+}/delete", method = RequestMethod.POST)
   public String deleteTopic(@PathVariable("name") String topicName, Model model) {
-    if (!topicDeleteEnabled) {
+    if (!kafkaMonitor.isTopicDeleteEnabled()) {
       model.addAttribute("deleteErrorMessage", "Not configured to be deleted.");
       return topicDetails(topicName, model);
     }
@@ -83,7 +78,7 @@ public final class TopicController {
    */
   @RequestMapping("/create")
   public String createTopicPage(Model model) {
-    model.addAttribute("topicCreateEnabled", topicCreateEnabled);
+    model.addAttribute("topicCreateEnabled", kafkaMonitor.isTopicCreateEnabled());
     model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
     return "topic-create";
   }
@@ -130,9 +125,9 @@ public final class TopicController {
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
   public String createTopic(CreateTopicVO createTopicVO, Model model) {
-    model.addAttribute("topicCreateEnabled", topicCreateEnabled);
+    model.addAttribute("topicCreateEnabled", kafkaMonitor.isTopicCreateEnabled());
     model.addAttribute("topicName", createTopicVO.getName());
-    if (!topicCreateEnabled) {
+    if (!kafkaMonitor.isTopicCreateEnabled()) {
       model.addAttribute("errorMessage", "Not configured to be created.");
       return createTopicPage(model);
     }
