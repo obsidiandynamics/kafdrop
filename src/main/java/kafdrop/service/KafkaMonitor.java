@@ -25,6 +25,7 @@ import org.apache.kafka.common.*;
 import java.util.*;
 
 public interface KafkaMonitor {
+  
   List<BrokerVO> getBrokers();
 
   Optional<BrokerVO> getBroker(int id);
@@ -59,4 +60,10 @@ public interface KafkaMonitor {
   void deleteTopic(String topic);
 
   List<AclVO> getAcls();
+
+  boolean isTopicCreateEnabled();
+  void setTopicCreateEnabled(boolean createEnabled);
+
+  boolean isTopicDeleteEnabled();
+  void setTopicDeleteEnabled(boolean deleteEnabled);
 }

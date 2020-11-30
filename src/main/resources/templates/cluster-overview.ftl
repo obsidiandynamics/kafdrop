@@ -24,7 +24,17 @@
 <div>
     <div id="kafdropVersion">${buildProperties.getVersion()} [${buildProperties.getTime()}]</div>
 
-    <h2>Kafka Cluster Overview</h2>
+    <h2>Kafka Cluster Overview&nbsp;&nbsp;&nbsp;<a class="btn" href="<@spring.url '/toggleReadOnly'/>">
+    	                                                  <#if topicCreateEnabled && topicDeleteEnabled>
+    	                                                  <i class="fa fa-toggle-off"></i>
+    	                                                  <#else>
+    	                                                  <i class="fa fa-toggle-on"></i>
+    	                                                  </#if>
+                                                       		Read-Only
+                                      					</a>
+
+    </h2>
+
     <div id="cluster-overview">
         <table class="table table-bordered">
             <tbody>

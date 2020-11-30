@@ -26,6 +26,7 @@ import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
 import org.apache.kafka.common.header.*;
 import org.slf4j.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.*;
 
 import java.util.*;
@@ -43,9 +44,16 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   private final KafkaHighLevelAdminClient highLevelAdminClient;
 
-  public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelAdminClient highLevelAdminClient) {
+  private boolean topicCreateEnabled;
+
+  private boolean topicDeleteEnabled;
+
+  public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelAdminClient highLevelAdminClient
+          , @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled, @Value("${topic.deleteEnabled:true}") boolean topicDeleteEnabled) {
     this.highLevelConsumer = highLevelConsumer;
     this.highLevelAdminClient = highLevelAdminClient;
+    this.topicCreateEnabled=topicCreateEnabled;
+    this.topicDeleteEnabled=topicDeleteEnabled;
   }
 
   @Override
@@ -314,5 +322,21 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         .map(offsets -> offsets.forTopics(topics))
         .filter(not(ConsumerGroupOffsets::isEmpty))
         .collect(Collectors.toList());
+  }
+  @Override
+  public boolean isTopicCreateEnabled() {
+    return topicCreateEnabled;
+  }
+  @Override
+  public void setTopicCreateEnabled(boolean createEnabled) {
+    this.topicCreateEnabled = createEnabled;
+  }
+  @Override
+  public boolean isTopicDeleteEnabled() {
+    return topicDeleteEnabled;
+  }
+  @Override
+  public void setTopicDeleteEnabled(boolean deleteEnabled) {
+    this.topicDeleteEnabled = deleteEnabled;
   }
 }

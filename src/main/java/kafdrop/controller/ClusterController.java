@@ -30,7 +30,6 @@ import org.springframework.stereotype.*;
 import org.springframework.ui.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -42,17 +41,14 @@ public final class ClusterController {
 
   private final BuildProperties buildProperties;
 
-  private final boolean topicCreateEnabled;
 
-  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ObjectProvider<BuildInfo> buildInfoProvider,
-          @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
+  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ObjectProvider<BuildInfo> buildInfoProvider) {
     this.kafkaConfiguration = kafkaConfiguration;
     this.kafkaMonitor = kafkaMonitor;
     this.buildProperties = buildInfoProvider.stream()
         .map(BuildInfo::getBuildProperties)
         .findAny()
         .orElseGet(ClusterController::blankBuildProperties);
-    this.topicCreateEnabled = topicCreateEnabled;
   }
 
   private static BuildProperties blankBuildProperties() {
@@ -80,7 +76,8 @@ public final class ClusterController {
     model.addAttribute("missingBrokerIds", missingBrokerIds);
     model.addAttribute("topics", topics);
     model.addAttribute("clusterSummary", clusterSummary);
-    model.addAttribute("topicCreateEnabled", topicCreateEnabled);
+    model.addAttribute("topicCreateEnabled", kafkaMonitor.isTopicCreateEnabled());
+    model.addAttribute("topicDeleteEnabled", kafkaMonitor.isTopicDeleteEnabled());
 
     if (filter != null) {
       model.addAttribute("filter", filter);
@@ -112,6 +109,13 @@ public final class ClusterController {
   @ResponseStatus(HttpStatus.OK)
   @RequestMapping("/health_check")
   public void healthCheck() {
+  }
+
+  @RequestMapping("/toggleReadOnly")
+  public String toggleReadOnly() {
+    kafkaMonitor.setTopicCreateEnabled(!kafkaMonitor.isTopicCreateEnabled());
+    kafkaMonitor.setTopicDeleteEnabled(!kafkaMonitor.isTopicDeleteEnabled());
+    return "redirect:/";
   }
 
   /**
