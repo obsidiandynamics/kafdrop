@@ -16,7 +16,7 @@ This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the 
 # Features
 * **View Kafka brokers** — topic and partition assignments, and controller status
 * **View topics** — partition count, replication status, and custom configuration
-* **Browse messages** — JSON, plain text and Avro encoding
+* **Browse messages** — JSON, plain text, Avro and Protobuf encoding
 * **View consumer groups** — per-partition parked offsets, combined and per-partition lag
 * **Create new topics**
 * **View ACLs**
@@ -63,13 +63,20 @@ Finally, a default message format (e.g. to deserialize Avro messages) can option
 Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
 
 ## Configure Protobuf message type
-In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime. 
+### Option 1: Using Protobuf Descriptor 
+In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. 
+Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). 
+Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime. 
 
 To configure a folder with protobuf descriptor file(s) (.desc), follow:
 ```
 --protobufdesc.directory=/var/protobuf_desc
 ```
 
+### Option 2 : Using Schema Registry
+In case of no protobuf descriptor file being supplied the implementation will attempt to create the protobuf deserializer using the schema registry instead.
+
+### Defaulting to Protobuf
 If preferred the message type could be set to default as follows:
 ```
 --message.format=PROTOBUF
@@ -250,7 +257,7 @@ docker run -d --rm -p 9000:9000 \
 |`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
-|`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro message
+|`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro or Protobuf message
 |`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
