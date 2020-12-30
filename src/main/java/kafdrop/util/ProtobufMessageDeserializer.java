@@ -64,7 +64,7 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
         throw new DeserializationException(errorMsg);
       }
       DynamicMessage message = DynamicMessage.parseFrom(messageDescriptor.get(), CodedInputStream.newInstance(buffer));
-
+      
       JsonFormat.TypeRegistry typeRegistry = JsonFormat.TypeRegistry.newBuilder().add(descriptors).build();
       Printer printer = JsonFormat.printer().usingTypeRegistry(typeRegistry);
 

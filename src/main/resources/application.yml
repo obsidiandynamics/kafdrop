@@ -27,10 +27,11 @@ kafdrop.monitor:
   clientId: Kafdrop
 
 kafka:
-  brokerConnect: localhost:9092
-  isSecured: false
-  saslMechanism: "PLAIN"
-  securityProtocol: "SASL_PLAINTEXT"
+  brokerConnect: tricycle-01.srvs.cloudkafka.com:9094,tricycle-02.srvs.cloudkafka.com:9094,tricycle-03.srvs.cloudkafka.com:9094
+  isSecured: true
+  env: local
+  saslMechanism: SCRAM-SHA-256
+  securityProtocol: SASL_SSL
   truststoreFile: "${KAFKA_TRUSTSTORE_FILE:kafka.truststore.jks}"
   propertiesFile : "${KAFKA_PROPERTIES_FILE:kafka.properties}"
   keystoreFile: "${KAFKA_KEYSTORE_FILE:kafka.keystore.jks}"

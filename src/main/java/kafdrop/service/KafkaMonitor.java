@@ -20,6 +20,8 @@ package kafdrop.service;
 
 import kafdrop.model.*;
 import kafdrop.util.*;
+
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.*;
 
 import java.util.*;
@@ -57,6 +59,8 @@ public interface KafkaMonitor {
    * @param topic name of the topic to delete
    */
   void deleteTopic(String topic);
+  
+  RecordMetadata publishMessage(CreateMessageVO message, Serializers serializers);
 
   List<AclVO> getAcls();
 }

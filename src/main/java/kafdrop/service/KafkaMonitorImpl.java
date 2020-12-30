@@ -23,6 +23,7 @@ import kafdrop.util.*;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.admin.ConfigEntry.*;
 import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.*;
 import org.apache.kafka.common.header.*;
 import org.slf4j.*;
@@ -42,10 +43,13 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   private final KafkaHighLevelConsumer highLevelConsumer;
 
   private final KafkaHighLevelAdminClient highLevelAdminClient;
+  
+  private final KafkaHighLevelProducer highLevelProducer;
 
-  public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelAdminClient highLevelAdminClient) {
+  public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelAdminClient highLevelAdminClient, KafkaHighLevelProducer highLevelProducer) {
     this.highLevelConsumer = highLevelConsumer;
     this.highLevelAdminClient = highLevelAdminClient;
+    this.highLevelProducer = highLevelProducer;
   }
 
   @Override
@@ -315,4 +319,9 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         .filter(not(ConsumerGroupOffsets::isEmpty))
         .collect(Collectors.toList());
   }
+
+	@Override
+	public RecordMetadata publishMessage(CreateMessageVO message, Serializers serializers) {
+		return highLevelProducer.publishMessage(message, serializers);
+	}
 }
