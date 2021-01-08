@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 <#import "/spring.ftl" as spring />
-<#import "lib/template.ftl" as template>
+<#import "lib/template.ftlh" as template>
 <@template.header "Topic: ${topic.name}">
     <style type="text/css">
         #action-bar {

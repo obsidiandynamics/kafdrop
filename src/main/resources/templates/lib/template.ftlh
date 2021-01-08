@@ -32,13 +32,13 @@
     <#nested>
 </head>
 <body>
-<#include "../includes/header.ftl">
+<#include "../includes/header.ftlh">
 <div class="container">
     </#macro>
 
     <#macro footer>
 </div>
-<#include "../includes/footer.ftl">
+<#include "../includes/footer.ftlh">
 <#nested>
 </body>
 </html>
