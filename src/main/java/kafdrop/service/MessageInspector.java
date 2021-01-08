@@ -26,16 +26,27 @@ import org.springframework.stereotype.*;
 import java.util.*;
 
 @Service
-public class MessageInspector {
+public final class MessageInspector {
   private final KafkaMonitor kafkaMonitor;
 
   public MessageInspector(KafkaMonitor kafkaMonitor) {
     this.kafkaMonitor = kafkaMonitor;
   }
 
+  /**
+   * Gets messages for a given partition.
+   */
   public List<MessageVO> getMessages(String topicName, int partitionId, long offset, int count,
-                                     MessageDeserializer deserializer) {
+                                     Deserializers deserializers) {
     final var topicPartition = new TopicPartition(topicName, partitionId);
-    return kafkaMonitor.getMessages(topicPartition, offset, count, deserializer);
+    return kafkaMonitor.getMessages(topicPartition, offset, count, deserializers);
+  }
+
+  /**
+   * Gets all messages from all partitions of a given topic.
+   */
+  public List<MessageVO> getMessages(String topicName, int count,
+                                     Deserializers deserializers) {
+    return kafkaMonitor.getMessages(topicName, count, deserializers);
   }
 }

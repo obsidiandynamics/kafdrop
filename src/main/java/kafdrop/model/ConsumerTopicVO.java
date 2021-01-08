@@ -20,7 +20,7 @@ package kafdrop.model;
 
 import java.util.*;
 
-public class ConsumerTopicVO {
+public final class ConsumerTopicVO {
   private final String topic;
   private final Map<Integer, ConsumerPartitionVO> offsets = new TreeMap<>();
 

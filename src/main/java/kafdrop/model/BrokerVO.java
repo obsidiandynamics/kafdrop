@@ -18,64 +18,38 @@
 
 package kafdrop.model;
 
-import com.fasterxml.jackson.annotation.*;
+public final class BrokerVO {
+  private final int id;
+  private final String host;
+  private final int port;
+  private final boolean controller;
+  private final String rack;
 
-import java.util.*;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class BrokerVO {
-  private int id;
-  private String host;
-  private int port;
-  private int version;
-  private boolean controller;
-  private Date timestamp;
+  public BrokerVO(int id, String host, int port, String rack, boolean controller) {
+    this.id = id;
+    this.host = host;
+    this.port = port;
+    this.rack = rack;
+    this.controller = controller;
+  }
 
   public int getId() {
     return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
   }
 
   public String getHost() {
     return host;
   }
 
-  public void setHost(String host) {
-    if (host != null) {
-      this.host = host;
-    }
-  }
-
   public int getPort() {
     return port;
   }
 
-  public void setPort(int port) {
-    if (port > 0) {
-      this.port = port;
-    }
-  }
-
-  public int getVersion() {
-    return version;
-  }
-
-  public void setVersion(int version) {
-    this.version = version;
-  }
-
-  public Date getTimestamp() {
-    return timestamp;
+  public String getRack() {
+    return rack;
   }
 
   public boolean isController() {
     return controller;
-  }
-
-  public void setController(boolean controller) {
-    this.controller = controller;
   }
 }

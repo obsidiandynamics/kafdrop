@@ -1,3 +1,4 @@
+<#ftl output_format="HTML">
 <#--
  Copyright 2016 Kafdrop contributors.
 
@@ -13,11 +14,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<#import "lib/template.ftl" as template>
 <#import "/spring.ftl" as spring />
+<#import "lib/template.ftl" as template>
 <@template.header "Topic: ${topic.name}: Messages">
     <style type="text/css">
-        h1 {
+        h2 {
             margin-bottom: 16px;
         }
 
@@ -29,34 +30,62 @@
             margin-left: 16px;
         }
 
+        .badge {
+            margin-right: 5px;
+        }
+
         .toggle-msg {
             float: left;
         }
     </style>
 
-    <script src="/js/message-inspector.js"></script>
+    <script src="<@spring.url '/js/message-inspector.js'/>"></script>
+    
+    <script type="text/javascript">
+	$( document ).ready(updateProtobufPanel);
+	function updateProtobufPanel()   
+	{   	   
+	   if ($("#format").val() != "PROTOBUF")
+	    {
+	        $('#protobufDescriptor').hide();
+	        $('#protobufMsgType').hide();
+	    }
+	    else
+	    {
+	        $('#protobufDescriptor').show();
+	        $('#protobufMsgType').show();
+	        $('#descFile').prop('required',true);
+	    }
+	}  
+	$(document).ready(function(){
+	    $("#format").change(function() {
+	    	updateProtobufPanel();
+	    });
+	});
+	</script>
 </@template.header>
 <#setting number_format="0">
 
 
-<h1>Topic Messages: <a href="/topic/${topic.name}">${topic.name}</a></h1>
+<h2>Topic Messages: <a href="<@spring.url '/topic/${topic.name}'/>">${topic.name}</a></h2>
 
 <#assign selectedPartition=messageForm.partition!0?number>
 <#assign selectedFormat=messageForm.format!defaultFormat>
+<#assign selectedKeyFormat=messageForm.keyFormat!defaultFormat>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
-    <span class="label label-default">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>&nbsp;
-    <span class="label label-default">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>&nbsp;
-    <span class="label label-default">Size:</span> <span
+    <span class="badge badge-light">First Offset:</span> <span id="firstOffset">${curPartition.firstOffset}</span>&nbsp;
+    <span class="badge badge-light">Last Offset:</span> <span id="lastOffset">${curPartition.size}</span>&nbsp;
+    <span class="badge badge-light">Size:</span> <span
             id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
 </div>
 
-<div id="messageFormPanel" class="panel panel-default">
-    <form method="GET" action="/topic/${topic.name}/messages" id="messageForm" class="form-inline panel-body">
+<div id="messageFormPanel" class="card">
+    <form method="GET" action="<@spring.url '/topic/${topic.name}/messages'/>" id="messageForm" class="form-inline card-body">
         <div class="form-group">
             <label for="partition">Partition</label>
-            <select id="partition" name="partition">
+            <select class="form-control" id="partition" name="partition">
                 <#list topic.partitions as p>
                     <option value="${p.id}" data-first-offset="${p.firstOffset}" data-last-offset="${p.size}"
                             <#if p.id == selectedPartition>selected="selected"</#if>>${p.id}</option>
@@ -67,7 +96,7 @@
         <@spring.bind path="messageForm.offset"/>
         <div class="form-group ${spring.status.error?string("has-error", "")}">
             <label class="control-label" for="offset">Offset</label>
-            <@spring.formInput path="messageForm.offset" attributes='class="form-control"'/>
+            <@spring.formInput path="messageForm.offset" attributes='class="form-control" size="10"'/>
             <#if spring.status.error>
                 <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
             </#if>
@@ -76,23 +105,51 @@
         <@spring.bind path="messageForm.count"/>
         <div class="form-group ${spring.status.error?string("has-error", "")}">
             <label class=control-label" for="count"># messages</label>
-            <@spring.formInput path="messageForm.count" attributes='class="form-control ${spring.status.error?string("has-error", "")}"'/>
+            <@spring.formInput path="messageForm.count" attributes='class="form-control ${spring.status.error?string("has-error", "")}" size="10"'/>
             <#if spring.status.error>
                 <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
             </#if>
         </div>
         &nbsp;&nbsp;
         <div class="form-group">
+            <label for="format">Key format</label>
+            <select class="form-control" id="keyFormat" name="keyFormat">
+                <#list keyFormats as kf>
+                    <option value="${kf}" <#if kf == selectedKeyFormat>selected="selected"</#if>>${kf}</option>
+                </#list>
+            </select>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group">
             <label for="format">Message format</label>
-            <select id="format" name="format">
+            <select class="form-control" id="format" name="format">
                 <#list messageFormats as f>
                     <option value="${f}" <#if f == selectedFormat>selected="selected"</#if>>${f}</option>
                 </#list>
             </select>
         </div>
         &nbsp;&nbsp;
-
-        <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> View Messages</button>
+        <div class="form-group" id="protobufDescriptor">
+        <#if descFiles?size != 0>
+          <label for="format">Protobuf descriptor</label>
+	        <select class="form-control" id="descFile" name="descFile">
+	          <#list descFiles as f>
+	           <option value="${f}">${f}</option>
+	          </#list>
+	        </select>
+        <#else>
+          <span class="errorMessage">No available descriptor, please check.</span>
+        </#if>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group" id="protobufMsgType">
+            <#if descFiles?size != 0>
+              <label class=control-label" for="format">Protobuf message type name</label>
+              <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
+            </#if>
+        </div>
+        &nbsp;&nbsp;
+        <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
     </form>
 </div>
 
@@ -100,11 +157,11 @@
 <div id="message-display" class="container">
     <#if messages?? && messages?size gt 0>
         <#list messages as msg>
-            <#assign offset=messageForm.offset + msg_index>
-            <div data-offset="${offset}" class="message-detail">
-                <span class="label label-default">Offset:</span> ${offset} &nbsp;
-                <span class="label label-default">Key:</span> ${msg.key!''} &nbsp;
-                <span class="label label-default">Headers:</span> ${msg.headers}
+            <div class="message-detail">
+                <span class="badge badge-light">Offset:</span> ${msg.offset} &nbsp;
+                <span class="badge badge-light">Key:</span> ${msg.key!''} &nbsp;
+                <span class="badge badge-light">Timestamp:</span> ${msg.timestamp?string('yyyy-MM-dd HH:mm:ss.SSS')}
+                <span class="badge badge-light">Headers:</span> ${msg.headersFormatted}
                 <div>
                     <a href="#" class="toggle-msg"><i class="fa fa-chevron-circle-right">&nbsp;</i></a>
                     <pre class="message-body">${msg.message!''}</pre>

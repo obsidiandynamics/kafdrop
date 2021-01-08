@@ -1,0 +1,293 @@
+// Darkly 4.3.1
+// Bootswatch
+
+
+// Variables ===================================================================
+
+//$web-font-path: "../fonts" !default;
+// @import url($web-font-path);
+
+
+/* lato-regular - latin-ext_latin */
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/lato-v16-latin-ext_latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Lato Regular'), local('Lato-Regular'),
+       url('../fonts/lato-v16-latin-ext_latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/lato-v16-latin-ext_latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/lato-v16-latin-ext_latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/lato-v16-latin-ext_latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/lato-v16-latin-ext_latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
+}
+/* lato-700 - latin-ext_latin */
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/lato-v16-latin-ext_latin-700.eot'); /* IE9 Compat Modes */
+  src: local('Lato Bold'), local('Lato-Bold'),
+       url('../fonts/lato-v16-latin-ext_latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/lato-v16-latin-ext_latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/lato-v16-latin-ext_latin-700.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/lato-v16-latin-ext_latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/lato-v16-latin-ext_latin-700.svg#Lato') format('svg'); /* Legacy iOS */
+}
+/* lato-700italic - latin-ext_latin */
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 700;
+  src: url('../fonts/lato-v16-latin-ext_latin-700italic.eot'); /* IE9 Compat Modes */
+  src: local('Lato Bold Italic'), local('Lato-BoldItalic'),
+       url('../fonts/lato-v16-latin-ext_latin-700italic.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/lato-v16-latin-ext_latin-700italic.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/lato-v16-latin-ext_latin-700italic.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/lato-v16-latin-ext_latin-700italic.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/lato-v16-latin-ext_latin-700italic.svg#Lato') format('svg'); /* Legacy iOS */
+}
+
+
+// Navbar ======================================================================
+
+.bg-primary {
+  .navbar-nav .active > .nav-link {
+    color: $success !important;
+  }
+}
+
+.bg-light {
+  &.navbar {
+    background-color: $success !important;
+  }
+
+  &.navbar-light .navbar-nav {
+    .nav-link:focus,
+    .nav-link:hover,
+    .active > .nav-link {
+      color: $primary !important;
+    }
+  }
+}
+
+// Buttons =====================================================================
+
+.btn-success {
+  $hue_rotation_deg: 5;
+  background-color: adjust_hue(darken($success, 5%), $hue_rotation_deg);
+  border-color: adjust_hue(darken($success, 5%), $hue_rotation_deg);
+
+  &:hover {
+    background-color: adjust_hue(darken($success, 10%), $hue_rotation_deg);
+    border-color: adjust_hue(darken($success, 10%), $hue_rotation_deg);
+  }
+}
+
+// Typography ==================================================================
+
+.blockquote {
+  &-footer {
+    color: $gray-600;
+  }
+}
+
+// Tables ======================================================================
+
+.table {
+
+  &-primary {
+    &, > th, > td {
+      background-color: $primary;
+    }
+  }
+
+  &-secondary {
+    &, > th, > td {
+      background-color: $secondary;
+    }
+  }
+
+  &-light {
+    &, > th, > td {
+      background-color: $light;
+    }
+  }
+
+  &-dark {
+    &, > th, > td {
+      background-color: $dark;
+    }
+  }
+
+  &-success {
+    &, > th, > td {
+      background-color: $success;
+    }
+  }
+
+  &-info {
+    &, > th, > td {
+      background-color: $info;
+    }
+  }
+
+  &-danger {
+    &, > th, > td {
+      background-color: $danger;
+    }
+  }
+
+  &-warning {
+    &, > th, > td {
+      background-color: $warning;
+    }
+  }
+
+  &-active {
+    &, > th, > td {
+      background-color: $table-active-bg;
+    }
+  }
+
+  &-hover {
+
+    .table-primary:hover {
+      &, > th, > td {
+        background-color: darken($primary, 5%);
+      }
+    }
+
+    .table-secondary:hover {
+      &, > th, > td {
+        background-color: darken($secondary, 5%);
+      }
+    }
+
+    .table-light:hover {
+      &, > th, > td {
+        background-color: darken($light, 5%);
+      }
+    }
+
+    .table-dark:hover {
+      &, > th, > td {
+        background-color: darken($dark, 5%);
+      }
+    }
+
+    .table-success:hover {
+      &, > th, > td {
+        background-color: darken($success, 5%);
+      }
+    }
+
+    .table-info:hover {
+      &, > th, > td {
+        background-color: darken($info, 5%);
+      }
+    }
+
+    .table-danger:hover {
+      &, > th, > td {
+        background-color: darken($danger, 5%);
+      }
+    }
+
+    .table-warning:hover {
+      &, > th, > td {
+        background-color: darken($warning, 5%);
+      }
+    }
+
+    .table-active:hover {
+      &, > th, > td {
+        background-color: $table-active-bg;
+      }
+    }
+
+  }
+}
+
+// Forms =======================================================================
+
+.input-group-addon {
+  color: #fff;
+}
+
+// Navs ========================================================================
+
+.nav-tabs,
+.nav-pills {
+
+  .nav-link,
+  .nav-link.active,
+  .nav-link.active:focus,
+  .nav-link.active:hover,
+  .nav-item.open .nav-link,
+  .nav-item.open .nav-link:focus,
+  .nav-item.open .nav-link:hover {
+    color: #fff;
+  }
+}
+
+.breadcrumb a {
+  color: #fff;
+}
+
+.pagination {
+  a:hover {
+    text-decoration: none;
+  }
+}
+
+// Indicators ==================================================================
+
+.close {
+  opacity: 0.4;
+
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
+}
+
+.alert {
+  border: none;
+  color: $white;
+
+  a,
+  .alert-link {
+    color: #fff;
+    text-decoration: underline;
+  }
+
+  @each $color, $value in $theme-colors {
+    &-#{$color} {
+      @if $enable-gradients {
+        background: $value linear-gradient(180deg, mix($white, $value, 15%), $value) repeat-x;
+      } @else {
+        background-color: $value;
+      }
+    }
+  }
+}
+
+// Progress bars ===============================================================
+
+// Containers ==================================================================
+
+
+.list-group-item-action {
+  color: #fff;
+
+  &:hover,
+  &:focus {
+    background-color: $gray-700;
+    color: #fff;
+  }
+
+  .list-group-item-heading {
+    color: #fff;
+  }
+}

@@ -16,12 +16,6 @@
  *
  */
 
-.l-content {
-    padding-left: 20px;
-    padding-right: 20px;
-    margin: 0 auto;
-}
-
 .clearing {
     height: 1px;
     line-height: 1px;
@@ -43,4 +37,59 @@ table.overview {
 
 input[type=text].error {
     border-color: red;
+}
+
+#header-title-line {
+    height: 7em;
+}
+
+#logo {
+    height: 7em;
+    padding-bottom: 0.5em;
+}
+
+#title {
+    line-height: 7em;
+}
+
+#title h1 {
+    vertical-align: bottom;
+    display: inline-block;
+}
+
+#filter {
+    border: 1px solid #444;
+    color: white;
+    background-color: #222;
+}
+
+#filter:focus {
+    outline: #00f0fe auto 2px;
+}
+
+#kafdropVersion {
+    color: #888;
+    font-size: 0.8em;
+    margin-top: -1.8em;
+    float: right;
+}
+
+#errorHeader {
+    font-size: 1.2em;
+}
+
+#errorMessage {
+    font-weight: bold;
+    color: #eb3474;
+}
+
+#stackTraceTitle {
+    padding-top: 2em;
+    font-weight: bold;
+    color: #999;
+}
+
+#stackTrace {
+    font-family: monospace;
+    color: #999;
 }

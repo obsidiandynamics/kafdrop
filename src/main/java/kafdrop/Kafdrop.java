@@ -19,13 +19,17 @@
 package kafdrop;
 
 import com.google.common.base.*;
+import io.undertow.server.*;
+import io.undertow.websockets.jsr.*;
 import kafdrop.config.ini.*;
-import kafdrop.service.*;
 import org.slf4j.*;
+import org.slf4j.Logger;
 import org.springframework.boot.Banner.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.builder.*;
 import org.springframework.boot.context.event.*;
+import org.springframework.boot.web.embedded.undertow.*;
+import org.springframework.boot.web.server.*;
 import org.springframework.context.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.*;
@@ -42,11 +46,27 @@ public class Kafdrop {
   private final static Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
 
   public static void main(String[] args) {
-    new SpringApplicationBuilder(Kafdrop.class)
-        .bannerMode(Mode.OFF)
-        .listeners(new EnvironmentSetupListener(),
-                   new LoggingConfigurationListener())
-        .run(args);
+    createApplicationBuilder()
+      .run(args);
+  }
+
+  public static SpringApplicationBuilder createApplicationBuilder() {
+    return new SpringApplicationBuilder(Kafdrop.class)
+      .bannerMode(Mode.OFF)
+      .listeners(new EnvironmentSetupListener(),
+              new LoggingConfigurationListener());
+  }
+
+  @Bean
+  public WebServerFactoryCustomizer<UndertowServletWebServerFactory> deploymentCustomizer() {
+    return factory -> {
+      final UndertowDeploymentInfoCustomizer customizer = deploymentInfo -> {
+        var inf = new WebSocketDeploymentInfo();
+        inf.setBuffers(new DefaultByteBufferPool(false, 64));
+        deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, inf);
+      };
+      factory.addDeploymentInfoCustomizers(customizer);
+    };
   }
 
   @Bean
@@ -59,7 +79,7 @@ public class Kafdrop {
     };
   }
 
-  private static class LoggingConfigurationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+  private static final class LoggingConfigurationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
     private static final String PROP_LOGGING_FILE = "logging.file";
     private static final String PROP_LOGGER = "LOGGER";
     private static final String PROP_SPRING_BOOT_LOG_LEVEL = "logging.level.org.springframework.boot";
@@ -72,8 +92,8 @@ public class Kafdrop {
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-      final Environment environment = event.getEnvironment();
-      final String loggingFile = environment.getProperty(PROP_LOGGING_FILE);
+      final var environment = event.getEnvironment();
+      final var loggingFile = environment.getProperty(PROP_LOGGING_FILE);
       if (loggingFile != null) {
         System.setProperty(PROP_LOGGER, "FILE");
         try {
@@ -90,7 +110,7 @@ public class Kafdrop {
     }
   }
 
-  private static class EnvironmentSetupListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+  private static final class EnvironmentSetupListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
     private static final String SM_CONFIG_DIR = "sm.config.dir";
     private static final String CONFIG_SUFFIX = "-config.ini";
 
@@ -101,27 +121,23 @@ public class Kafdrop {
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-      final ConfigurableEnvironment environment = event.getEnvironment();
+      final var environment = event.getEnvironment();
 
-      LOG.info("Initializing jaas config");
+      LOG.info("Initializing JAAS config");
       final String env = environment.getProperty("kafka.env");
       final boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
       LOG.info("env: {} .isSecured kafka: {}", env, isSecured);
       if (isSecured && Strings.isNullOrEmpty(env)) {
-        throw new RuntimeException("'env' cannot be null if connecting to secured kafka.");
+        throw new IllegalArgumentException("Value of 'env' cannot be null if connecting to secured kafka.");
       }
 
-      LOG.info("ENV: {}", env);
+      LOG.info("Env: {}", env);
       String path;
 
       if (isSecured) {
-        if ((env.equalsIgnoreCase("stage") || env.equalsIgnoreCase("prod") || env.equalsIgnoreCase("local"))) {
-          path = environment.getProperty("user.dir") + "/kaas_" + env.toLowerCase() + "_jaas.conf";
-          LOG.info("PATH: {}", path);
-          System.setProperty("java.security.auth.login.config", path);
-        } else {
-          throw new RuntimeException("unable to identify env. set 'evn' variable either to 'stage' or 'prod' or local");
-        }
+        path = environment.getProperty("user.dir") + "/kaas_" + env.toLowerCase() + "_jaas.conf";
+        LOG.info("PATH: {}", path);
+        System.setProperty("java.security.auth.login.config", path);
       }
 
       if (environment.containsProperty(SM_CONFIG_DIR)) {
@@ -133,11 +149,11 @@ public class Kafdrop {
       }
     }
 
-    private IniFilePropertySource readProperties(Environment environment, String name) {
-      final File file = new File(environment.getProperty(SM_CONFIG_DIR), name + CONFIG_SUFFIX);
+    private static IniFilePropertySource readProperties(Environment environment, String name) {
+      final var file = new File(environment.getProperty(SM_CONFIG_DIR), name + CONFIG_SUFFIX);
       if (file.exists() && file.canRead()) {
-        try (InputStream in = new FileInputStream(file);
-             Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
+        try (var in = new FileInputStream(file);
+             var reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
           return new IniFilePropertySource(name, new IniFileReader().read(reader), environment.getActiveProfiles());
         } catch (IOException ex) {
           LOG.error("Unable to read configuration file {}: {}", file, ex);

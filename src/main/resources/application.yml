@@ -1,5 +1,10 @@
 server:
-  port: 9000
+  port: ${SERVER_PORT:9000}
+  servlet:
+    context-path: /
+  error:
+    whitelabel:
+      enabled: false
 
 spring:
   jmx:
@@ -26,6 +31,6 @@ kafka:
   isSecured: false
   saslMechanism: "PLAIN"
   securityProtocol: "SASL_PLAINTEXT"
-
-zookeeper:
-  connect: localhost:2181
+  truststoreFile: "${KAFKA_TRUSTSTORE_FILE:kafka.truststore.jks}"
+  propertiesFile : "${KAFKA_PROPERTIES_FILE:kafka.properties}"
+  keystoreFile: "${KAFKA_KEYSTORE_FILE:kafka.keystore.jks}"

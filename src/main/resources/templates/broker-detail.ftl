@@ -13,6 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Broker: ${broker.id?string}">
     <style type="text/css">
@@ -23,33 +24,36 @@
         td.leader-partitions {
             word-break: break-all;
         }
-
     </style>
 </@template.header>
 
 <#setting number_format="0">
 
-<h1>Broker ID: ${broker.id}</h1>
+<h2>Broker ID: ${broker.id}</h2>
 
 <div id="topic-overview">
-    <h2>Broker Overview</h2>
+    <h3>Broker Overview</h3>
 
     <table class="table table-bordered overview">
         <tbody>
         <tr>
-            <td><i class="fa fa-laptop"></i> Host</td>
-            <td>${broker.host}:${broker.port}</td>
+            <td><i class="fa fa-laptop"></i>&nbsp;&nbsp;Host</td>
+            <td>${broker.host?if_exists}</td>
         </tr>
         <tr>
-            <td><i class="fa fa-clock-o"></i> Start time</td>
-            <td>${broker.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
+            <td><i class="fa fa-plug"></i>&nbsp;&nbsp;Port</td>
+            <td>${broker.port}</td>
         </tr>
         <tr>
-            <td>Controller</td>
+            <td><i class="fa fa-server"></i>&nbsp;&nbsp;Rack</td>
+            <td><#if broker.rack??>${broker.rack}<#else>-</#if></td>
+        </tr>
+        <tr>
+            <td><i class="fa fa-trophy"></i>&nbsp;&nbsp;Controller</td>
             <td><@template.yn broker.controller/></td>
         </tr>
         <tr>
-            <td># of topics</td>
+            <td><i class="fa fa-database"></i>&nbsp;&nbsp;Number of topics</td>
             <td>${topics?size}</td>
         </tr>
 
@@ -58,7 +62,7 @@
             <#assign partitionCount=partitionCount+(t.getLeaderPartitions(broker.id)?size)>
         </#list>
         <tr>
-            <td># of partitions</td>
+            <td><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Number of partitions</td>
             <td>${partitionCount}</td>
         </tr>
         </tbody>
@@ -66,7 +70,7 @@
 </div>
 
 <div>
-    <h2>Topic Detail</h2>
+    <h3>Topic Detail</h3>
 
     <table class="table table-bordered">
         <thead>
@@ -80,7 +84,7 @@
         <tbody>
         <#list topics as t>
             <tr>
-                <td><a href="/topic/${t.name}">${t.name}</a></td>
+                <td><a href="<@spring.url '/topic/${t.name}'/>">${t.name}</a></td>
                 <td>${t.partitions?size}</td>
                 <td>${t.getLeaderPartitions(broker.id)?size}</td>
                 <td class="leader-partitions"><#list t.getLeaderPartitions(broker.id) as p>${p.id}<#sep>,</#list></td>

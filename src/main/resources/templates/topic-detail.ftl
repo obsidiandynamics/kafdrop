@@ -13,6 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Topic: ${topic.name}">
     <style type="text/css">
@@ -23,22 +24,37 @@
         th {
             word-break: break-all;
         }
+
+        #delete-topic-form {
+            display: inline-block;
+            float: right;
+        }
     </style>
 </@template.header>
 
 <#setting number_format="0">
 
-<h1>Topic: ${topic.name}</h1>
+<h2>Topic: ${topic.name}</h2>
 
-<div id="action-bar" class="container">
-    <a class="btn btn-default" href="/topic/${topic.name}/messages"><i class="fa fa-eye"></i> View Messages</a>
+<#if deleteErrorMessage??>
+    <p>Error deleting topic ${topic.name}: ${deleteErrorMessage}</p>
+</#if>
+
+<div id="action-bar" class="container pl-0">
+    <a id="topic-messages" class="btn btn-outline-light" href="<@spring.url '/topic/${topic.name}/messages'/>">
+        <i class="fa fa-eye"></i> View Messages
+    </a>
+    <#if topicDeleteEnabled>
+        <form id="delete-topic-form" action="<@spring.url '/topic/${topic.name}/delete'/>" method="POST">
+            <button class="btn btn-danger" type="submit"><i class="fa fa-remove"></i> Delete topic</button>
+        </form>
+    </#if>
 </div>
-
-<div class="container-fluid">
+<br/>
+<div class="container-fluid pl-0">
     <div class="row">
-
         <div id="topic-overview" class="col-md-8">
-            <h2>Overview</h2>
+            <h3>Overview</h3>
 
             <table class="table table-bordered">
                 <tbody>
@@ -66,9 +82,8 @@
             </table>
         </div>
 
-
         <div id="topic-config" class="col-md-4">
-            <h2>Configuration</h2>
+            <h3>Configuration</h3>
 
             <#if topic.config?size == 0>
                 <div>No topic-specific configuration</div>
@@ -90,31 +105,33 @@
 
     <div class="row">
         <div id="partition-detail" class="col-md-8">
-            <h2>Partition Detail</h2>
-            <table id="partition-detail-table" class="table table-bordered table-condensed small">
+            <h3>Partition Detail</h3>
+            <table id="partition-detail-table" class="table table-bordered table-sm small">
                 <thead>
                 <tr>
                     <th>Partition</th>
-                    <th>First Offset</th>
-                    <th>Last Offset</th>
+                    <th>First<br>Offset</th>
+                    <th>Last<br>Offset</th>
                     <th>Size</th>
-                    <th>Leader</th>
-                    <th>Replicas</th>
-                    <th>In-sync Replicas</th>
-                    <th>Preferred Leader</th>
+                    <th>Leader<br>Node</th>
+                    <th>Replica<br>Nodes</th>
+                    <th>In-sync<br>Replica<br>Nodes</th>
+                    <th>Offline<br>Replica<br>Nodes</th>
+                    <th>Preferred<br>Leader</th>
                     <th>Under-replicated</th>
                 </tr>
                 </thead>
                 <tbody>
                 <#list topic.partitions as p>
                     <tr>
-                        <td>${p.id}</td>
+                        <td><a href="<@spring.url '/topic/${topic.name}/messages?partition=${p.id}&offset=${p.firstOffset}&count=100'/>">${p.id}</a></td>
                         <td>${p.firstOffset}</td>
                         <td>${p.size}</td>
                         <td>${p.size - p.firstOffset}</td>
                         <td <#if !(p.leader)??>class="warning"</#if>>${(p.leader.id)!"none"}</td>
                         <td><#list p.replicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
                         <td><#list p.inSyncReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
+                        <td><#list p.offlineReplicas as r>${r.id}<#if r_has_next>,</#if></#list></td>
                         <td <#if !p.leaderPreferred>class="warning"</#if>><@template.yn p.leaderPreferred/></td>
                         <td <#if p.underReplicated>class="warning"</#if>><@template.yn p.underReplicated/></td>
                     </tr>
@@ -124,8 +141,8 @@
         </div>
 
         <div id="consumers" class="col-md-4">
-            <h2>Consumers</h2>
-            <table id="consumers-table" class="table table-bordered table-condensed small">
+            <h3>Consumers</h3>
+            <table id="consumers-table" class="table table-bordered table-sm small">
                 <thead>
                 <tr>
                     <th>Group ID</th>
@@ -135,7 +152,7 @@
                 <tbody>
                 <#list consumers![] as c>
                     <tr>
-                        <td>${c.groupId}</td>
+                        <td><a href="<@spring.url '/consumer/${c.groupId}'/>">${c.groupId}</a></td>
                         <td>${c.getTopic(topic.name).lag}</td>
                     </tr>
                 </#list>
@@ -145,3 +162,19 @@
     </div>
 </div>
 <@template.footer/>
+
+<script>
+  $(document).ready(function () {
+    let removalConfirmed = false;
+
+    $('#delete-topic-form').submit(function (event) {
+      if (!removalConfirmed) {
+        event.preventDefault();
+        if(confirm('Are you sure you want to delete the topic?')) {
+          removalConfirmed = true;
+          $('#delete-topic-form').submit();
+        }
+      }
+    });
+  });
+</script>

@@ -13,28 +13,32 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#macro header title>
     <!DOCTYPE html>
 <html>
 <head>
     <title>Kafdrop: ${title}</title>
-    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css"/>
-    <link type="text/css" rel="stylesheet" href="/css/font-awesome.min.css"/>
-    <link type="text/css" rel="stylesheet" href="/css/global.css"/>
+    <link type="text/css" rel="stylesheet" href="<@spring.url '/css/bootstrap.min.css'/>"/>
+    <link type="text/css" rel="stylesheet" href="<@spring.url '/css/font-awesome.min.css'/>"/>
+    <link type="text/css" rel="stylesheet" href="<@spring.url '/css/global.css'/>"/>
 
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/global.js"></script>
+    <script src="<@spring.url '/js/jquery.min.js'/>"></script>
+    <script src="<@spring.url '/js/popper.min.js'/>"></script>
+    <script src="<@spring.url '/js/bootstrap.min.js'/>"></script>
+    <script src="<@spring.url '/js/global.js'/>"></script>
+    <script async defer src="<@spring.url '/js/github-buttons.js'/>"></script>
 
     <#nested>
 </head>
 <body>
 <#include "../includes/header.ftl">
-<div class="container l-container">
+<div class="container">
     </#macro>
 
     <#macro footer>
 </div>
+<#include "../includes/footer.ftl">
 <#nested>
 </body>
 </html>

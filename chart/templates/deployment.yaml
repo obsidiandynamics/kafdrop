@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}
@@ -18,32 +18,61 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "chart.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+{{- if .Values.podAnnotations }}
+{{ toYaml .Values.podAnnotations | indent 8 }}
+{{- end }}        
     spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-          - name: ZOOKEEPER_CONNECT
-            value: "{{ .Values.zkConnect }}"
           - name: KAFKA_BROKERCONNECT
-            value: "{{ .Values.kafkaBrokerConnect }}"
+            value: "{{ .Values.kafka.brokerConnect }}"
+          - name: KAFKA_PROPERTIES
+            value: "{{ .Values.kafka.properties }}"
+          - name: KAFKA_TRUSTSTORE
+            value: "{{ .Values.kafka.truststore }}"
+          - name: KAFKA_KEYSTORE
+            value: "{{ .Values.kafka.keystore }}"
           - name: JVM_OPTS
             value: "{{ .Values.jvm.opts }}"
+          - name: JMX_PORT
+            value: "{{ .Values.jmx.port }}"
+          - name: HOST
+            value: "{{ .Values.host }}"
+          - name: SERVER_SERVLET_CONTEXTPATH
+            value: "{{ .Values.server.servlet.contextPath | trimSuffix "/" }}"
+          - name: KAFKA_PROPERTIES_FILE
+            value: "{{ .Values.kafka.propertiesFile }}"
+          - name: KAFKA_TRUSTSTORE_FILE
+            value: "{{ .Values.kafka.truststoreFile }}"
+          - name: KAFKA_KEYSTORE_FILE
+            value: "{{ .Values.kafka.keystoreFile }}"
+          - name: SERVER_PORT
+            value: "{{ .Values.server.port }}"
+          - name: CMD_ARGS
+{{- if .Values.mountProtoDesc.enabled }}
+            value: "--message.format=PROTOBUF --protobufdesc.directory=/protodesc/ {{ .Values.cmdArgs }}"
+{{- else }}
+            value: "{{ .Values.cmdArgs }}"
+{{- end }}
+
           ports:
             - name: http
               containerPort: 9000
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: "{{ .Values.server.servlet.contextPath | trimSuffix "/" }}/actuator/health"
               port: http
             initialDelaySeconds: 180
             periodSeconds: 30
             timeoutSeconds: 10
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path: "{{ .Values.server.servlet.contextPath | trimSuffix "/" }}/actuator/health"
               port: http
             initialDelaySeconds: 20
             periodSeconds: 5
@@ -62,3 +91,15 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+{{- if .Values.mountProtoDesc.enabled }}
+          volumeMounts:
+            - mountPath: /protodesc/
+              name: proto-desc
+      volumes:
+        - name: proto-desc
+          hostPath:
+            path: {{ .Values.mountProtoDesc.hostPath }}
+            type: Directory
+{{- end }}
+
+

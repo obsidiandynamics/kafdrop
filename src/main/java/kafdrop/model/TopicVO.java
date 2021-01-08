@@ -21,10 +21,12 @@ package kafdrop.model;
 import java.util.*;
 import java.util.stream.*;
 
-public class TopicVO implements Comparable<TopicVO> {
+public final class TopicVO implements Comparable<TopicVO> {
   private final String name;
+
   private Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
-  private final Map<String, Object> config = new TreeMap<>();
+
+  private Map<String, String> config = Collections.emptyMap();
 
   public TopicVO(String name) {
     this.name = name;
@@ -34,8 +36,12 @@ public class TopicVO implements Comparable<TopicVO> {
     return name;
   }
 
-  public Map<String, Object> getConfig() {
+  public Map<String, String> getConfig() {
     return config;
+  }
+
+  public void setConfig(Map<String, String> config) {
+    this.config = config;
   }
 
   public Map<Integer, TopicPartitionVO> getPartitionMap() {
@@ -90,7 +96,7 @@ public class TopicVO implements Comparable<TopicVO> {
     if (partitions.isEmpty()) {
       return 0;
     } else {
-      long preferredLeaderCount = partitions.values().stream()
+      final var preferredLeaderCount = partitions.values().stream()
           .filter(TopicPartitionVO::isLeaderPreferred)
           .count();
       return ((double) preferredLeaderCount) / ((double) partitions.size());
@@ -106,18 +112,21 @@ public class TopicVO implements Comparable<TopicVO> {
   public boolean equals(Object o) {
     if (this == o) {
       return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
+    } else if (o instanceof TopicVO) {
+      final var that = (TopicVO) o;
+      return Objects.equals(name, that.name);
+    } else {
       return false;
     }
-
-    TopicVO that = (TopicVO) o;
-
-    return name.equals(that.name);
   }
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return Objects.hashCode(name);
+  }
+
+  @Override
+  public String toString() {
+    return TopicVO.class.getSimpleName() + " [name=" + name +", partitions=" + partitions + "]";
   }
 }

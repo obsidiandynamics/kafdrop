@@ -20,38 +20,59 @@ package kafdrop.controller;
 
 import io.swagger.annotations.*;
 import kafdrop.config.*;
-import kafdrop.config.CuratorConfiguration.*;
 import kafdrop.model.*;
 import kafdrop.service.*;
+import org.springframework.beans.factory.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.*;
 import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.ui.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
 @Controller
 public final class ClusterController {
+  private final KafkaConfiguration kafkaConfiguration;
+
   private final KafkaMonitor kafkaMonitor;
 
-  private final CuratorConfiguration.ZookeeperProperties zookeeperProperties;
+  private final BuildProperties buildProperties;
 
-  public ClusterController(KafkaMonitor kafkaMonitor, ZookeeperProperties zookeeperProperties) {
+  private final boolean topicCreateEnabled;
+
+  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ObjectProvider<BuildInfo> buildInfoProvider,
+          @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
+    this.kafkaConfiguration = kafkaConfiguration;
     this.kafkaMonitor = kafkaMonitor;
-    this.zookeeperProperties = zookeeperProperties;
+    this.buildProperties = buildInfoProvider.stream()
+        .map(BuildInfo::getBuildProperties)
+        .findAny()
+        .orElseGet(ClusterController::blankBuildProperties);
+    this.topicCreateEnabled = topicCreateEnabled;
+  }
+
+  private static BuildProperties blankBuildProperties() {
+    final var properties = new Properties();
+    properties.setProperty("version", "3.x");
+    properties.setProperty("time", String.valueOf(System.currentTimeMillis()));
+    return new BuildProperties(properties);
   }
 
   @RequestMapping("/")
   public String clusterInfo(Model model,
                             @RequestParam(value = "filter", required = false) String filter) {
-    model.addAttribute("zookeeper", zookeeperProperties);
+    model.addAttribute("bootstrapServers", kafkaConfiguration.getBrokerConnect());
+    model.addAttribute("buildProperties", buildProperties);
 
-    final List<BrokerVO> brokers = kafkaMonitor.getBrokers();
-    final List<TopicVO> topics = kafkaMonitor.getTopics();
-    final ClusterSummaryVO clusterSummary = kafkaMonitor.getClusterSummary(topics);
+    final var brokers = kafkaMonitor.getBrokers();
+    final var topics = kafkaMonitor.getTopics();
+    final var clusterSummary = kafkaMonitor.getClusterSummary(topics);
 
-    final List<Integer> missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
+    final var missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
         .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
         .collect(Collectors.toList());
 
@@ -59,6 +80,7 @@ public final class ClusterController {
     model.addAttribute("missingBrokerIds", missingBrokerIds);
     model.addAttribute("topics", topics);
     model.addAttribute("clusterSummary", clusterSummary);
+    model.addAttribute("topicCreateEnabled", topicCreateEnabled);
 
     if (filter != null) {
       model.addAttribute("filter", filter);
@@ -73,8 +95,7 @@ public final class ClusterController {
   })
   @RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody ClusterInfoVO getCluster() {
-    final ClusterInfoVO vo = new ClusterInfoVO();
-    vo.zookeeper = zookeeperProperties;
+    final var vo = new ClusterInfoVO();
     vo.brokers = kafkaMonitor.getBrokers();
     vo.topics = kafkaMonitor.getTopics();
     vo.summary = kafkaMonitor.getClusterSummary(vo.topics);
@@ -83,7 +104,6 @@ public final class ClusterController {
 
   @ExceptionHandler(BrokerNotFoundException.class)
   public String brokerNotFound(Model model) {
-    model.addAttribute("zookeeper", zookeeperProperties);
     model.addAttribute("brokers", Collections.emptyList());
     model.addAttribute("topics", Collections.emptyList());
     return "cluster-overview";
@@ -95,11 +115,9 @@ public final class ClusterController {
   }
 
   /**
-   * Simple DTO to encapsulate the cluster state: ZK properties, broker list,
-   * and topic list.
+   * Simple DTO to encapsulate the cluster state.
    */
   public static final class ClusterInfoVO {
-    CuratorConfiguration.ZookeeperProperties zookeeper;
     ClusterSummaryVO summary;
     List<BrokerVO> brokers;
     List<TopicVO> topics;

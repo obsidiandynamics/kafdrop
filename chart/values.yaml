@@ -5,16 +5,34 @@ image:
   tag: latest
   pullPolicy: Always
 
-zkConnect: localhost:2181
-kafkaBrokerConnect: localhost:9092
+kafka:
+  brokerConnect: localhost:9092
+  properties: ""
+  truststore: ""
+  keystore: ""
+  propertiesFile: "kafka.properties"
+  truststoreFile: "kafka.truststore.jks"
+  keystoreFile: "kafka.keystore.jks"
+
+host:
 
 jvm:
   opts: ""
+jmx:
+  port: 8686
 
 nameOverride: ""
 fullnameOverride: ""
 
+cmdArgs: ""
+
+server:
+  port: 9000
+  servlet:
+    contextPath: /
+
 service:
+  annotations: {}
   type: NodePort
   port: 9000
   nodePort: 30900
@@ -39,3 +57,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+podAnnotations: {}
+
+mountProtoDesc: 
+  enabled: false
+  hostPath:

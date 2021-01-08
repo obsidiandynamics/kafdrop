@@ -22,7 +22,7 @@ import com.google.common.collect.*;
 
 import java.util.*;
 
-public class IniFileProperties {
+public final class IniFileProperties {
   private Map<String, Map<String, String>> sectionProperties = Maps.newLinkedHashMap();
   private Map<String, String> defaultProperties = Maps.newLinkedHashMap();
 
@@ -35,16 +35,13 @@ public class IniFileProperties {
   }
 
   public Map<String, String> getSectionProperties(String section) {
-    Map<String, String> sectionProperties = doGetSectionProperties(section);
-    if (sectionProperties != null) {
-      sectionProperties = Collections.unmodifiableMap(sectionProperties);
-    }
-    return sectionProperties;
+    final var sectionProperties = doGetSectionProperties(section);
+    return sectionProperties != null ? sectionProperties : Collections.unmodifiableMap(sectionProperties);
   }
 
   public void addSectionProperty(String section, String name, String value) {
-    Map<String, String> properties = doGetSectionProperties(section);
-    if (section != null && properties == null) {
+    var properties = doGetSectionProperties(section);
+    if (properties == null) {
       properties = Maps.newLinkedHashMap();
       sectionProperties.put(section, properties);
     }
@@ -53,13 +50,10 @@ public class IniFileProperties {
   }
 
   private Map<String, String> doGetSectionProperties(String section) {
-    Map<String, String> properties;
     if (section == null) {
-      properties = getDefaultProperties();
+      return getDefaultProperties();
     } else {
-      properties = sectionProperties.get(section);
+      return sectionProperties.get(section);
     }
-
-    return properties;
   }
 }

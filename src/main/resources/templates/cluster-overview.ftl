@@ -13,37 +13,39 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<#import "/spring.ftl" as spring />
 <#import "lib/template.ftl" as template>
 <@template.header "Broker List"/>
 
-<script src="/js/powerFilter.js"></script>
+<script src="<@spring.url '/js/powerFilter.js'/>"></script>
 
 
 <#setting number_format="0">
 <div>
-    <h2>Kafka Cluster Overview</h2>
+    <div id="kafdropVersion">${buildProperties.getVersion()} [${buildProperties.getTime()}]</div>
 
+    <h2>Kafka Cluster Overview</h2>
     <div id="cluster-overview">
         <table class="table table-bordered">
             <tbody>
             <tr>
-                <td>ZooKeeper host connection</td>
-                <td><#list zookeeper.connectList as z>${z}<#if z_has_next>, </#if></#list></td>
+                <td><i class="fa fa-server"></i>&nbsp;&nbsp;Bootstrap servers</td>
+                <td>${bootstrapServers}</td>
             </tr>
             <tr>
-                <td>Total topics</td>
+                <td><i class="fa fa-database"></i>&nbsp;&nbsp;Total topics</td>
                 <td>${clusterSummary.topicCount}</td>
             </tr>
             <tr>
-                <td>Total partitions</td>
+                <td><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Total partitions</td>
                 <td>${clusterSummary.partitionCount}</td>
             </tr>
             <tr>
-                <td>Total preferred partition leader</td>
+                <td><i class="fa fa-trophy"></i>&nbsp;&nbsp;Total preferred partition leader</td>
                 <td <#if clusterSummary.preferredReplicaPercent lt 1.0>class="warning"</#if>>${clusterSummary.preferredReplicaPercent?string.percent}</td>
             </tr>
             <tr>
-                <td>Total under-replicated partitions</td>
+                <td><i class="fa fa-heartbeat"></i>&nbsp;&nbsp;Total under-replicated partitions</td>
                 <td <#if clusterSummary.underReplicatedCount gt 0>class="warning"</#if>>${clusterSummary.underReplicatedCount}</td>
             </tr>
             </tbody>
@@ -51,26 +53,21 @@
     </div>
 
     <div id="brokers">
-        <h3>Brokers</h3>
+        <h3><i class="fa fa-server"></i> Brokers</h3>
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Host</th>
-                <th>Port</th>
-                <th>Version</th>
+                <th><i class="fa fa-tag"></i>&nbsp;&nbsp;ID</th>
+                <th><i class="fa fa-laptop"></i>&nbsp;&nbsp;Host</th>
+                <th><i class="fa fa-plug"></i>&nbsp;&nbsp;Port</th>
+                <th><i class="fa fa-server"></i>&nbsp;&nbsp;Rack</th>
+                <th><i class="fa fa-trophy"></i>&nbsp;&nbsp;Controller</th>
                 <th>
-                    Start Time
-                    <a title="Time the broker joined the cluster"
-                       data-toggle="tooltip" data-placement="top" href="#"
-                    ><i class="fa fa-question-circle"></i></a>
-                </th>
-                <th>Controller</th>
-                <th>
-                    # Partitions (% of total)
+                    <i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Number of partitions (% of total)
                     <a title="# of partitions this broker is the leader for"
-                       data-toggle="tooltip" data-placement="top" href="#"
-                    ><i class="fa fa-question-circle"></i></a>
+                       data-toggle="tooltip" data-placement="top" href="#">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
                 </th>
             </tr>
             </thead>
@@ -87,11 +84,10 @@
             </#if>
             <#list brokers as b>
                 <tr>
-                    <td><a href="/broker/${b.id}"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
-                    <td>${b.host}</td>
+                    <td><a href="<@spring.url '/broker/${b.id}'/>"><i class="fa fa-info-circle fa-lg"></i> ${b.id}</a></td>
+                    <td>${b.host?if_exists}</td>
                     <td>${b.port?string}</td>
-                    <td>${b.version}</td>
-                    <td>${b.timestamp?string["yyyy-MM-dd HH:mm:ss.SSSZ"]}</td>
+                    <td><#if b.rack??>${b.rack}<#else>-</#if></td>
                     <td><@template.yn b.controller/></td>
                     <td>${(clusterSummary.getBrokerLeaderPartitionCount(b.id))!0}
                         (${(clusterSummary.getBrokerLeaderPartitionRatio(b.id))?string.percent})
@@ -103,7 +99,7 @@
     </div>
 
     <div id="topics">
-        <h3>Topics</h3>
+        <h3><i class="fa fa-database"></i> Topics&nbsp;&nbsp;&nbsp;<a href="<@spring.url '/acl'/>"><i class="fa fa-lock"></i> ACLs</a></h3>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -112,8 +108,8 @@
 
                     <span style="font-weight:normal;">
                             &nbsp;<INPUT id='filter' size=25 NAME='searchRow' title='Just type to filter the rows'>&nbsp;
-                            <span id="rowCount"></span>
-                        </span>
+                        <span id="rowCount"></span>
+                    </span>
                 </th>
                 <th>
                     Partitions
@@ -144,7 +140,7 @@
             </#if>
             <#list topics as t>
                 <tr class="dataRow">
-                    <td><a href="/topic/${t.name}">${t.name}</a></td>
+                    <td><a href="<@spring.url '/topic/${t.name}'/>">${t.name}</a></td>
                     <td>${t.partitions?size}</td>
                     <td <#if t.preferredReplicaPercent lt 1.0>class="warning"</#if>>${t.preferredReplicaPercent?string.percent}</td>
                     <td <#if t.underReplicatedPartitions?size gt 0>class="warning"</#if>>${t.underReplicatedPartitions?size}</td>
@@ -153,6 +149,11 @@
             </#list>
             </tbody>
         </table>
+        <#if topicCreateEnabled>
+            <a class="btn btn-outline-light" href="<@spring.url '/topic/create'/>">
+                <i class="fa fa-plus"></i> New
+            </a>
+        </#if>
     </div>
 </div>
 
