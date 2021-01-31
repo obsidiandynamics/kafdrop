@@ -12,7 +12,7 @@ public final class PublishPayloadVO {
   @ApiParam("Topic name")
   String name;
 
-  @ApiParam("Number of partitions")
+  @ApiParam("Payload")
   String payload;
 
 }

@@ -71,29 +71,4 @@
     </#if>
 </div>
 
-<#--<div>
-    <h3>Topic Detail</h3>
-
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Topic</th>
-            <th>Total Partitions</th>
-            <th>Broker Partitions</th>
-            <th>Partition IDs</th>
-        </tr>
-        </thead>
-        <tbody>
-        <#list topics as t>
-            <tr>
-                <td><a href="<@spring.url '/topic/${t.name}'/>">${t.name}</a></td>
-                <td>${t.partitions?size}</td>
-                <td>${t.getLeaderPartitions(broker.id)?size}</td>
-                <td class="leader-partitions"><#list t.getLeaderPartitions(broker.id) as p>${p.id}<#sep>,</#list></td>
-            </tr>
-        </#list>
-        </tbody>
-    </table>
-</div>-->
-
 <@template.footer/>
