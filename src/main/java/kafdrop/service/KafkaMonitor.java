@@ -59,4 +59,6 @@ public interface KafkaMonitor {
   void deleteTopic(String topic);
 
   List<AclVO> getAcls();
+
+  void publish(String producerTopic, String payload);
 }

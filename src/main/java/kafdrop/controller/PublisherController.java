@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class PublisherController {
 
     @Autowired
-    KafkaHighLevelProducer producer;
-    @Autowired
     KafkaMonitor kafkaMonitor;
 
     @RequestMapping("/ui")
@@ -31,10 +29,7 @@ public class PublisherController {
 
     @PostMapping("{topic}")
     public void publish(@PathVariable("topic") String producerTopics, @RequestBody String message){
-        try{
-            producer.publish(producerTopics,message);
-        }catch(Exception e){System.out.println(e);}
-        System.out.println("Success...");
+        kafkaMonitor.publish(producerTopics,message);
     }
 
 
@@ -44,15 +39,12 @@ public class PublisherController {
     })
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public String publishTopic(PublishPayloadVO publishPayloadVO, Model model) {
-
         try{
             model.addAttribute("topicName", publishPayloadVO.getName());
-            producer.publish(publishPayloadVO.getName(),publishPayloadVO.getPayload());
-
+            kafkaMonitor.publish(publishPayloadVO.getName(),publishPayloadVO.getPayload());
         }catch(Exception e){
             model.addAttribute("errorMessage", e.getMessage());
-            System.out.println(e);}
-        System.out.println("Success...");
+        }
         model.addAttribute("published", true);
         return "publish-payload";
     }

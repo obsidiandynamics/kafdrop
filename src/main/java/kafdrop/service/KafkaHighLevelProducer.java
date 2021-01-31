@@ -50,9 +50,9 @@ public final class KafkaHighLevelProducer {
     ProducerRecord record = new ProducerRecord(producerTopic, key, payload);
     try {
       producer.send(record);
-      System.out.println("Producer completed");
+      LOG.debug("publish payload completed: {}", payload);
     } catch (Exception var12) {
-      System.out.println("Producer failed to send  " + var12);
+      LOG.error("Error while publishing payload", var12);
       throw var12;
     } finally {
       //producer.close();

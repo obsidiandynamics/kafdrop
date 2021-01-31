@@ -41,10 +41,13 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   private final KafkaHighLevelConsumer highLevelConsumer;
 
+  private final KafkaHighLevelProducer highLevelProducer;
+
   private final KafkaHighLevelAdminClient highLevelAdminClient;
 
-  public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelAdminClient highLevelAdminClient) {
+  public KafkaMonitorImpl(KafkaHighLevelConsumer highLevelConsumer, KafkaHighLevelProducer highLevelProducer, KafkaHighLevelAdminClient highLevelAdminClient) {
     this.highLevelConsumer = highLevelConsumer;
+    this.highLevelProducer = highLevelProducer;
     this.highLevelAdminClient = highLevelAdminClient;
   }
 
@@ -229,6 +232,11 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     }
     Collections.sort(aclVos);
     return aclVos;
+  }
+
+  @Override
+  public void publish(String producerTopic, String payload) {
+    highLevelProducer.publish(producerTopic,payload);
   }
 
   private static List<ConsumerVO> convert(List<ConsumerGroupOffsets> consumerGroupOffsets, Collection<TopicVO> topicVos) {
