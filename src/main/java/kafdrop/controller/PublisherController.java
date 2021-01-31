@@ -6,9 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import kafdrop.model.PublishPayloadVO;
 import kafdrop.model.TopicVO;
-import kafdrop.service.KafkaHighLevelProducer;
 import kafdrop.service.KafkaMonitor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,8 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/publish")
 public class PublisherController {
 
-    @Autowired
-    KafkaMonitor kafkaMonitor;
+
+    private final KafkaMonitor kafkaMonitor;
+
+    public PublisherController(KafkaMonitor kafkaMonitor) {
+        this.kafkaMonitor = kafkaMonitor;
+    }
 
     @RequestMapping("/ui")
     public String consumerDetail(Model model) {
