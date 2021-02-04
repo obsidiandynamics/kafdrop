@@ -1,5 +1,5 @@
 <#--
- Copyright 2016 Kafdrop contributors.
+ Copyright 2021 Kafdrop contributors.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -23,22 +23,21 @@
     <link type="text/css" rel="stylesheet" href="<@spring.url '/css/font-awesome.min.css'/>"/>
     <link type="text/css" rel="stylesheet" href="<@spring.url '/css/global.css'/>"/>
 
-    <script src="<@spring.url '/js/jquery.min.js'/>"></script>
-    <script src="<@spring.url '/js/popper.min.js'/>"></script>
-    <script src="<@spring.url '/js/bootstrap.min.js'/>"></script>
+    <script src="<@spring.url '/js/jquery-3.5.1.slim.min.js'/>"></script>
+    <script src="<@spring.url '/js/bootstrap.bundle.min.js'/>"></script>
     <script src="<@spring.url '/js/global.js'/>"></script>
     <script async defer src="<@spring.url '/js/github-buttons.js'/>"></script>
 
     <#nested>
 </head>
 <body>
-<#include "../includes/header.ftl">
+<#include "../includes/header.ftlh">
 <div class="container">
     </#macro>
 
     <#macro footer>
 </div>
-<#include "../includes/footer.ftl">
+<#include "../includes/footer.ftlh">
 <#nested>
 </body>
 </html>

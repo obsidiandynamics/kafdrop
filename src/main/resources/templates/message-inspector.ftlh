@@ -1,6 +1,6 @@
 <#ftl output_format="HTML">
 <#--
- Copyright 2016 Kafdrop contributors.
+ Copyright 2021 Kafdrop contributors.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  limitations under the License.
 -->
 <#import "/spring.ftl" as spring />
-<#import "lib/template.ftl" as template>
+<#import "lib/template.ftlh" as template>
 <@template.header "Topic: ${topic.name}: Messages">
     <style type="text/css">
         h2 {
