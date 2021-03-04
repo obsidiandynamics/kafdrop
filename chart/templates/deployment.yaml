@@ -2,11 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}
-  labels:
-    app.kubernetes.io/name: {{ include "chart.name" . }}
-    helm.sh/chart: {{ include "chart.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  labels: {{ include "chart.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -15,9 +11,7 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
-      labels:
-        app.kubernetes.io/name: {{ include "chart.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+      labels: {{- include "chart.labels" . | nindent 8 }}
       annotations:
 {{- if .Values.podAnnotations }}
 {{ toYaml .Values.podAnnotations | indent 8 }}

@@ -6,11 +6,7 @@ metadata:
 {{ tpl (toYaml .Values.service.annotations) . | indent 4 }}
 {{- end }}
   name: {{ include "chart.fullname" . }}
-  labels:
-    app.kubernetes.io/name: {{ include "chart.name" . }}
-    helm.sh/chart: {{ include "chart.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  labels: {{ include "chart.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
