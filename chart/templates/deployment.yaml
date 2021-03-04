@@ -6,9 +6,7 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:
-      app.kubernetes.io/name: {{ include "chart.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+    matchLabels: {{- include "chart.matchLabels" . | nindent 6 }}
   template:
     metadata:
       labels: {{- include "chart.labels" . | nindent 8 }}
