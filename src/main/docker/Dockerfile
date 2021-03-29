@@ -1,4 +1,4 @@
-FROM openjdk:12.0.1-jdk-oraclelinux7
+FROM openjdk:14-slim
 
 ADD kafdrop.sh /
 ADD kafdrop*tar.gz /
