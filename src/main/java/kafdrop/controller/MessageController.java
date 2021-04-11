@@ -260,13 +260,19 @@ public final class MessageController {
       final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
 
       deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
-    } else if (format == MessageFormat.PROTOBUF) {
+    } else if (format == MessageFormat.PROTOBUF && null != descFile) {
       // filter the input file name
+
       final var descFileName = descFile.replace(".desc", "")
           .replaceAll("\\.", "")
           .replaceAll("/", "");
       final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
       deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
+    } else if (format == MessageFormat.PROTOBUF) {
+      final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
+      final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
+
+      deserializer = new ProtobufSchemaRegistryMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
     } else if (format == MessageFormat.MSGPACK) {
       deserializer = new MsgPackMessageDeserializer();
     } else {
