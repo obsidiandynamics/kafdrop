@@ -10,7 +10,7 @@
     <description>For when you have a Kafka cluster to monitor</description>
 
     <properties>
-        <spring.boot.version>2.2.10.RELEASE</spring.boot.version>
+        <spring.boot.version>2.4.4</spring.boot.version>
         <additionalparam>-Xdoclint:none</additionalparam>
 
         <!-- name of parameter changed in latest mvn javadoc plugin version-->
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
-            <version>5.2.2</version>
+            <version>6.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client</artifactId>
-            <version>5.5.2</version>
+            <version>6.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-protobuf-serializer</artifactId>
-            <version>5.5.2</version>
+            <version>6.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -146,8 +146,13 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
+            <version>2.6.7</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
