@@ -55,6 +55,10 @@ Optionally, configure a schema registry connection with:
 ```
 --schemaregistry.connect=http://localhost:8081
 ```
+and if you also require basic auth for your schema registry connection you should add:
+```
+--schemaregistry.auth=username:password
+```
 
 Finally, a default message format (e.g. to deserialize Avro messages) can optionally be configured as follows:
 ```
@@ -258,6 +262,7 @@ docker run -d --rm -p 9000:9000 \
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
 |`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro or Protobuf message
+|`SCHEMAREGISTRY_AUTH`  |Optional basic auth credentials in the form `username:password`.
 |`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
