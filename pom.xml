@@ -10,7 +10,7 @@
     <description>For when you have a Kafka cluster to monitor</description>
 
     <properties>
-        <spring.boot.version>2.2.10.RELEASE</spring.boot.version>
+        <spring.boot.version>2.2.13.RELEASE</spring.boot.version>
         <additionalparam>-Xdoclint:none</additionalparam>
 
         <!-- name of parameter changed in latest mvn javadoc plugin version-->
@@ -64,13 +64,13 @@
 		    <groupId>com.google.protobuf</groupId>
 		    <artifactId>protobuf-java</artifactId>
 		    <version>${protobuf.version}</version>
-		</dependency>		    
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
 		<dependency>
 		    <groupId>com.google.protobuf</groupId>
 		    <artifactId>protobuf-java-util</artifactId>
-		    <version>${protobuf.version}</version>		    
-		</dependency>	
+		    <version>${protobuf.version}</version>
+		</dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
