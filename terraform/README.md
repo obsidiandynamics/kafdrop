@@ -5,6 +5,7 @@ helm repo add main https://bedag.github.io/helm-charts/  && helm repo update
 ```
 Prepare terraform:
 ```sh
+terraform init
 terraform validate
 terraform fmt
 ```
