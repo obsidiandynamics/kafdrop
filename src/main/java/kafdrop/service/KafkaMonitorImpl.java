@@ -292,6 +292,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
     ConsumerGroupOffsets forTopics(Set<String> topics) {
       final var filteredOffsets = offsets.entrySet().stream()
+          .filter(e -> e.getValue() != null)
           .filter(e -> topics.contains(e.getKey().topic()))
           .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
       return new ConsumerGroupOffsets(groupId, filteredOffsets);
