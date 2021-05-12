@@ -130,6 +130,13 @@
             <version>0.8.20</version>
         </dependency>
 
+        <!-- Support for AWS MSK IAM Auth-->
+        <dependency>
+            <groupId>software.amazon.msk</groupId>
+            <artifactId>aws-msk-iam-auth</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
