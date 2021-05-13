@@ -17,6 +17,7 @@ public final class KafkaConfiguration {
   private static final Logger LOG = LoggerFactory.getLogger(KafkaConfiguration.class);
 
   private String brokerConnect;
+  private String saslJaasConfig;
   private Boolean isSecured = false;
   private String saslMechanism;
   private String securityProtocol;
@@ -26,6 +27,7 @@ public final class KafkaConfiguration {
 
   public void applyCommon(Properties properties) {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
+    properties.setProperty(SaslConfigs.SASL_JAAS_CONFIG, saslJaasConfig);
     if (isSecured) {
       LOG.warn("The 'isSecured' property is deprecated; consult README.md on the preferred way to configure security");
       properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
