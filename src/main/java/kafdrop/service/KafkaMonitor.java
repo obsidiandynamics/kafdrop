@@ -31,6 +31,8 @@ public interface KafkaMonitor {
 
   List<TopicVO> getTopics();
 
+  List<TopicVO> getTopicsWithOffsets();
+
   /**
    * Returns messages for a given topic.
    */

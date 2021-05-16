@@ -37,7 +37,7 @@ public final class ConsumerController {
 
   @RequestMapping("/{groupId:.+}")
   public String consumerDetail(@PathVariable("groupId") String groupId, Model model) throws ConsumerNotFoundException {
-    final var topicVos = kafkaMonitor.getTopics();
+    final var topicVos = kafkaMonitor.getTopicsWithOffsets();
     final var consumer = kafkaMonitor.getConsumers(topicVos)
         .stream()
         .filter(c -> c.getGroupId().equals(groupId))

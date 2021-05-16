@@ -103,6 +103,13 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         .sorted(Comparator.comparing(TopicVO::getName))
         .collect(Collectors.toList());
 
+    return topicVos;
+  }
+
+  @Override
+  public List<TopicVO> getTopicsWithOffsets() {
+    final var topicVos = getTopics();
+
     setTopicPartitionSizes(topicVos);
 
     return topicVos;
