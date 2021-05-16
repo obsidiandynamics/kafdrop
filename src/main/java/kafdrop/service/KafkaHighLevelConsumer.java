@@ -58,7 +58,7 @@ public final class KafkaHighLevelConsumer {
 
     kafkaConsumer.poll(Duration.ofMillis(0));
     final Set<TopicPartition> assignedPartitionList = kafkaConsumer.assignment();
-    final TopicVO topicVO = getTopicInfo(topic);
+    final TopicVO topicVO = getTopicInfo(topic, partitionInfoSet);
     final Map<Integer, TopicPartitionVO> partitionsVo = topicVO.getPartitionMap();
 
     kafkaConsumer.seekToBeginning(assignedPartitionList);
@@ -197,7 +197,11 @@ public final class KafkaHighLevelConsumer {
 
   synchronized Map<String, TopicVO> getTopicInfos(String[] topics) {
     initializeClient();
-    final var topicSet = kafkaConsumer.listTopics().keySet();
+
+    final Map<String, List<PartitionInfo>> topicsMap;
+    topicsMap = kafkaConsumer.listTopics();
+
+    final var topicSet = topicsMap.keySet();
     if (topics.length == 0) {
       topics = Arrays.copyOf(topicSet.toArray(), topicSet.size(), String[].class);
     }
@@ -205,15 +209,14 @@ public final class KafkaHighLevelConsumer {
 
     for (var topic : topics) {
       if (topicSet.contains(topic)) {
-        topicVos.put(topic, getTopicInfo(topic));
+        topicVos.put(topic, getTopicInfo(topic, topicsMap.get(topic)));
       }
     }
 
     return topicVos;
   }
 
-  private TopicVO getTopicInfo(String topic) {
-    final var partitionInfoList = kafkaConsumer.partitionsFor(topic);
+  private TopicVO getTopicInfo(String topic, List<PartitionInfo> partitionInfoList) {
     final var topicVo = new TopicVO(topic);
     final var partitions = new TreeMap<Integer, TopicPartitionVO>();
 
