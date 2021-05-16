@@ -18,6 +18,8 @@
 
 package kafdrop.model;
 
+import org.apache.kafka.common.PartitionInfo;
+
 import java.util.*;
 import java.util.stream.*;
 
@@ -25,6 +27,8 @@ public final class TopicVO implements Comparable<TopicVO> {
   private final String name;
 
   private Map<Integer, TopicPartitionVO> partitions = new TreeMap<>();
+
+  private List<PartitionInfo> partitionInfoList = new ArrayList<>();
 
   private Map<String, String> config = Collections.emptyMap();
 
@@ -44,16 +48,20 @@ public final class TopicVO implements Comparable<TopicVO> {
     this.config = config;
   }
 
-  public Map<Integer, TopicPartitionVO> getPartitionMap() {
-    return Collections.unmodifiableMap(partitions);
-  }
-
   public Collection<TopicPartitionVO> getPartitions() {
     return Collections.unmodifiableCollection(partitions.values());
   }
 
   public void setPartitions(Map<Integer, TopicPartitionVO> partitions) {
     this.partitions = partitions;
+  }
+
+  public List<PartitionInfo> getPartitionInfoList() {
+    return this.partitionInfoList;
+  }
+
+  public void setPartitionInfoList(List<PartitionInfo> partitionInfoList) {
+    this.partitionInfoList = partitionInfoList;
   }
 
   public Optional<TopicPartitionVO> getPartition(int partitionId) {

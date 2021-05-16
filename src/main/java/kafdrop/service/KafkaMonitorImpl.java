@@ -102,16 +102,16 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     final var topicVos = getTopicMetadata().values().stream()
         .sorted(Comparator.comparing(TopicVO::getName))
         .collect(Collectors.toList());
-    for (var topicVo : topicVos) {
-      topicVo.setPartitions(getTopicPartitionSizes(topicVo));
-    }
+
+    setTopicPartitionSizes(topicVos);
+
     return topicVos;
   }
 
   @Override
   public Optional<TopicVO> getTopic(String topic) {
     final var topicVo = Optional.ofNullable(getTopicMetadata(topic).get(topic));
-    topicVo.ifPresent(vo -> vo.setPartitions(getTopicPartitionSizes(vo)));
+    topicVo.ifPresent(vo -> setTopicPartitionSizes(Collections.singletonList(vo)));
     return topicVo;
   }
 
@@ -191,8 +191,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     return map;
   }
 
-  private Map<Integer, TopicPartitionVO> getTopicPartitionSizes(TopicVO topic) {
-    return highLevelConsumer.getPartitionSize(topic.getName());
+  private void setTopicPartitionSizes(List<TopicVO> topics) {
+    highLevelConsumer.setAllPartitionSizes(topics);
   }
 
   @Override

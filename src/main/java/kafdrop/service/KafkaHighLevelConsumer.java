@@ -10,11 +10,11 @@ import org.apache.kafka.common.serialization.*;
 import org.slf4j.*;
 import org.springframework.stereotype.*;
 
-import javax.annotation.*;
-import java.nio.*;
-import java.time.*;
+import javax.annotation.PostConstruct;
+import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 @Service
 public final class KafkaHighLevelConsumer {
@@ -47,36 +47,38 @@ public final class KafkaHighLevelConsumer {
     }
   }
 
-  synchronized Map<Integer, TopicPartitionVO> getPartitionSize(String topic) {
+  synchronized void setAllPartitionSizes(List<TopicVO> topics) {
     initializeClient();
 
-    final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
-    kafkaConsumer.assign(partitionInfoSet.stream()
-                             .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
-                                                                      partitionInfo.partition()))
-                             .collect(Collectors.toList()));
+    Map<TopicVO, List<TopicPartition>> allTopics = topics.stream().map(topicVO -> {
+              List<TopicPartition> topicPartitions = topicVO.getPartitionInfoList().stream()
+                      .map(partitionInfo -> {
+                        return new TopicPartition(partitionInfo.topic(), partitionInfo.partition());
+                      }).collect(Collectors.toList());
 
-    kafkaConsumer.poll(Duration.ofMillis(0));
-    final Set<TopicPartition> assignedPartitionList = kafkaConsumer.assignment();
-    final TopicVO topicVO = getTopicInfo(topic, partitionInfoSet);
-    final Map<Integer, TopicPartitionVO> partitionsVo = topicVO.getPartitionMap();
+              return Pair.of(topicVO, topicPartitions);
+            }
+    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
-    kafkaConsumer.seekToBeginning(assignedPartitionList);
-    assignedPartitionList.forEach(topicPartition -> {
-      final TopicPartitionVO topicPartitionVo = partitionsVo.get(topicPartition.partition());
-      final long startOffset = kafkaConsumer.position(topicPartition);
-      LOG.debug("topic: {}, partition: {}, startOffset: {}", topicPartition.topic(), topicPartition.partition(), startOffset);
-      topicPartitionVo.setFirstOffset(startOffset);
-    });
+    List<TopicPartition> allTopicPartitions = allTopics.values().stream().flatMap(Collection::stream)
+            .collect(Collectors.toList());
 
-    kafkaConsumer.seekToEnd(assignedPartitionList);
-    assignedPartitionList.forEach(topicPartition -> {
-      final long latestOffset = kafkaConsumer.position(topicPartition);
-      LOG.debug("topic: {}, partition: {}, latestOffset: {}", topicPartition.topic(), topicPartition.partition(), latestOffset);
-      final TopicPartitionVO partitionVo = partitionsVo.get(topicPartition.partition());
-      partitionVo.setSize(latestOffset);
-    });
-    return partitionsVo;
+    kafkaConsumer.assign(allTopicPartitions);
+    Map<TopicPartition, Long> beginningOffset = kafkaConsumer.beginningOffsets(allTopicPartitions);
+    Map<TopicPartition, Long> endOffsets = kafkaConsumer.endOffsets(allTopicPartitions);
+
+    allTopics.forEach((topicVO, topicPartitions) -> topicPartitions.forEach(topicPartition -> {
+      Optional<TopicPartitionVO> partition = topicVO.getPartition(topicPartition.partition());
+
+      partition.ifPresent(p -> {
+        Long startOffset = beginningOffset.get(topicPartition);
+        Long endOffset = endOffsets.get(topicPartition);
+
+        LOG.debug("topic: {}, partition: {}, startOffset: {}, endOffset: {}", topicPartition.topic(), topicPartition.partition(), startOffset, endOffset);
+        p.setFirstOffset(startOffset);
+        p.setSize(endOffset);
+      });
+    }));
   }
 
   /**
@@ -218,6 +220,7 @@ public final class KafkaHighLevelConsumer {
 
   private TopicVO getTopicInfo(String topic, List<PartitionInfo> partitionInfoList) {
     final var topicVo = new TopicVO(topic);
+    topicVo.setPartitionInfoList(partitionInfoList);
     final var partitions = new TreeMap<Integer, TopicPartitionVO>();
 
     for (var partitionInfo : partitionInfoList) {
