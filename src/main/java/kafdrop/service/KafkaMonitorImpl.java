@@ -99,7 +99,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<TopicVO> getTopics() {
-    final var topicVos = getTopicMetadata().values().stream()
+    final var topicVos = getTopicMetadata(highLevelConsumer.getAllTopic()).values().stream()
         .sorted(Comparator.comparing(TopicVO::getName))
         .collect(Collectors.toList());
 
@@ -108,22 +108,28 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<TopicVO> getTopicsWithOffsets() {
-    final var topicVos = getTopics();
+    Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopic();
 
-    setTopicPartitionSizes(topicVos);
+    final var topicVos = getTopicMetadata(topicsMap).values().stream()
+            .sorted(Comparator.comparing(TopicVO::getName))
+            .collect(Collectors.toList());
+
+    setTopicPartitionSizes(topicsMap, topicVos);
 
     return topicVos;
   }
 
   @Override
   public Optional<TopicVO> getTopic(String topic) {
-    final var topicVo = Optional.ofNullable(getTopicMetadata(topic).get(topic));
-    topicVo.ifPresent(vo -> setTopicPartitionSizes(Collections.singletonList(vo)));
+    Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopic();
+
+    final var topicVo = Optional.ofNullable(getTopicMetadata(topicsMap, topic).get(topic));
+    topicVo.ifPresent(vo -> setTopicPartitionSizes(topicsMap, Collections.singletonList(vo)));
     return topicVo;
   }
 
-  private Map<String, TopicVO> getTopicMetadata(String... topics) {
-    final var topicInfos = highLevelConsumer.getTopicInfos(topics);
+  private Map<String, TopicVO> getTopicMetadata(Map<String, List<PartitionInfo>> allTopicsMap, String... topics) {
+    final var topicInfos = highLevelConsumer.getTopicInfos(allTopicsMap, topics);
     final var retrievedTopicNames = topicInfos.keySet();
     final var topicConfigs = highLevelAdminClient.describeTopicConfigs(retrievedTopicNames);
 
@@ -198,8 +204,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     return map;
   }
 
-  private void setTopicPartitionSizes(List<TopicVO> topics) {
-    highLevelConsumer.setAllPartitionSizes(topics);
+  private void setTopicPartitionSizes(Map<String, List<PartitionInfo>> topicsMap, List<TopicVO> topics) {
+    highLevelConsumer.setAllPartitionSizes(topicsMap, topics);
   }
 
   @Override

@@ -47,17 +47,17 @@ public final class KafkaHighLevelConsumer {
     }
   }
 
-  synchronized void setAllPartitionSizes(List<TopicVO> topics) {
+  synchronized void setAllPartitionSizes(Map<String, List<PartitionInfo>> topicsMap, List<TopicVO> topics) {
     initializeClient();
 
     Map<TopicVO, List<TopicPartition>> allTopics = topics.stream().map(topicVO -> {
-              List<TopicPartition> topicPartitions = topicVO.getPartitionInfoList().stream()
-                      .map(partitionInfo -> {
-                        return new TopicPartition(partitionInfo.topic(), partitionInfo.partition());
-                      }).collect(Collectors.toList());
+      List<TopicPartition> topicPartitions = topicsMap.get(topicVO.getName()).stream()
+        .map(partitionInfo -> {
+          return new TopicPartition(partitionInfo.topic(), partitionInfo.partition());
+        }).collect(Collectors.toList());
 
-              return Pair.of(topicVO, topicPartitions);
-            }
+        return Pair.of(topicVO, topicPartitions);
+      }
     ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
     List<TopicPartition> allTopicPartitions = allTopics.values().stream().flatMap(Collection::stream)
@@ -197,13 +197,16 @@ public final class KafkaHighLevelConsumer {
     return bytes != null ? deserializer.deserializeMessage(ByteBuffer.wrap(bytes)) : "empty";
   }
 
-  synchronized Map<String, TopicVO> getTopicInfos(String[] topics) {
+  synchronized Map<String, List<PartitionInfo>> getAllTopic() {
     initializeClient();
 
-    final Map<String, List<PartitionInfo>> topicsMap;
-    topicsMap = kafkaConsumer.listTopics();
+    return kafkaConsumer.listTopics();
+  }
 
-    final var topicSet = topicsMap.keySet();
+  synchronized Map<String, TopicVO> getTopicInfos(Map<String, List<PartitionInfo>> allTopicsMap, String[] topics) {
+    initializeClient();
+
+    final var topicSet = allTopicsMap.keySet();
     if (topics.length == 0) {
       topics = Arrays.copyOf(topicSet.toArray(), topicSet.size(), String[].class);
     }
@@ -211,7 +214,7 @@ public final class KafkaHighLevelConsumer {
 
     for (var topic : topics) {
       if (topicSet.contains(topic)) {
-        topicVos.put(topic, getTopicInfo(topic, topicsMap.get(topic)));
+        topicVos.put(topic, getTopicInfo(topic, allTopicsMap.get(topic)));
       }
     }
 
@@ -220,7 +223,6 @@ public final class KafkaHighLevelConsumer {
 
   private TopicVO getTopicInfo(String topic, List<PartitionInfo> partitionInfoList) {
     final var topicVo = new TopicVO(topic);
-    topicVo.setPartitionInfoList(partitionInfoList);
     final var partitions = new TreeMap<Integer, TopicPartitionVO>();
 
     for (var partitionInfo : partitionInfoList) {
