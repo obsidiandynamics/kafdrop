@@ -20,6 +20,8 @@ package kafdrop;
 
 import com.google.common.base.*;
 import io.undertow.server.*;
+import io.undertow.server.handlers.DisallowedMethodsHandler;
+import io.undertow.util.HttpString;
 import io.undertow.websockets.jsr.*;
 import kafdrop.config.ini.*;
 import org.slf4j.*;
@@ -64,6 +66,17 @@ public class Kafdrop {
         var inf = new WebSocketDeploymentInfo();
         inf.setBuffers(new DefaultByteBufferPool(false, 64));
         deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, inf);
+        // see https://stackoverflow.com/a/54129696
+        deploymentInfo.addInitialHandlerChainWrapper(new HandlerWrapper() {
+          @Override
+          public HttpHandler wrap(HttpHandler handler) {
+            HttpString[] disallowedHttpMethods = {
+              HttpString.tryFromString("TRACE"),
+              HttpString.tryFromString("TRACK")
+            };
+            return new DisallowedMethodsHandler(handler, disallowedHttpMethods);
+          }
+        });
       };
       factory.addDeploymentInfoCustomizers(customizer);
     };

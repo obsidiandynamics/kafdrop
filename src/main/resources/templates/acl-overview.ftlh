@@ -38,12 +38,12 @@
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Pattern Name</th>
-            <th><i class="fa fa-user"></i>&nbsp;&nbsp;Principal</th>
+            <th style="hyphens:none;white-space:nowrap"><i class="fa fa-tag"></i>&nbsp;&nbsp;Pattern Name</th>
+            <th style="hyphens:none;white-space:nowrap"><i class="fa fa-user"></i>&nbsp;&nbsp;Principal</th>
             <th><i class="fa fa-user"></i>&nbsp;&nbsp;Resource Type</th>
             <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Pattern Type</th>
-            <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Operation</th>
-            <th><i class="fa fa-server"></i>&nbsp;&nbsp;Host</th>
+            <th style="hyphens:none;white-space:nowrap"><i class="fa fa-tag"></i>&nbsp;&nbsp;Operation</th>
+            <th style="hyphens:none;white-space:nowrap"><i class="fa fa-server"></i>&nbsp;&nbsp;Host</th>
             <th><i class="fa fa-tag"></i>&nbsp;&nbsp;Permission Type</th>
         </tr>
         </thead>
@@ -51,7 +51,7 @@
         <#list acls as a>
             <tr class="dataRow">
                 <td>${a.name}</td>
-                <td>${a.principal}</td>
+                <td style="hyphens:none;white-space:nowrap">${a.principal}</td>
                 <td>${a.resourceType}</td>
                 <td>${a.patternType}</td>
                 <td>${a.operation}</td>

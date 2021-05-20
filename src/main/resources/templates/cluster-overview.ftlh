@@ -30,7 +30,7 @@
             <tbody>
             <tr>
                 <td><i class="fa fa-server"></i>&nbsp;&nbsp;Bootstrap servers</td>
-                <td>${bootstrapServers}</td>
+                <td style="max-width:800px;word-wrap:break-word">${bootstrapServers}</td>
             </tr>
             <tr>
                 <td><i class="fa fa-database"></i>&nbsp;&nbsp;Total topics</td>

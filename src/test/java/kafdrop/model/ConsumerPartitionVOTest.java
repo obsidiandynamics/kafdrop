@@ -18,17 +18,22 @@
 
 package kafdrop.model;
 
-import org.junit.*;
+import static org.assertj.core.api.Assertions.*;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@SpringBootTest()
 public final class ConsumerPartitionVOTest {
   private void doLagTest(long first, long last, long offset, long expectedLag) {
     final var partition = new ConsumerPartitionVO("test", "test", 0);
     partition.setFirstOffset(first);
     partition.setSize(last);
     partition.setOffset(offset);
-    assertEquals("Unexpected lag", expectedLag, partition.getLag());
+    assertThat(expectedLag).isEqualTo(partition.getLag());
   }
 
   @Test
