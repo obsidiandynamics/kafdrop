@@ -7,6 +7,11 @@ server:
       enabled: false
 
 spring:
+  security:
+    user:
+      name: admin
+      password: admin
+      roles: USER
   jmx:
     enabled: true
     default_domain: Kafdrop
