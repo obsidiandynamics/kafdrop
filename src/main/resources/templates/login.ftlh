@@ -8,7 +8,7 @@
         <div class="col-md"><span></span></div>
         <div class="col-md"><span></span></div>
         <div class="col-md">
-            <form method="post" action="/login">
+            <form method="post" action="<@spring.url '/login'/>">
                 <h3 class="form-signin-heading">Please sign in</h3><br/>
                 <p>
                     <label for="username">User Name:</label><br/>
