@@ -47,6 +47,7 @@
     <#if topicDeleteEnabled>
         <form id="delete-topic-form" action="<@spring.url '/topic/${topic.name}/delete'/>" method="POST">
             <button class="btn btn-danger" type="submit"><i class="fa fa-remove"></i> Delete topic</button>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </form>
     </#if>
 </div>
