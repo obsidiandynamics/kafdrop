@@ -43,6 +43,7 @@ public class PublisherController {
     public String publishTopic(PublishPayloadVO publishPayloadVO, Model model) {
         try{
             model.addAttribute("topicName", publishPayloadVO.getName());
+            model.addAttribute("topicNames",kafkaMonitor.getTopics().stream().map(TopicVO::getName).toArray());
             kafkaMonitor.publish(publishPayloadVO.getName(),publishPayloadVO.getPayload());
         }catch(Exception e){
             model.addAttribute("errorMessage", e.getMessage());
