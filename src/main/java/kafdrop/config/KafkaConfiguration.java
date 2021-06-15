@@ -11,7 +11,7 @@ import org.springframework.stereotype.*;
 
 
 @Component
-@ConfigurationProperties (prefix = "kafka")
+@ConfigurationProperties(prefix = "kafka")
 @Data
 public final class KafkaConfiguration {
   private static final Logger LOG = LoggerFactory.getLogger(KafkaConfiguration.class);
