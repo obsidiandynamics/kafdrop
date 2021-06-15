@@ -28,7 +28,7 @@ kafdrop.monitor:
 
 kafka:
   brokerConnect: localhost:9092
-  isSecured: false
+  isSecured: "${KAFKA_IS_SECURED:false}"
   saslMechanism: "${KAFKA_SASL_MECHANISM:PLAIN}"
   securityProtocol: "${KAFKA_SECURITY_PROTOCOL:SASL_PLAINTEXT}"
   truststoreFile: "${KAFKA_TRUSTSTORE_FILE:/tmp/kafka.truststore.jks}"
