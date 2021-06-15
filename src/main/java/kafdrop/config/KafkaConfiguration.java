@@ -28,15 +28,22 @@ public final class KafkaConfiguration {
   private String truststoreFile;
   private String propertiesFile;
   private String keystoreFile;
+  private String jaasConfig;
+  private String clientCallback;
+  private String iamEnabled;
 
   public void applyCommon(Properties properties) {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
+
     if (isSecured) {
       LOG.warn("The 'isSecured' property is deprecated; consult README.md on the preferred way to configure security");
-      properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
     }
 
-    if (isSecured || securityProtocol.equals("SSL")) {
+    LOG.info("Setting sasl mechanism to {}", saslMechanism);
+    properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
+
+    if (isSecured || securityProtocol.equals("SSL") || securityProtocol.equals("SASL_SSL")) {
+      LOG.info("Setting security protocol to {}", securityProtocol);
       properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
     }
 
@@ -44,6 +51,12 @@ public final class KafkaConfiguration {
     if (new File(truststoreFile).isFile()) {
       LOG.info("Assigning truststore location to {}", truststoreFile);
       properties.put("ssl.truststore.location", truststoreFile);
+    }
+    LOG.info("Is iam enabled : {}", iamEnabled);
+    if (Boolean.parseBoolean(iamEnabled)) {
+      LOG.info("Setting sasl.jaas.config {} and sasl and callback callback properties {}", jaasConfig, clientCallback);
+      properties.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, clientCallback);
+      properties.put(SaslConfigs.SASL_JAAS_CONFIG, jaasConfig);
     }
 
     LOG.info("Checking keystore file {}", keystoreFile);

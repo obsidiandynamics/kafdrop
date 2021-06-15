@@ -22,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>3.22.3</protobuf.version>
         <testcontainers.version>1.18.0</testcontainers.version>
+        <msk.auth.version>1.1.6</msk.auth.version>
         <kafka-libs.version>7.3.3</kafka-libs.version>
     </properties>
 
@@ -75,6 +76,11 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.msk</groupId>
+            <artifactId>aws-msk-iam-auth</artifactId>
+            <version>${msk.auth.version}</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
@@ -142,6 +148,12 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sts</artifactId>
+            <version>${sts.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
