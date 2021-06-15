@@ -31,6 +31,7 @@ public final class KafkaConfiguration {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
 
     if (isSecured) {
+      LOG.warn("The 'isSecured' property is deprecated; consult README.md on the preferred way to configure security");
       LOG.info("Setting security protocol to {}", securityProtocol);
       LOG.info("Setting sasl mechanism to {}", saslMechanism);
       properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
