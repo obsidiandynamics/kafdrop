@@ -31,7 +31,7 @@ kafka:
   isSecured: "${KAFKA_IS_SECURED:false}"
   saslMechanism: "${KAFKA_SASL_MECHANISM:PLAIN}"
   securityProtocol: "${KAFKA_SECURITY_PROTOCOL:SASL_PLAINTEXT}"
-  truststoreFile: "${KAFKA_TRUSTSTORE_FILE:/kafka.truststore.jks}"
+  truststoreFile: "${KAFKA_TRUSTSTORE_FILE:kafka.truststore.jks}"
   propertiesFile : "${KAFKA_PROPERTIES_FILE:kafka.properties}"
   keystoreFile: "${KAFKA_KEYSTORE_FILE:kafka.keystore.jks}"
   iamEnabled: "${KAFKA_IAM_ENABLED:false}"
