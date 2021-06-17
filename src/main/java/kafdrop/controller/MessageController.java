@@ -21,6 +21,7 @@ package kafdrop.controller;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -52,6 +53,7 @@ import io.swagger.annotations.ApiResponses;
 import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
+import kafdrop.form.SearchMessageForm;
 import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
@@ -182,9 +184,9 @@ public final class MessageController {
   }
 
   /**
-   * Human friendly view of reading messages.
+   * Human friendly view of searching messages.
    * @param topicName Name of topic
-   * @param searchMessageForm Message form for submitting requests to view messages.
+   * @param searchMessageForm Message form for submitting requests to search messages.
    * @param errors
    * @param model
    * @return View for seeing messages in a partition.
@@ -203,12 +205,14 @@ public final class MessageController {
       defaultForm.setSearchText("");
       defaultForm.setFormat(defaultFormat);
       defaultForm.setKeyFormat(defaultFormat);
-
+      defaultForm.setMaximumCount(100);
+      defaultForm.setStartTimestamp(new Date(0));
       model.addAttribute("searchMessageForm", defaultForm);
     }
 
     final TopicVO topic = kafkaMonitor.getTopic(topicName)
             .orElseThrow(() -> new TopicNotFoundException(topicName));
+
     model.addAttribute("topic", topic);
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
@@ -223,14 +227,19 @@ public final class MessageController {
               getDeserializer(topicName, searchMessageForm.getFormat(), searchMessageForm.getDescFile(), searchMessageForm.getMsgTypeName())
       );
 
-      model.addAttribute(
-              "messages",
-              messageSearcher.search(topicName, searchMessageForm.getSearchText(), deserializers));
+      var searchResults = kafkaMonitor.searchMessages(
+        topicName,
+        searchMessageForm.getSearchText(),
+        searchMessageForm.getMaximumCount(),
+        searchMessageForm.getStartTimestamp(),
+        deserializers);
+      
+      model.addAttribute("messages", searchResults.getMessages());
+      model.addAttribute("details", searchResults.getCompletionDetails());
     }
 
     return "search-message";
   }
-
 
   /**
    * Returns the selected nessagr format based on the

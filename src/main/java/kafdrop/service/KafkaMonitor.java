@@ -45,9 +45,14 @@ public interface KafkaMonitor {
   ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics);
 
   List<ConsumerVO> getConsumers(Collection<TopicVO> topicVos);
-
-  List<MessageVO> searchMessages(String topic, String searchString, Deserializers deserializers);
-
+ 
+  /* Seach messages */
+  SearchResultsVO searchMessages(String topic, 
+                                 String searchString,
+                                 Integer maximumCount, 
+                                 Date startTimestamp,
+                                 Deserializers deserializers);
+  
   /**
    * Create topic
    * @param createTopicDto topic params

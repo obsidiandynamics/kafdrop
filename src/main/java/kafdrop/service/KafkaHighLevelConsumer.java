@@ -2,12 +2,11 @@ package kafdrop.service;
 
 import kafdrop.config.*;
 import kafdrop.model.*;
+import kafdrop.service.SearchResults.CompletionReason;
 import kafdrop.util.*;
-import org.apache.kafka.clients.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.*;
-import org.apache.kafka.common.config.*;
 import org.apache.kafka.common.serialization.*;
 import org.slf4j.*;
 import org.springframework.stereotype.*;
@@ -22,7 +21,7 @@ import java.util.stream.*;
 public final class KafkaHighLevelConsumer {
   private static final int POLL_TIMEOUT_MS = 200;
   private static final int SEARCH_POLL_TIMEOUT_MS = 1000;
-
+  private static final int SEARCH_MAX_MESSAGES_TO_SCAN = 100000;
   private static final Logger LOG = LoggerFactory.getLogger(KafkaHighLevelConsumer.class);
 
   private KafkaConsumer<byte[], byte[]> kafkaConsumer;
@@ -195,16 +194,21 @@ public final class KafkaHighLevelConsumer {
             rec.leaderEpoch()))
         .collect(Collectors.toList());
   }
-
+ 
   /**
    * Searches records from all partitions of a given topic containing a given text.
+   * @param topic The topic
    * @param searchString Searched text.
+   * @param maximumCount The maximum number of results to return
+   * @param startTimestamp The begining message timestamp to search from
    * @param deserializers Key and Value deserializers
    * @return A list of consumer records for a given topic.
    */
-  synchronized List<ConsumerRecord<String, String>> searchRecords(String topic,
-                                                                     String searchString,
-                                                                     Deserializers deserializers) {
+  synchronized SearchResults searchRecords(String topic,
+                                           String searchString,
+                                           Integer maximumCount,
+                                           Date startTimestamp,
+                                           Deserializers deserializers) {
     initializeClient();
     final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
     final var partitions = partitionInfoSet.stream()
@@ -212,43 +216,92 @@ public final class KafkaHighLevelConsumer {
             partitionInfo.partition()))
         .collect(Collectors.toList());
     kafkaConsumer.assign(partitions);
-    kafkaConsumer.seekToBeginning(partitions);
+    
+    // make the consumer seek to the correct offsets for the start timestamp
+    final var partitionOffsets = kafkaConsumer.offsetsForTimes(partitions.stream().collect(Collectors.toMap(tp-> tp, tp-> startTimestamp.getTime())));
+    
+    // Seek each partition to that correct offset
+    for (var partition : partitionOffsets.keySet()) {
+      var offset = partitionOffsets.get(partition);
 
-    final List<ConsumerRecord<byte[], byte[]>> rawRecords = new ArrayList<>();
-
-    boolean moreRecords;
-    do {
-      final var polled = kafkaConsumer.poll(Duration.ofMillis(SEARCH_POLL_TIMEOUT_MS));
-
-      for (var partition : polled.partitions()) {
-        var records = polled.records(partition);
-        if (!records.isEmpty()) {
-          rawRecords.addAll(records);
-        }
+      // Old kafka message versions don't have timestamps so the offset would be null for that partition
+      if (offset == null) {
+        offset = new OffsetAndTimestamp(0, 0);
       }
 
-      moreRecords = !polled.isEmpty();
-    } while (moreRecords);
+      kafkaConsumer.seek(partition, offset.offset());
+    }
 
-    String loweredSearchString = searchString.toLowerCase();
-    return rawRecords
-            .stream()
-            .filter(rec -> deserialize(deserializers.getKeyDeserializer(), rec.key()).toLowerCase().contains(loweredSearchString))
-            .map(rec -> new ConsumerRecord<>(rec.topic(),
-                      rec.partition(),
-                      rec.offset(),
-                      rec.timestamp(),
-                      rec.timestampType(),
-                      0L,
-                      rec.serializedKeySize(),
-                      rec.serializedValueSize(),
-                      deserialize(deserializers.getKeyDeserializer(), rec.key()),
-                      deserialize(deserializers.getValueDeserializer(), rec.value()),
-                      rec.headers(),
-                      rec.leaderEpoch())
-            )
-            .collect(Collectors.toList());
+    // Time to search!
+    final List<ConsumerRecord<String, String>> foundRecords = new ArrayList<>();
+    var moreRecords = true;
+    var scannedCount = 0;
+    var loweredSearchString = searchString.toLowerCase();
+    var endingTimestamp = Long.MAX_VALUE;
+
+    while (foundRecords.size() < maximumCount && moreRecords && scannedCount < SEARCH_MAX_MESSAGES_TO_SCAN) {
+
+      final var polled = kafkaConsumer.poll(Duration.ofMillis(SEARCH_POLL_TIMEOUT_MS));
+
+      //Loop each partition
+      for (var partition : polled.partitions()) {
+
+        endingTimestamp = Long.MAX_VALUE;
+
+        //Pull records from one partition
+        var records = polled.records(partition);
+        if (!records.isEmpty()) {
+
+            // Keep track of the lowest timestamp among this batch of records.
+            // This is what we will report to the user in the event that the search terminates
+            // early, so that they can perform a new search with this new timestamp as a starting point
+            var firstTimestamp = records.get(0).timestamp();
+            if (firstTimestamp < endingTimestamp){
+              endingTimestamp = firstTimestamp;
+            }
+
+            scannedCount += records.size();
+            //Add to found records if it matches the search cretirea
+            foundRecords.addAll(records.stream()
+              .filter(rec -> 
+                        deserialize(deserializers.getKeyDeserializer(), rec.key()).toLowerCase().contains(loweredSearchString) || 
+                        deserialize(deserializers.getValueDeserializer(), rec.value()).toLowerCase().contains(loweredSearchString))
+              .map(rec -> new ConsumerRecord<>(rec.topic(),
+                        rec.partition(),
+                        rec.offset(),
+                        rec.timestamp(),
+                        rec.timestampType(),
+                        0L,
+                        rec.serializedKeySize(),
+                        rec.serializedValueSize(),
+                        deserialize(deserializers.getKeyDeserializer(), rec.key()),
+                        deserialize(deserializers.getValueDeserializer(), rec.value()),
+                        rec.headers(),
+                        rec.leaderEpoch()))
+              .collect(Collectors.toList()));
+        }
+      }
+      
+      //If no more polled exit the loop
+      moreRecords = !polled.isEmpty();
+    }
+
+    SearchResults.CompletionReason completionReason;
+    if (!moreRecords) {
+      completionReason = CompletionReason.NO_MORE_MESSAGES_IN_TOPIC;
+    }
+    else if (foundRecords.size() >= maximumCount) {
+      completionReason = CompletionReason.FOUND_REQUESTED_NUMBER_OF_RESULTS;
+    }
+    else if (scannedCount >= SEARCH_MAX_MESSAGES_TO_SCAN){
+      completionReason = CompletionReason.EXCEEDED_MAX_SCAN_COUNT;
+    } else {
+      completionReason = CompletionReason.REACHED_END_OF_TIMESPAN;
+    }
+
+    return new SearchResults(foundRecords, completionReason, new Date(endingTimestamp), scannedCount);
   }
+
 
   private static String deserialize(MessageDeserializer deserializer, byte[] bytes) {
     return bytes != null ? deserializer.deserializeMessage(ByteBuffer.wrap(bytes)) : "empty";

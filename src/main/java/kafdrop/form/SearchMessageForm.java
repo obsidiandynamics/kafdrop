@@ -1,14 +1,27 @@
 package kafdrop.form;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import kafdrop.util.MessageFormat;
 
+import java.util.Date;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class SearchMessageForm {
 
     @NotBlank
     private String searchText;
+
+    @NotNull
+    @Min(1)
+    @Max(1000)
+    private Integer maximumCount;
 
     private MessageFormat format;
 
@@ -17,10 +30,21 @@ public class SearchMessageForm {
     private String descFile;
 
     private String msgTypeName;
+    
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private Date startTimestamp;
 
     public SearchMessageForm(String searchText, MessageFormat format) {
         this.searchText = searchText;
         this.format = format;
+    }
+
+    public Date getStartTimestamp() {
+        return startTimestamp;
+    }
+
+    public void setStartTimestamp(Date startTimestamp) {
+        this.startTimestamp = startTimestamp;
     }
 
     public SearchMessageForm(String searchText) {
@@ -40,6 +64,14 @@ public class SearchMessageForm {
 
     public void setSearchText(String searchText) {
         this.searchText = searchText;
+    }
+
+    public Integer getMaximumCount() {
+        return maximumCount;
+    }
+
+    public void setMaximumCount(Integer maximumCount) {
+        this.maximumCount = maximumCount;
     }
 
     public MessageFormat getKeyFormat() {
@@ -74,4 +106,3 @@ public class SearchMessageForm {
         this.msgTypeName = msgTypeName;
     }
 }
-

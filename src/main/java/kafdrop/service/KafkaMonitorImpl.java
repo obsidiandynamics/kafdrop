@@ -196,6 +196,63 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   }
 
   @Override
+  public SearchResultsVO searchMessages(String topic, 
+                                        String searchString,
+                                        Integer maxmuimCount, 
+                                        Date startTimestamp,
+                                        Deserializers deserializers)
+ {
+    final var records = highLevelConsumer.searchRecords(topic, searchString, maxmuimCount, startTimestamp, deserializers);
+    final var results = new SearchResultsVO();
+
+    if (records != null) {
+      final var messageVos = new ArrayList<MessageVO>();
+      results.setMessages(messageVos);
+
+      for (var record : records.getResults()) {
+        final var messageVo = new MessageVO();
+        messageVo.setPartition(record.partition());
+        messageVo.setOffset(record.offset());
+        messageVo.setKey(record.key());
+        messageVo.setMessage(record.value());
+        messageVo.setHeaders(headersToMap(record.headers()));
+        messageVo.setTimestamp(new Date(record.timestamp()));
+        messageVos.add(messageVo);
+      }      
+
+      switch (records.getCompletionReason()) {
+        case FOUND_REQUESTED_NUMBER_OF_RESULTS:
+          results.setCompletionDetails(String.format("Search completed after finding requested number of results.  Scanned %d messages.", records.getMessagesScannedCount()));
+          break;
+        case EXCEEDED_MAX_SCAN_COUNT:
+          results.setCompletionDetails(
+            String.format(
+              "Search timed out after scanning %d messages.  Last scanned message timestamp was %d.  Adjust your time span for more results.",
+              records.getMessagesScannedCount(),
+              records.getFinalMessageTimestamp()));
+          break;
+        case NO_MORE_MESSAGES_IN_TOPIC:
+          results.setCompletionDetails(
+            String.format(
+              "Search reached the end of the topic before finding requested number of results.  Scanned %d messages.", 
+              records.getMessagesScannedCount()));
+          break;
+        case REACHED_END_OF_TIMESPAN:
+          results.setCompletionDetails(
+            String.format(
+              "Search reached the end of the specified time span before finding requested number of results.  Scanned %d messages.", 
+              records.getMessagesScannedCount()));
+      }
+
+    } else {
+      results.setCompletionDetails("Unknown error");
+      results.setMessages(Collections.emptyList());
+    }
+
+    return results;
+  }
+  
+  @Override
   public List<ConsumerVO> getConsumers(Collection<TopicVO> topicVos) {
     final var topics = topicVos.stream().map(TopicVO::getName).collect(Collectors.toSet());
     final var consumerGroupOffsets = getConsumerOffsets(topics);
