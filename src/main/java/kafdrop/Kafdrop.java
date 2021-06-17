@@ -46,13 +46,17 @@ public class Kafdrop {
   private final static Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
 
   public static void main(String[] args) {
-    new SpringApplicationBuilder(Kafdrop.class)
-        .bannerMode(Mode.OFF)
-        .listeners(new EnvironmentSetupListener(),
-                   new LoggingConfigurationListener())
-        .run(args);
+    createApplicationBuilder()
+      .run(args);
   }
-  
+
+  public static SpringApplicationBuilder createApplicationBuilder() {
+    return new SpringApplicationBuilder(Kafdrop.class)
+      .bannerMode(Mode.OFF)
+      .listeners(new EnvironmentSetupListener(),
+              new LoggingConfigurationListener());
+  }
+
   @Bean
   public WebServerFactoryCustomizer<UndertowServletWebServerFactory> deploymentCustomizer() {
     return factory -> {

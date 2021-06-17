@@ -49,11 +49,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import kafdrop.config.MessageFormatConfiguration;
 import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
-import kafdrop.config.ProtobufDescriptorConfiguration;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
-import kafdrop.config.SchemaRegistryConfiguration;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
 import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
@@ -70,12 +67,11 @@ public final class MessageController {
 
   private final MessageSearcher messageSearcher;
 
-  private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
-  private final MessageFormatConfiguration.MessageFormatProperties keyFormatProperties;
+  private final MessageFormatProperties messageFormatProperties;
+  private final MessageFormatProperties keyFormatProperties;
+  private final SchemaRegistryProperties schemaRegistryProperties;
 
-  private final SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
-  
-  private final ProtobufDescriptorConfiguration.ProtobufDescriptorProperties protobufProperties;
+  private final ProtobufDescriptorProperties protobufProperties;
 
   public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties, MessageSearcher messageSearcher) {
     this.kafkaMonitor = kafkaMonitor;
@@ -247,6 +243,8 @@ public final class MessageController {
       return MessageFormat.AVRO;
     } else if ("PROTOBUF".equalsIgnoreCase(format)) {
       return MessageFormat.PROTOBUF;
+    } else if ("MSGPACK".equalsIgnoreCase(format)){
+      return MessageFormat.MSGPACK;
     } else {
       return MessageFormat.DEFAULT;
     }
@@ -316,13 +314,21 @@ public final class MessageController {
       final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
 
       deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
-    } else if (format == MessageFormat.PROTOBUF) {
+    } else if (format == MessageFormat.PROTOBUF && null != descFile) {
       // filter the input file name
+
       final var descFileName = descFile.replace(".desc", "")
           .replaceAll("\\.", "")
           .replaceAll("/", "");
       final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
       deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
+    } else if (format == MessageFormat.PROTOBUF) {
+      final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
+      final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
+
+      deserializer = new ProtobufSchemaRegistryMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
+    } else if (format == MessageFormat.MSGPACK) {
+      deserializer = new MsgPackMessageDeserializer();
     } else {
       deserializer = new DefaultMessageDeserializer();
     }
