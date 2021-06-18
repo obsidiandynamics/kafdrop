@@ -5,11 +5,12 @@
 
     <groupId>com.obsidiandynamics.kafdrop</groupId>
     <artifactId>kafdrop</artifactId>
-    <version>3.28.0-SNAPSHOT</version>
+    <version>${version}</version>
 
     <description>For when you have a Kafka cluster to monitor</description>
 
     <properties>
+        <version>3.28.0-SNAPSHOT</version>
         <spring.boot.version>2.4.4</spring.boot.version>
         <additionalparam>-Xdoclint:none</additionalparam>
 
@@ -18,6 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>3.11.1</protobuf.version>
         <testcontainers.version>1.14.3</testcontainers.version>
+        <docker.repository>obsidiandymanics</docker.repository>
     </properties>
 
     <scm>
@@ -266,7 +268,7 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.2.0</version>
                 <configuration>
-                    <imageName>obsidiandynamics/kafdrop</imageName>
+                    <imageName>${docker.repository}/kafdrop</imageName>
                     <forceTags>true</forceTags>
                     <dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
                     <imageTags>
