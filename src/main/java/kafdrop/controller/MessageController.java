@@ -30,7 +30,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import kafdrop.form.SearchMessageForm;
-import kafdrop.service.MessageSearcher;
 import kafdrop.util.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -53,7 +52,6 @@ import io.swagger.annotations.ApiResponses;
 import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
-import kafdrop.form.SearchMessageForm;
 import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
@@ -67,22 +65,19 @@ public final class MessageController {
 
   private final MessageInspector messageInspector;
 
-  private final MessageSearcher messageSearcher;
-
   private final MessageFormatProperties messageFormatProperties;
   private final MessageFormatProperties keyFormatProperties;
   private final SchemaRegistryProperties schemaRegistryProperties;
 
   private final ProtobufDescriptorProperties protobufProperties;
 
-  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties, MessageSearcher messageSearcher) {
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
     this.keyFormatProperties = keyFormatProperties;
     this.schemaRegistryProperties = schemaRegistryProperties;
     this.protobufProperties = protobufProperties; 
-    this.messageSearcher = messageSearcher;
   }
 
   /**
