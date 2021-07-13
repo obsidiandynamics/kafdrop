@@ -67,81 +67,78 @@
 <#assign selectedKeyFormat=searchMessageForm.keyFormat!defaultFormat>
 
 <div id="searchMessageFormPanel" class="card">
-    <form method="GET" action="<@spring.url '/topic/${topic.name}/search-messages'/>" id="searchMessageForm" class="form-inline card-body">
-        <div class="form-row">
-        <@spring.bind path="searchMessageForm.searchText"/>
-        <div class="form-group ${spring.status.error?string("has-error", "")}">
-            <label class="control-label" for="searchText">Search text</label>
-            <@spring.formInput path="searchMessageForm.searchText" attributes='class="form-control" size="20"'/>
-            <#if spring.status.error>
-                <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
-            </#if>
+    <form method="GET" action="<@spring.url '/topic/${topic.name}/search-messages'/>" id="searchMessageForm" class="card-body">
+        <div class="row g-3">
+            <@spring.bind path="searchMessageForm.searchText"/>
+            <div class="col-7 form-group ${spring.status.error?string("has-error", "")}">
+                <label class="control-label" for="searchText">Search text</label>
+                <@spring.formInput path="searchMessageForm.searchText" attributes='class="form-control" size="40"'/>
+                <#if spring.status.error>
+                    <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
+                </#if>
+            </div>
+            <@spring.bind path="searchMessageForm.startTimestamp"/>
+            <div class="col form-group ${spring.status.error?string("has-error", "")}">
+                <label class=control-label" for="maximumCount">Start Timestamp</label>
+                <@spring.formInput path="searchMessageForm.startTimestamp" attributes='pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]+" class="form-control ${spring.status.error?string("has-error", "")}" size="30"'/>
+                <span class="form-text">yyyy-MM-dd HH:mm:ss.SSS</span>
+                <#if spring.status.error>
+                    <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
+                </#if>
+            </div>            
+            <@spring.bind path="searchMessageForm.maximumCount"/>
+            <div class="col-2 form-group ${spring.status.error?string("has-error", "")}">
+                <label class=control-label" for="maximumCount">Max results</label>
+                <select class="form-control" id="maximumCount" name="maximumCount">
+                    <option value="1">1</option>
+                    <option value="10">10</option>
+                    <option value="100" selected>100</option>
+                    <option value="250">250</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                </select>
+            </div>
         </div>
-        &nbsp;&nbsp;
-        <@spring.bind path="searchMessageForm.maximumCount"/>
-        <div class="form-group ${spring.status.error?string("has-error", "")}">
-            <label class=control-label" for="maximumCount">Max results</label>
-            <select class="form-control" id="maximumCount" name="maximumCount">
-                <option value="1">1</option>
-                <option value="10">10</option>
-                <option value="100" selected>100</option>
-                <option value="250">250</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
-            </select>
+        <div class="row g-3">
+            <div class="col-2 form-group">
+                <label class="control-label" for="keyFormat">Key format</label>
+                <select class="form-control" id="keyFormat" name="keyFormat">
+                    <#list keyFormats as kf>
+                        <option value="${kf}" <#if kf == selectedKeyFormat>selected="selected"</#if>>${kf}</option>
+                    </#list>
+                </select>
+            </div>
+            <div class="col-2 form-group">
+                <label class="control-label" for="format">Message format</label>
+                <select class="form-control" id="format" name="format">
+                    <#list messageFormats as f>
+                        <option value="${f}" <#if f == selectedFormat>selected="selected"</#if>>${f}</option>
+                    </#list>
+                </select>
+            </div>
+            
+            <div class="col-3 form-group" id="protobufDescriptor">
+                <#if descFiles?size != 0>
+                <label class="control-label" for="descFile">Protobuf descriptor</label>
+                    <select class="form-control" id="descFile" name="descFile">
+                    <#list descFiles as f>
+                    <option value="${f}">${f}</option>
+                    </#list>
+                    </select>
+                <#else>
+                <span class="errorMessage">No available descriptor, please check.</span>
+                </#if>
+            </div>
+            <div class="col-3 form-group" id="protobufMsgType">
+                <#if descFiles?size != 0>
+                <label class="control-label" for="msgTypeName">Protobuf message type name</label>
+                <@spring.formInput path="searchMessageForm.msgTypeName" attributes='class="form-control"'/>
+                </#if>
+            </div>
         </div>
-        &nbsp;&nbsp;
-        <@spring.bind path="searchMessageForm.startTimestamp"/>
-        <div class="form-group ${spring.status.error?string("has-error", "")}">
-            <label class=control-label" for="maximumCount">Start Timestamp</label>
-            <@spring.formInput path="searchMessageForm.startTimestamp" attributes='class="form-control ${spring.status.error?string("has-error", "")}" size="20"'/>
-            <#if spring.status.error>
-                <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
-            </#if>
+        <div class="text-right">
+            <button id="searchMessagesBtn" class="btn btn-success" type="submit"><i class="fa fa-search"></i> Search Messages</button>
         </div>
-        </div>
-        <div class="form-row">
-        &nbsp;&nbsp;
-        <div class="form-group">
-            <label class="control-label" for="keyFormat">Key format</label>
-            <select class="form-control" id="keyFormat" name="keyFormat">
-                <#list keyFormats as kf>
-                    <option value="${kf}" <#if kf == selectedKeyFormat>selected="selected"</#if>>${kf}</option>
-                </#list>
-            </select>
-        </div>
-        &nbsp;&nbsp;
-        <div class="form-group">
-            <label class="control-label" for="format">Message format</label>
-            <select class="form-control" id="format" name="format">
-                <#list messageFormats as f>
-                    <option value="${f}" <#if f == selectedFormat>selected="selected"</#if>>${f}</option>
-                </#list>
-            </select>
-        </div>
-        &nbsp;&nbsp;
-        <div class="form-group" id="protobufDescriptor">
-        <#if descFiles?size != 0>
-          <label class="control-label" for="descFile">Protobuf descriptor</label>
-	        <select class="form-control" id="descFile" name="descFile">
-	          <#list descFiles as f>
-	           <option value="${f}">${f}</option>
-	          </#list>
-	        </select>
-        <#else>
-          <span class="errorMessage">No available descriptor, please check.</span>
-        </#if>
-        </div>
-        &nbsp;&nbsp;
-        <div class="form-group" id="protobufMsgType">
-            <#if descFiles?size != 0>
-              <label class="control-label" for="msgTypeName">Protobuf message type name</label>
-              <@spring.formInput path="searchMessageForm.msgTypeName" attributes='class="form-control"'/>
-            </#if>
-        </div>
-        &nbsp;&nbsp;
-        </div>
-        <button id="searchMessagesBtn" class="btn btn-success" type="submit"><i class="fa fa-search"></i> Search Messages</button>
     </form>
 </div>
 
