@@ -21,7 +21,7 @@ management:
       base-path: /actuator
       exposure.include: "*"
   server:
-    port: 9000
+    port: ${SERVER_PORT:9000}
 
 kafdrop.monitor:
   clientId: Kafdrop
