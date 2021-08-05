@@ -4,7 +4,10 @@ apiVersion: route.openshift.io/v1
 metadata:
   name: {{ include "chart.fullname" . }}
   labels:
-    {{- include "chart.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "chart.name" . }}
+    helm.sh/chart: {{ include "chart.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   to:
     kind: Service
