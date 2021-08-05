@@ -11,12 +11,10 @@ terraform fmt
 ```
 Planning:
 ```sh
-terraform plan
+terraform plan -out planed
 ```
 Install:
 ```sh
-terraform apply
+terraform apply planed
 ```
-then Enter "yes"
-
 Good Luck
