@@ -1,4 +1,4 @@
-## Running in Kubernetes (using Terraform and Helm Chart)
+## Running in Kubernetes (using Terraform and Helm Provider)
 Add helm repo:
 ```sh
 helm repo add main https://bedag.github.io/helm-charts/  && helm repo update
