@@ -23,7 +23,7 @@ branches:
   - master
 
 install:
-  - travis_retry mvn dependency:resolve
+  - mvn dependency:resolve
 
 script:
   - ./ci-script.sh
