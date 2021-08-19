@@ -37,9 +37,11 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+{{- if or .Values.kafka.truststore .Values.kafka.keystore .Values.kafka.properties }}
           envFrom:
           - secretRef:
               name: {{ include "chart.fullname" . }}
+{{- end }}
           env:
           - name: KAFKA_BROKERCONNECT
             value: "{{ .Values.kafka.brokerConnect }}"
