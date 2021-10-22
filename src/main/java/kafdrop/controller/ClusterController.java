@@ -71,6 +71,7 @@ public final class ClusterController {
     final var brokers = kafkaMonitor.getBrokers();
     final var topics = kafkaMonitor.getTopics();
     final var clusterSummary = kafkaMonitor.getClusterSummary(topics);
+    final var consumerGroupCount = kafkaMonitor.getConsumerGroupCount();
 
     final var missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
         .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
@@ -81,6 +82,7 @@ public final class ClusterController {
     model.addAttribute("topics", topics);
     model.addAttribute("clusterSummary", clusterSummary);
     model.addAttribute("topicCreateEnabled", topicCreateEnabled);
+    model.addAttribute("consumerGroupCount", consumerGroupCount);
 
     if (filter != null) {
       model.addAttribute("filter", filter);

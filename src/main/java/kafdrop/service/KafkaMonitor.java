@@ -59,4 +59,9 @@ public interface KafkaMonitor {
   void deleteTopic(String topic);
 
   List<AclVO> getAcls();
+
+  /**
+   * get the count of consumer groups
+   */
+  Integer getConsumerGroupCount();
 }

@@ -60,4 +60,13 @@ public final class ConsumerController {
         .findAny();
     return consumer.orElseThrow(() -> new ConsumerNotFoundException(groupId));
   }
+
+  @ApiOperation(value = "getConsumerGroupCount", notes = "Get the count of consumer groups")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Success", response = ConsumerVO.class)
+  })
+  @RequestMapping(path = "/count", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  public @ResponseBody Integer getConsumerGroupCount() throws KafkaAdminClientException {
+    return kafkaMonitor.getConsumerGroupCount();
+  }
 }
