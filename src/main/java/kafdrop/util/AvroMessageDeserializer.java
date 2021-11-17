@@ -37,18 +37,18 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
   }
 
   private static void setConfigFromEnvIfAvailable(String topicName, String configPath, Map<String,Object> config){
-
     String configPrefix = "SCHEMA_REGISTRY";
-    String topicScopedEnvPath = Arrays.stream(new String[]{configPrefix, configPath.replace(".", "_"), topicName.replace("-", "_") } )
+    String topicScopedEnvPath = Arrays.stream(new String[]{configPrefix, configPath.replaceAll("\\.", "_"), topicName.replaceAll("-", "_") } )
             .map(String::toUpperCase).collect(Collectors.joining("_"));
 
-    String noTopicScopedEnvPath = Arrays.stream(new String[]{ "SCHEMA_REGISTRY", configPath.replace(".", "_") })
+    String noTopicScopedEnvPath = Arrays.stream(new String[]{ configPrefix, configPath.replaceAll("\\.", "_") })
             .map(String::toUpperCase).collect(Collectors.joining("_"));
 
     for(String envPath : new String[]{topicScopedEnvPath, noTopicScopedEnvPath}) {
+
       String namingStrategyValue = System.getenv(envPath);
       if (namingStrategyValue != null) {
-        config.put(envPath, namingStrategyValue);
+        config.put(configPath, namingStrategyValue);
       }
     }
   }

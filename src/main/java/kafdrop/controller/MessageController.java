@@ -28,6 +28,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import kafdrop.config.MessageFormatConfiguration;
 import kafdrop.util.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -62,19 +63,19 @@ public final class MessageController {
   private final MessageInspector messageInspector;
 
   private final MessageFormatProperties messageFormatProperties;
-  private final MessageFormatProperties keyFormatProperties;
+  private final MessageFormatConfiguration.KeyFormatProperties keyFormatProperties;
 
   private final SchemaRegistryProperties schemaRegistryProperties;
 
   private final ProtobufDescriptorProperties protobufProperties;
 
-  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatConfiguration.KeyFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
     this.keyFormatProperties = keyFormatProperties;
     this.schemaRegistryProperties = schemaRegistryProperties;
-    this.protobufProperties = protobufProperties; 
+    this.protobufProperties = protobufProperties;
   }
 
   /**
@@ -312,9 +313,9 @@ public final class MessageController {
     private MessageFormat format;
 
     private MessageFormat keyFormat;
-    
+
     private String descFile;
-    
+
     private String msgTypeName;
 
     public PartitionOffsetInfo(int partition, long offset, long count, MessageFormat format) {
