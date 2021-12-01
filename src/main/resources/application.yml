@@ -14,6 +14,19 @@ spring:
     deserialization:
       fail_on_unknown_properties: false
       read_unknown_enum_values_as_null: true
+  datasource:
+    platform: postgres
+    url: "${POSTGRES_URL}"
+    username: "${POSTGRES_USER}"
+    password: "${POSTGRES_PASSWORD}"
+    driverClassName: org.postgresql.Driver
+  ## in case you want to switch authentication from postgresql to mysql
+  # datasource:
+  #   platform: mysql
+  #   url: "${MYSQL_URL}"
+  #   username: "${MYSQL_USER}"
+  #   password: "${MYSQL_PASSWORD}"
+  #   driverClassName: com.mysql.jdbc.Driver
 
 management:
   endpoints:

@@ -290,76 +290,9 @@ helm upgrade -i kafdrop chart --set image.tag=3.x.x \
 Edit the `.scss` files in the `theme` directory, then run `theme/install.sh`. This will overwrite `src/main/resources/static/css/bootstrap.min.css`. Then build as usual. (Requires `npm`.)
 
 ## Securing the Kafdrop UI
-Kafdrop doesn't (yet) natively implement an authentication mechanism to restrict user access. Here's a quick workaround using NGINX using Basic Auth. The instructions below are for macOS and Homebrew.
+Kafdrop UI is an internal service and should be run only on a private & isolated network to eliminate public access. One more layer of security is an authentication mechanism to restrict user access. The authentication mechanism used by Kafdrop is based on [Spring Security](https://spring.io/guides/topicals/spring-security-architecture) (default login page: [Login Screenshot](docs/images/login.png)) with RBAC on top of a database. [Here](./src/main/resources/init-migration-example.sql) is an example of how to add users. The password is encoded with [bcrypt](https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/crypto/bcrypt/BCryptPasswordEncoder.html).
+You can use both PostgreSQL (default) && MySQL (or any other JDBC) for the authentication, in case you want to use the MySQL, mark postgres && unmark mysql both in [Maven POM](pom.xml) && [Application Configuration](./src/main/resources/application.yml).
 
-### Requirements
-* NGINX: install using `which nginx > /dev/null || brew install nginx`
-* Apache HTTP utilities: `which htpasswd > /dev/null || brew install httpd`
-
-### Setup
-Set the admin password (you will be prompted):
-```sh
-htpasswd -c /usr/local/etc/nginx/.htpasswd admin
-```
-
-Add a logout page in `/usr/local/opt/nginx/html/401.html`:
-```html
-<!DOCTYPE html>
-<p>Not authorized. <a href="<!--# echo var="scheme" -->://<!--# echo var="http_host" -->/">Login</a>.</p>
-```
-
-Use the following snippet for `/usr/local/etc/nginx/nginx.conf`:
-```
-worker_processes 4;
-  
-events {
-  worker_connections 1024;
-}
-
-http {
-  upstream kafdrop {
-    server 127.0.0.1:9000;
-    keepalive 64;
-  }
-
-  server {
-    listen *:8080;
-    server_name _;
-    access_log /usr/local/var/log/nginx/nginx.access.log;
-    error_log /usr/local/var/log/nginx/nginx.error.log;
-    auth_basic "Restricted Area";
-    auth_basic_user_file /usr/local/etc/nginx/.htpasswd;
-
-    location / {
-      proxy_pass http://kafdrop;
-    }
-
-    location /logout {
-      return 401;
-    }
-
-    error_page 401 /errors/401.html;
-
-    location /errors {
-      auth_basic off;
-      ssi        on;
-      alias /usr/local/opt/nginx/html;
-    }
-  }
-}
-```
-
-Run NGINX:
-```sh
-nginx
-```
-
-Or reload its configuration if already running:
-```sh
-nginx -s reload
-```
-
-To logout, browse to [/logout](http://localhost:8080/logout).
 
 > **Hey there!** We hope you really like Kafdrop! Please take a moment to [⭐](https://github.com/obsidiandynamics/kafdrop)the repo or [Tweet](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fobsidiandynamics%2Fkafdrop&text=Get%20Kafdrop%20%E2%80%94%20a%20web-based%20UI%20for%20viewing%20%23ApacheKafka%20topics%20and%20browsing%20consumers%20) about it.
 
