@@ -1,31 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.obsidiandynamics.kafdrop</groupId>
     <artifactId>kafdrop</artifactId>
     <version>3.28.0-SNAPSHOT</version>
-
     <description>For when you have a Kafka cluster to monitor</description>
-
     <properties>
         <spring.boot.version>2.4.4</spring.boot.version>
         <additionalparam>-Xdoclint:none</additionalparam>
-
         <!-- name of parameter changed in latest mvn javadoc plugin version-->
         <additionalOptions>-Xdoclint:none</additionalOptions>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>3.11.1</protobuf.version>
         <testcontainers.version>1.14.3</testcontainers.version>
     </properties>
-
     <scm>
         <connection>scm:git:git@github.com:obsidiandynamics/kafdrop.git</connection>
         <developerConnection>scm:git:git@github.com:obsidiandynamics/kafdrop.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
-
     <distributionManagement>
         <repository>
             <id>bintray-obsidiandynamics-kafdrop</id>
@@ -33,7 +26,6 @@
             <url>https://api.bintray.com/maven/obsidiandynamics/kafdrop/main/;publish=1</url>
         </repository>
     </distributionManagement>
-
     <repositories>
         <repository>
             <id>central</id>
@@ -44,9 +36,15 @@
             <url>https://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
-
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-bom</artifactId>
+                <version>2.16.0</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
             <dependency>
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
@@ -57,20 +55,19 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <dependencies>
-    	<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-		<dependency>
-		    <groupId>com.google.protobuf</groupId>
-		    <artifactId>protobuf-java</artifactId>
-		    <version>${protobuf.version}</version>
-		</dependency>		    
-		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
-		<dependency>
-		    <groupId>com.google.protobuf</groupId>
-		    <artifactId>protobuf-java-util</artifactId>
-		    <version>${protobuf.version}</version>		    
-		</dependency>	
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -129,7 +126,6 @@
             <artifactId>msgpack-core</artifactId>
             <version>0.8.20</version>
         </dependency>
-
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -170,7 +166,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -184,14 +179,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
         </dependency>
-
         <!-- Swagger API docs -->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>2.9.2</version>
         </dependency>
-
         <!-- Spring test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -204,7 +197,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <!-- Testcontainers -->
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -218,9 +210,7 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

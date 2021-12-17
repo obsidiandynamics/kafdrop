@@ -1,0 +1,18 @@
+### kafdrop BUILD Dockerfile.local
+
+FROM maven:3.8.1-jdk-11 as build
+
+WORKDIR /build
+COPY . /build
+RUN mvn clean install 
+
+
+FROM openjdk:11 as run
+WORKDIR /app
+COPY --from=build /build/target/kafdrop-3.28.0-SNAPSHOT.jar /app/kafdrop.jar
+ENV KAFKA_BROKERCONNECT=localhost:9092
+RUN   yum update -y \
+    && yum install -y netcat
+EXPOSE  9000
+ENTRYPOINT ["java","-jar", "kafdrop.jar"]
+
