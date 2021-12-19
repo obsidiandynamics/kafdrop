@@ -3,6 +3,7 @@ server:
   servlet:
     context-path: /
   error:
+    path: /error
     whitelabel:
       enabled: false
 
