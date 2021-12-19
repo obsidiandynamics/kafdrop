@@ -22,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>3.19.1</protobuf.version>
         <testcontainers.version>1.16.2</testcontainers.version>
+        <kafka-libs.version>6.1.4</kafka-libs.version>
     </properties>
 
     <scm>
@@ -78,7 +79,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
-            <version>6.1.1</version>
+            <version>${kafka-libs.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -89,7 +90,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client</artifactId>
-            <version>6.1.1</version>
+            <version>${kafka-libs.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -100,7 +101,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-protobuf-serializer</artifactId>
-            <version>6.1.1</version>
+            <version>${kafka-libs.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -111,12 +112,12 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.9.1</version>
+            <version>1.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack-core</artifactId>
-            <version>0.8.20</version>
+            <version>0.8.24</version>
         </dependency>
 
         <!-- Spring Boot -->
