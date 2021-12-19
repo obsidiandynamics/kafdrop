@@ -18,6 +18,8 @@
 
 package kafdrop.model;
 
+import java.util.Objects;
+
 public final class AclVO implements Comparable<AclVO>{
     private final String name;
     private final String resourceType;
@@ -68,4 +70,17 @@ public final class AclVO implements Comparable<AclVO>{
 
     @Override
     public int compareTo(AclVO that) { return this.name.compareTo(that.name) ; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AclVO aclVO = (AclVO) o;
+        return name.equals(aclVO.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 }

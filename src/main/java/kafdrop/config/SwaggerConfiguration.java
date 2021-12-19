@@ -18,6 +18,7 @@
 
 package kafdrop.config;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.*;
@@ -33,6 +34,7 @@ import springfox.documentation.swagger2.annotations.*;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -60,7 +62,7 @@ public class SwaggerConfiguration {
   /**
    *  Swagger Predicate for only selecting JSON endpoints.
    */
-  public final class JsonRequestHandlerPredicate implements Predicate<RequestHandler> {
+  public static final class JsonRequestHandlerPredicate implements Predicate<RequestHandler> {
     @Override
     public boolean test(RequestHandler input) {
       return input.produces().contains(MediaType.APPLICATION_JSON);
@@ -70,7 +72,7 @@ public class SwaggerConfiguration {
   /**
    *  Swagger Predicate for ignoring {@code /actuator} endpoints.
    */
-  public final class IgnoreDebugPathPredicate implements Predicate<String> {
+  public static final class IgnoreDebugPathPredicate implements Predicate<String> {
     @Override
     public boolean test(String input) {
       return !input.startsWith("/actuator");
@@ -85,7 +87,7 @@ public class SwaggerConfiguration {
     return new BeanPostProcessor() {
 
       @Override
-      public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+      public Object postProcessAfterInitialization(@NotNull Object bean, @NotNull String beanName) throws BeansException {
         if (bean instanceof WebMvcRequestHandlerProvider || bean instanceof WebFluxRequestHandlerProvider) {
           customizeSpringfoxHandlerMappings(getHandlerMappings(bean));
         }
@@ -104,7 +106,7 @@ public class SwaggerConfiguration {
       private List<RequestMappingInfoHandlerMapping> getHandlerMappings(Object bean) {
         try {
           Field field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
-          field.setAccessible(true);
+          Objects.requireNonNull(field).setAccessible(true);
           return (List<RequestMappingInfoHandlerMapping>) field.get(bean);
         } catch (IllegalArgumentException | IllegalAccessException e) {
           throw new IllegalStateException(e);
