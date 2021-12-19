@@ -23,9 +23,4 @@ public final class BasicErrorController extends AbstractErrorController {
     final var model = Map.of("error", error);
     return new ModelAndView("error", model);
   }
-
-  public String getErrorPath() {
-    // not used anymore (see javadoc, remove method when spring boot removes it from ErrorController interface)
-    return null;
-  }
 }
