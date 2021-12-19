@@ -20,8 +20,8 @@
         <!-- name of parameter changed in latest mvn javadoc plugin version-->
         <additionalOptions>-Xdoclint:none</additionalOptions>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <protobuf.version>3.11.1</protobuf.version>
-        <testcontainers.version>1.14.3</testcontainers.version>
+        <protobuf.version>3.19.1</protobuf.version>
+        <testcontainers.version>1.16.2</testcontainers.version>
     </properties>
 
     <scm>
