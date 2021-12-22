@@ -144,14 +144,14 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     final var records = highLevelConsumer.getLatestRecords(topic, count, deserializers);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
-      for (var record : records) {
+      for (var rec : records) {
         final var messageVo = new MessageVO();
-        messageVo.setPartition(record.partition());
-        messageVo.setOffset(record.offset());
-        messageVo.setKey(record.key());
-        messageVo.setMessage(record.value());
-        messageVo.setHeaders(headersToMap(record.headers()));
-        messageVo.setTimestamp(new Date(record.timestamp()));
+        messageVo.setPartition(rec.partition());
+        messageVo.setOffset(rec.offset());
+        messageVo.setKey(rec.key());
+        messageVo.setMessage(rec.value());
+        messageVo.setHeaders(headersToMap(rec.headers()));
+        messageVo.setTimestamp(new Date(rec.timestamp()));
         messageVos.add(messageVo);
       }
       return messageVos;
@@ -166,14 +166,14 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     final var records = highLevelConsumer.getLatestRecords(topicPartition, offset, count, deserializers);
     if (records != null) {
       final var messageVos = new ArrayList<MessageVO>();
-      for (var record : records) {
+      for (var rec : records) {
         final var messageVo = new MessageVO();
         messageVo.setPartition(topicPartition.partition());
-        messageVo.setOffset(record.offset());
-        messageVo.setKey(record.key());
-        messageVo.setMessage(record.value());
-        messageVo.setHeaders(headersToMap(record.headers()));
-        messageVo.setTimestamp(new Date(record.timestamp()));
+        messageVo.setOffset(rec.offset());
+        messageVo.setKey(rec.key());
+        messageVo.setMessage(rec.value());
+        messageVo.setHeaders(headersToMap(rec.headers()));
+        messageVo.setTimestamp(new Date(rec.timestamp()));
         messageVos.add(messageVo);
       }
       return messageVos;
@@ -243,8 +243,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         final var partition = topicPartitionOffset.getKey().partition();
         final var offset = topicPartitionOffset.getValue().offset();
         groupTopicPartitionOffsetMap
-            .computeIfAbsent(groupId, __ -> new TreeMap<>())
-            .computeIfAbsent(topic, __ -> new TreeMap<>())
+            .computeIfAbsent(groupId, unused -> new TreeMap<>())
+            .computeIfAbsent(topic, unused -> new TreeMap<>())
             .put(partition, offset);
       }
     }
