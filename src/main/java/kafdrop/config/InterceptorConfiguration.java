@@ -22,7 +22,6 @@ import org.springframework.core.env.*;
 import org.springframework.stereotype.*;
 import org.springframework.web.servlet.*;
 import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.web.servlet.handler.*;
 
 import javax.servlet.http.*;
 
@@ -39,7 +38,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
     registry.addInterceptor(new ProfileHandlerInterceptor());
   }
 
-  public class ProfileHandlerInterceptor extends HandlerInterceptorAdapter {
+  public class ProfileHandlerInterceptor implements AsyncHandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
       final var activeProfiles = environment.getActiveProfiles();

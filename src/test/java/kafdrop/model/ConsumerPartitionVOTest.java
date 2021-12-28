@@ -18,21 +18,21 @@
 
 package kafdrop.model;
 
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public final class ConsumerPartitionVOTest {
+final class ConsumerPartitionVOTest {
   private void doLagTest(long first, long last, long offset, long expectedLag) {
     final var partition = new ConsumerPartitionVO("test", "test", 0);
     partition.setFirstOffset(first);
     partition.setSize(last);
     partition.setOffset(offset);
-    assertEquals("Unexpected lag", expectedLag, partition.getLag());
+    assertEquals(expectedLag, partition.getLag(), "Unexpected lag");
   }
 
   @Test
-  public void testGetLag() {
+  void testGetLag() {
     doLagTest(0, 0, 0, 0);
     doLagTest(-1, -1, -1, 0);
     doLagTest(5, 10, 8, 2);

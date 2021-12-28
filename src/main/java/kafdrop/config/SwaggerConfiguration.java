@@ -18,15 +18,25 @@
 
 package kafdrop.config;
 
-import com.google.common.base.*;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.*;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
 import springfox.documentation.*;
 import springfox.documentation.builders.*;
 import springfox.documentation.spi.*;
 import springfox.documentation.spring.web.plugins.*;
 import springfox.documentation.swagger2.annotations.*;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  *  Auto configuration for Swagger. Can be disabled by setting {@code swagger.enabled=false}.
@@ -52,9 +62,9 @@ public class SwaggerConfiguration {
   /**
    *  Swagger Predicate for only selecting JSON endpoints.
    */
-  public final class JsonRequestHandlerPredicate implements Predicate<RequestHandler> {
+  public static final class JsonRequestHandlerPredicate implements Predicate<RequestHandler> {
     @Override
-    public boolean apply(RequestHandler input) {
+    public boolean test(RequestHandler input) {
       return input.produces().contains(MediaType.APPLICATION_JSON);
     }
   }
@@ -62,10 +72,46 @@ public class SwaggerConfiguration {
   /**
    *  Swagger Predicate for ignoring {@code /actuator} endpoints.
    */
-  public final class IgnoreDebugPathPredicate implements Predicate<String> {
+  public static final class IgnoreDebugPathPredicate implements Predicate<String> {
     @Override
-    public boolean apply(String input) {
+    public boolean test(String input) {
       return !input.startsWith("/actuator");
     }
+  }
+
+  /**
+   * Works around https://github.com/springfox/springfox/issues/3462
+   */
+  @Bean
+  public static BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
+    return new BeanPostProcessor() {
+
+      @Override
+      public Object postProcessAfterInitialization(@NotNull Object bean, @NotNull String beanName) throws BeansException {
+        if (bean instanceof WebMvcRequestHandlerProvider || bean instanceof WebFluxRequestHandlerProvider) {
+          customizeSpringfoxHandlerMappings(getHandlerMappings(bean));
+        }
+        return bean;
+      }
+
+      private <T extends RequestMappingInfoHandlerMapping> void customizeSpringfoxHandlerMappings(List<T> mappings) {
+        List<T> copy = mappings.stream()
+                .filter(mapping -> mapping.getPatternParser() == null)
+                .collect(Collectors.toList());
+        mappings.clear();
+        mappings.addAll(copy);
+      }
+
+      @SuppressWarnings("unchecked")
+      private List<RequestMappingInfoHandlerMapping> getHandlerMappings(Object bean) {
+        try {
+          Field field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
+          Objects.requireNonNull(field).setAccessible(true);
+          return (List<RequestMappingInfoHandlerMapping>) field.get(bean);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+          throw new IllegalStateException(e);
+        }
+      }
+    };
   }
 }

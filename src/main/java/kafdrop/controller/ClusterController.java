@@ -30,7 +30,6 @@ import org.springframework.stereotype.*;
 import org.springframework.ui.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -93,7 +92,7 @@ public final class ClusterController {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Success", response = ClusterInfoVO.class)
   })
-  @RequestMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody ClusterInfoVO getCluster() {
     final var vo = new ClusterInfoVO();
     vo.brokers = kafkaMonitor.getBrokers();
@@ -112,6 +111,7 @@ public final class ClusterController {
   @ResponseStatus(HttpStatus.OK)
   @RequestMapping("/health_check")
   public void healthCheck() {
+    // only http code shall be checked
   }
 
   /**

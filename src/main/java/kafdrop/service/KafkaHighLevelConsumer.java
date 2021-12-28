@@ -3,11 +3,9 @@ package kafdrop.service;
 import kafdrop.config.*;
 import kafdrop.model.*;
 import kafdrop.util.*;
-import org.apache.kafka.clients.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.*;
-import org.apache.kafka.common.config.*;
 import org.apache.kafka.common.serialization.*;
 import org.slf4j.*;
 import org.springframework.stereotype.*;
@@ -125,7 +123,6 @@ public final class KafkaHighLevelConsumer {
                                          rec.offset(),
                                          rec.timestamp(),
                                          rec.timestampType(),
-                                         0L,
                                          rec.serializedKeySize(),
                                          rec.serializedValueSize(),
                                          deserialize(deserializers.getKeyDeserializer(),rec.key()),
@@ -185,7 +182,6 @@ public final class KafkaHighLevelConsumer {
             rec.offset(),
             rec.timestamp(),
             rec.timestampType(),
-            0L,
             rec.serializedKeySize(),
             rec.serializedValueSize(),
             deserialize(deserializers.getKeyDeserializer(), rec.key()),

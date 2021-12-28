@@ -44,6 +44,7 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
           String schemaRegistryAuth,
           String schemaPropertyFile) {
     final var config = new HashMap<String, Object>();
+
     final var sslConfig = new HashMap<String, Object>();
     config.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
 
@@ -63,6 +64,7 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
         }
       }
     }
+
 
     if (schemaRegistryAuth != null) {
       config.put(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
