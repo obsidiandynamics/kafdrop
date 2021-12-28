@@ -1,0 +1,90 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Release with mvn
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - 
+      name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    - 
+      name: app version
+      run: |
+        echo "app_ver=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)"
+        echo "app_ver=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+    -
+      name: Build with Maven
+      run: mvn -B clean integration-test package assembly:single docker:build
+
+# Docker hub action
+    -
+      name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }} 
+    -
+      name: push snapshot version
+      run: |
+        echo publishing docker container $app_ver
+        docker push docker.io/obsidiandynamics/kafdrop:$app_ver
+    -
+      name: push latest if it's a release
+      if: ${{ ! endsWith( env.app_ver, '-SNAPSHOT' ) }}
+      run: docker push docker.io/obsidiandynamics/kafdrop:latest
+
+#  bintray_upload:
+    -
+      name: bintray upload
+      if: ${{ ! endsWith( env.app_ver, '-SNAPSHOT' ) }}
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+      run: |
+        set +x
+        curl -X DELETE https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/versions/${app_ver} -u ${BINTRAY_USER}:${BINTRAY_KEY} || echo Skipped 'delete'
+        cat settings.xml.template | sed "s/{{BINTRAY_USER}}/${BINTRAY_USER}/g" | sed "s/{{BINTRAY_KEY}}/${BINTRAY_KEY}/g" > settings.xml
+        set -x
+        mvn -B deploy -s settings.xml
+
+# github_release:
+    -
+      name: github release
+      if: ${{ ! endsWith( env.app_ver, '-SNAPSHOT' ) }}
+      env:
+        GITHUB_USER: ${{ secrets.RELEASE_USER }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+      run: |
+        repo_url="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY"
+        get_release_status=$(curl -u $GITHUB_USER:$GITHUB_TOKEN -s -o /dev/null -w "%{http_code}" $repo_url/releases/tags/${app_ver})
+        echo "Release tag query status code: $get_release_status"
+        if [ $get_release_status == "404" ]; then
+          echo "Publishing release"
+          release_json="{ \
+            \"tag_name\": \"${app_ver}\", \
+            \"target_commitish\": \"master\", \
+            \"name\": \"${app_ver}\", \
+            \"body\": \"Download from [Bintray](https://bintray.com/obsidiandynamics/kafdrop/download_file?file_path=com%2Fobsidiandynamics%2Fkafdrop%2Fkafdrop%2F${app_ver}%2Fkafdrop-${app_ver}.jar)\", \
+            \"draft\": false, \
+            \"prerelease\": false \
+          }"
+          curl -u $GITHUB_USER:$GITHUB_TOKEN -X POST $repo_url/releases -d "$release_json"
+        elif [ $get_release_status == "200" ]; then
+          echo "Release already exists; skipping"
+        else
+          echo "Unexpected error checking release status: $get_release_status"
+          exit 1
+        fi
+
