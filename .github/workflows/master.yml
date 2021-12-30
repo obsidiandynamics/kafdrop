@@ -57,20 +57,6 @@ jobs:
           exit 1
         fi
 
-#  bintray_upload:
-    -
-      name: bintray upload
-      if: ${{ ! endsWith( env.app_ver, '-SNAPSHOT' ) }}
-      env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
-      run: |
-        set +x
-        curl -X DELETE https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/versions/${app_ver} -u ${BINTRAY_USER}:${BINTRAY_KEY} || echo Skipped 'delete'
-        cat settings.xml.template | sed "s/{{BINTRAY_USER}}/${BINTRAY_USER}/g" | sed "s/{{BINTRAY_KEY}}/${BINTRAY_KEY}/g" > settings.xml
-        set -x
-        mvn -B deploy -s settings.xml
-
 # Docker hub action
     -
       name: Login to Docker Hub
