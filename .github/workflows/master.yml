@@ -5,7 +5,7 @@ name: Release with mvn
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master ] 
 
 jobs:
   build:
@@ -32,30 +32,13 @@ jobs:
     -
       name: github release
       if: ${{ ! endsWith( env.app_ver, '-SNAPSHOT' ) }}
-      env:
-        GITHUB_USER: ${{ secrets.RELEASE_USER }}
-        GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
-      run: |
-        repo_url="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY"
-        get_release_status=$(curl -u $GITHUB_USER:$GITHUB_TOKEN -s -o /dev/null -w "%{http_code}" $repo_url/releases/tags/${app_ver})
-        echo "Release tag query status code: $get_release_status"
-        if [ $get_release_status == "404" ]; then
-          echo "Publishing release"
-          release_json="{ \
-            \"tag_name\": \"${app_ver}\", \
-            \"target_commitish\": \"master\", \
-            \"name\": \"${app_ver}\", \
-            \"body\": \"Download from [Bintray](https://bintray.com/obsidiandynamics/kafdrop/download_file?file_path=com%2Fobsidiandynamics%2Fkafdrop%2Fkafdrop%2F${app_ver}%2Fkafdrop-${app_ver}.jar)\", \
-            \"draft\": false, \
-            \"prerelease\": false \
-          }"
-          curl -u $GITHUB_USER:$GITHUB_TOKEN -X POST $repo_url/releases -d "$release_json"
-        elif [ $get_release_status == "200" ]; then
-          echo "Release already exists; skipping"
-        else
-          echo "Unexpected error checking release status: $get_release_status"
-          exit 1
-        fi
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "./target/kafdrop-*.jar"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ env.app_ver }}
+        commit: "master"
+        generateReleaseNotes: true
 
 # Docker hub action
     -
