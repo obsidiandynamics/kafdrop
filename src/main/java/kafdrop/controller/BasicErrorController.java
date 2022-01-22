@@ -22,8 +22,15 @@ public final class BasicErrorController extends AbstractErrorController {
 
   @RequestMapping("/error")
   public ModelAndView handleError(HttpServletRequest request) {
-    final var error = getErrorAttributes(request, ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE));
+    final var errorAttributeOptions = ErrorAttributeOptions.of(
+      ErrorAttributeOptions.Include.STACK_TRACE,
+      ErrorAttributeOptions.Include.MESSAGE);
+
+    final var error = getErrorAttributes(request, errorAttributeOptions);
     LOG.info("errorAtts: {}", error);
+    
+    error.putIfAbsent("message", "");
+
     final var model = Map.of("error", error);
     return new ModelAndView("error", model);
   }
