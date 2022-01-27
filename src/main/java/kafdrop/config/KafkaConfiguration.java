@@ -17,7 +17,7 @@ public final class KafkaConfiguration {
   private static final Logger LOG = LoggerFactory.getLogger(KafkaConfiguration.class);
 
   private String brokerConnect;
-  private Boolean isSecured = false;
+  private boolean isSecured = false;
   private String saslMechanism;
   private String securityProtocol;
   private String truststoreFile;

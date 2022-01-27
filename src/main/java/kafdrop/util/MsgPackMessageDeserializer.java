@@ -15,8 +15,7 @@ public class MsgPackMessageDeserializer implements MessageDeserializer {
 
   @Override
   public String deserializeMessage(ByteBuffer buffer) {
-    MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(buffer);
-    try {
+    try (MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(buffer)) {
       return unpacker.unpackValue().toJson();
     } catch (IOException e) {
       final String errorMsg = "Unable to unpack msgpack message";

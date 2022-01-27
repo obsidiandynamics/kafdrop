@@ -51,7 +51,7 @@ public final class ConsumerController {
       @ApiResponse(code = 200, message = "Success", response = ConsumerVO.class),
       @ApiResponse(code = 404, message = "Invalid consumer group")
   })
-  @RequestMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @GetMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId) throws ConsumerNotFoundException {
     final var topicVos = kafkaMonitor.getTopics();
     final var consumer = kafkaMonitor.getConsumers(topicVos)

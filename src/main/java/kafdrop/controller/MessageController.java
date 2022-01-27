@@ -36,8 +36,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -47,11 +45,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import kafdrop.config.MessageFormatConfiguration;
 import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
-import kafdrop.config.ProtobufDescriptorConfiguration;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
-import kafdrop.config.SchemaRegistryConfiguration;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
 import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
@@ -66,12 +61,12 @@ public final class MessageController {
 
   private final MessageInspector messageInspector;
 
-  private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
-  private final MessageFormatConfiguration.MessageFormatProperties keyFormatProperties;
+  private final MessageFormatProperties messageFormatProperties;
+  private final MessageFormatProperties keyFormatProperties;
 
-  private final SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties;
-  
-  private final ProtobufDescriptorConfiguration.ProtobufDescriptorProperties protobufProperties;
+  private final SchemaRegistryProperties schemaRegistryProperties;
+
+  private final ProtobufDescriptorProperties protobufProperties;
 
   public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, MessageFormatProperties keyFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
     this.kafkaMonitor = kafkaMonitor;
@@ -213,7 +208,7 @@ public final class MessageController {
       @ApiResponse(code = 200, message = "Success", response = List.class),
       @ApiResponse(code = 404, message = "Invalid topic name")
   })
-  @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/topic/{name:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody
   List<Object> getPartitionOrMessages(
       @PathVariable("name") String topicName,
@@ -263,13 +258,19 @@ public final class MessageController {
       final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
 
       deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
-    } else if (format == MessageFormat.PROTOBUF) {
+    } else if (format == MessageFormat.PROTOBUF && null != descFile) {
       // filter the input file name
+
       final var descFileName = descFile.replace(".desc", "")
-          .replaceAll("\\.", "")
-          .replaceAll("/", "");
+          .replace(".", "")
+          .replace("/", "");
       final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
-      deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
+      deserializer = new ProtobufMessageDeserializer(fullDescFile, msgTypeName);
+    } else if (format == MessageFormat.PROTOBUF) {
+      final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
+      final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
+
+      deserializer = new ProtobufSchemaRegistryMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
     } else if (format == MessageFormat.MSGPACK) {
       deserializer = new MsgPackMessageDeserializer();
     } else {

@@ -43,7 +43,7 @@ import java.util.stream.*;
 
 @SpringBootApplication
 public class Kafdrop {
-  private final static Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
 
   public static void main(String[] args) {
     createApplicationBuilder()
@@ -99,8 +99,7 @@ public class Kafdrop {
         try {
           System.setProperty("logging.dir", new File(loggingFile).getParent());
         } catch (Exception ex) {
-          System.err.println("Unable to set up logging.dir from logging.file " + loggingFile + ": " +
-                                 Throwables.getStackTraceAsString(ex));
+          LOG.error("Unable to set up logging.dir from logging.file {}", loggingFile, ex);
         }
       }
       if (environment.containsProperty("debug") &&

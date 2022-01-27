@@ -38,15 +38,15 @@ public class HealthCheckConfiguration {
     }
 
     @ManagedAttribute
-    public Map getHealth() {
-      final var health = healthEndpoint.health();
+    public Map<String, Object> getHealth() {
+      final var health = (Health) healthEndpoint.health();
       final var healthMap = new LinkedHashMap<String, Object>();
       healthMap.put("status", getStatus(health));
       healthMap.put("detail", getDetails(health.getDetails()));
       return healthMap;
     }
 
-    private Map getDetails(Map<String, Object> details) {
+    private Map<String, Object> getDetails(Map<String, Object> details) {
       return details.entrySet().stream()
           .collect(Collectors.toMap(Map.Entry::getKey,
                                     e -> {
