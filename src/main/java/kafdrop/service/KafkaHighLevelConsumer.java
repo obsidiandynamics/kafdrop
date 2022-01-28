@@ -3,6 +3,7 @@ package kafdrop.service;
 import kafdrop.config.*;
 import kafdrop.model.*;
 import kafdrop.util.*;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.*;
