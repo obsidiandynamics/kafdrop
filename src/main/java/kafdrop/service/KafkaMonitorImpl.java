@@ -99,7 +99,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<TopicVO> getTopics() {
-    final var topicVos = getTopicMetadata(highLevelConsumer.getAllTopic()).values().stream()
+    final var topicVos = getTopicMetadata(highLevelConsumer.getAllTopics()).values().stream()
         .sorted(Comparator.comparing(TopicVO::getName))
         .collect(Collectors.toList());
 
@@ -108,7 +108,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<TopicVO> getTopicsWithOffsets() {
-    Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopic();
+    Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopics();
 
     final var topicVos = getTopicMetadata(topicsMap).values().stream()
             .sorted(Comparator.comparing(TopicVO::getName))
@@ -121,7 +121,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public Optional<TopicVO> getTopic(String topic) {
-    Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopic();
+    Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopics();
 
     final var topicVo = Optional.ofNullable(getTopicMetadata(topicsMap, topic).get(topic));
     topicVo.ifPresent(vo -> setTopicPartitionSizes(Collections.singletonList(vo)));

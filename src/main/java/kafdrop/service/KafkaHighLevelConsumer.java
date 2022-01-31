@@ -196,7 +196,7 @@ public final class KafkaHighLevelConsumer {
     return bytes != null ? deserializer.deserializeMessage(ByteBuffer.wrap(bytes)) : "empty";
   }
 
-  synchronized Map<String, List<PartitionInfo>> getAllTopic() {
+  synchronized Map<String, List<PartitionInfo>> getAllTopics() {
     initializeClient();
 
     return kafkaConsumer.listTopics();
