@@ -48,18 +48,16 @@ public final class KafkaHighLevelConsumer {
     }
   }
 
-  synchronized void setAllPartitionSizes(Map<String, List<PartitionInfo>> topicsMap, List<TopicVO> topics) {
+  synchronized void setTopicPartitionSizes(List<TopicVO> topics) {
     initializeClient();
 
     Map<TopicVO, List<TopicPartition>> allTopics = topics.stream().map(topicVO -> {
-      List<TopicPartition> topicPartitions = topicsMap.get(topicVO.getName()).stream()
-        .map(partitionInfo -> {
-          return new TopicPartition(partitionInfo.topic(), partitionInfo.partition());
-        }).collect(Collectors.toList());
+      List<TopicPartition> topicPartitions = topicVO.getPartitions().stream().map(topicPartitionVO -> {
+        return new TopicPartition(topicVO.getName(), topicPartitionVO.getId());
+      }).collect(Collectors.toList());
 
-        return Pair.of(topicVO, topicPartitions);
-      }
-    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+      return Pair.of(topicVO, topicPartitions);
+    }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
     List<TopicPartition> allTopicPartitions = allTopics.values().stream().flatMap(Collection::stream)
             .collect(Collectors.toList());

@@ -114,7 +114,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
             .sorted(Comparator.comparing(TopicVO::getName))
             .collect(Collectors.toList());
 
-    setTopicPartitionSizes(topicsMap, topicVos);
+    setTopicPartitionSizes(topicVos);
 
     return topicVos;
   }
@@ -124,7 +124,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopic();
 
     final var topicVo = Optional.ofNullable(getTopicMetadata(topicsMap, topic).get(topic));
-    topicVo.ifPresent(vo -> setTopicPartitionSizes(topicsMap, Collections.singletonList(vo)));
+    topicVo.ifPresent(vo -> setTopicPartitionSizes(Collections.singletonList(vo)));
     return topicVo;
   }
 
@@ -204,8 +204,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     return map;
   }
 
-  private void setTopicPartitionSizes(Map<String, List<PartitionInfo>> topicsMap, List<TopicVO> topics) {
-    highLevelConsumer.setAllPartitionSizes(topicsMap, topics);
+  private void setTopicPartitionSizes(List<TopicVO> topics) {
+    highLevelConsumer.setTopicPartitionSizes(topics);
   }
 
   @Override
