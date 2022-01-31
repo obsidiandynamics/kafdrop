@@ -52,15 +52,16 @@ public final class KafkaHighLevelConsumer {
     initializeClient();
 
     Map<TopicVO, List<TopicPartition>> allTopics = topics.stream().map(topicVO -> {
-      List<TopicPartition> topicPartitions = topicVO.getPartitions().stream().map(topicPartitionVO -> {
-        return new TopicPartition(topicVO.getName(), topicPartitionVO.getId());
-      }).collect(Collectors.toList());
+      List<TopicPartition> topicPartitions = topicVO.getPartitions().stream().map(topicPartitionVO ->
+        new TopicPartition(topicVO.getName(), topicPartitionVO.getId())
+      ).collect(Collectors.toList());
 
       return Pair.of(topicVO, topicPartitions);
     }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
-    List<TopicPartition> allTopicPartitions = allTopics.values().stream().flatMap(Collection::stream)
-            .collect(Collectors.toList());
+    List<TopicPartition> allTopicPartitions = allTopics.values().stream()
+      .flatMap(Collection::stream)
+      .collect(Collectors.toList());
 
     kafkaConsumer.assign(allTopicPartitions);
     Map<TopicPartition, Long> beginningOffset = kafkaConsumer.beginningOffsets(allTopicPartitions);
@@ -209,16 +210,12 @@ public final class KafkaHighLevelConsumer {
     if (topics.length == 0) {
       topics = Arrays.copyOf(topicSet.toArray(), topicSet.size(), String[].class);
     }
-    final var topicVos = new HashMap<String, TopicVO>(topics.length, 1f);
 
-    for (var topic : topics) {
-      if (topicSet.contains(topic)) {
-        topicVos.put(topic, getTopicInfo(topic, allTopicsMap.get(topic)));
-      }
-    }
-
-    return topicVos;
-  }
+    return Arrays.stream(topics)
+      .filter(topicSet::contains)
+      .map(topic -> Pair.of(topic, getTopicInfo(topic, allTopicsMap.get(topic))))
+      .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+   }
 
   private TopicVO getTopicInfo(String topic, List<PartitionInfo> partitionInfoList) {
     final var topicVo = new TopicVO(topic);
