@@ -60,7 +60,7 @@ public final class TopicController {
     final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
-    model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
+    model.addAttribute("consumers", kafkaMonitor.getConsumersByTopics(Collections.singleton(topic)));
     model.addAttribute("topicDeleteEnabled", topicDeleteEnabled);
     model.addAttribute("keyFormat", defaultKeyFormat);
     model.addAttribute("format", defaultFormat);
@@ -125,7 +125,7 @@ public final class TopicController {
   public @ResponseBody List<ConsumerVO> getConsumers(@PathVariable("name") String topicName) {
     final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
-    return kafkaMonitor.getConsumers(Collections.singleton(topic));
+    return kafkaMonitor.getConsumersByTopics(Collections.singleton(topic));
   }
 
   /**

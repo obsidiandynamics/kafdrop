@@ -106,14 +106,10 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     return topicVos;
   }
 
-  @Override
-  public List<TopicVO> getTopicsWithOffsets() {
+  public List<TopicVO> getTopics(String[] topics) {
     Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopics();
 
-    final var topicVos = getTopicMetadata(topicsMap).values().stream()
-            .sorted(Comparator.comparing(TopicVO::getName))
-            .collect(Collectors.toList());
-
+    ArrayList<TopicVO> topicVos = new ArrayList<>(getTopicMetadata(topicsMap, topics).values());
     setTopicPartitionSizes(topicVos);
 
     return topicVos;
@@ -121,11 +117,9 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public Optional<TopicVO> getTopic(String topic) {
-    Map<String, List<PartitionInfo>> topicsMap = highLevelConsumer.getAllTopics();
+    String[] topics = { topic };
 
-    final var topicVo = Optional.ofNullable(getTopicMetadata(topicsMap, topic).get(topic));
-    topicVo.ifPresent(vo -> setTopicPartitionSizes(Collections.singletonList(vo)));
-    return topicVo;
+    return getTopics(topics).stream().findAny();
   }
 
   private Map<String, TopicVO> getTopicMetadata(Map<String, List<PartitionInfo>> allTopicsMap, String... topics) {
@@ -209,7 +203,24 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   }
 
   @Override
-  public List<ConsumerVO> getConsumers(Collection<TopicVO> topicVos) {
+  public List<ConsumerVO> getConsumersByGroup(String groupId) {
+    List<ConsumerGroupOffsets> consumerGroupOffsets = getConsumerOffsets(groupId);
+
+    String[] uniqueTopicNames = consumerGroupOffsets.stream()
+      .flatMap(consumerGroupOffset -> consumerGroupOffset.offsets.keySet()
+      .stream().map(TopicPartition::topic))
+      .distinct()
+      .toArray(String[]::new);
+
+    List<TopicVO> topicVOs = getTopics(uniqueTopicNames);
+
+    LOG.debug("consumerGroupOffsets: {}", consumerGroupOffsets);
+    LOG.debug("topicVos: {}", topicVOs);
+    return convert(consumerGroupOffsets, topicVOs);
+  }
+
+  @Override
+  public List<ConsumerVO> getConsumersByTopics(Collection<TopicVO> topicVos) {
     final var topics = topicVos.stream().map(TopicVO::getName).collect(Collectors.toSet());
     final var consumerGroupOffsets = getConsumerOffsets(topics);
     LOG.debug("consumerGroupOffsets: {}", consumerGroupOffsets);
@@ -319,6 +330,10 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   private ConsumerGroupOffsets resolveOffsets(String groupId) {
     return new ConsumerGroupOffsets(groupId, highLevelAdminClient.listConsumerGroupOffsetsIfAuthorized(groupId));
+  }
+
+  private List<ConsumerGroupOffsets> getConsumerOffsets(String groupId) {
+    return Collections.singletonList(resolveOffsets(groupId));
   }
 
   private List<ConsumerGroupOffsets> getConsumerOffsets(Set<String> topics) {
