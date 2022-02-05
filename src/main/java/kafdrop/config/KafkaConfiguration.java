@@ -28,8 +28,11 @@ public final class KafkaConfiguration {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
     if (isSecured) {
       LOG.warn("The 'isSecured' property is deprecated; consult README.md on the preferred way to configure security");
-      properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
       properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
+    }
+
+    if(isSecured || securityProtocol.equals("SSL")) {
+      properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
     }
 
     LOG.info("Checking truststore file {}", truststoreFile);
