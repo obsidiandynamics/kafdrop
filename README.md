@@ -274,6 +274,9 @@ docker run -d --rm -p 9000:9000 \
 |`KAFKA_PROPERTIES_FILE`|Internal location where the Kafka properties file will be written to (if `KAFKA_PROPERTIES` is set). Defaults to `kafka.properties`.
 |`KAFKA_TRUSTSTORE_FILE`|Internal location where the truststore file will be written to (if `KAFKA_TRUSTSTORE` is set). Defaults to `kafka.truststore.jks`.
 |`KAFKA_KEYSTORE_FILE`  |Internal location where the keystore file will be written to (if `KAFKA_KEYSTORE` is set). Defaults to `kafka.keystore.jks`.
+|`SCHEMAREGISTRY_PROPERTIES`|Additional properties to configure the schema registry connection (base-64 encoded). Provides keystore/trustore location and password.
+|`SCHEMAREGISTRY_TRUSTSTORE`|Certificate for schema registry authentication (base-64 encoded). Required for TLS/SSL.
+|`SCHEMAREGISTRY_KEYSTORE`  |Private key for mutual TLS authentication (base-64 encoded).
 
 ### Using Helm
 Like in the Docker example, supply the files in base-64 form:

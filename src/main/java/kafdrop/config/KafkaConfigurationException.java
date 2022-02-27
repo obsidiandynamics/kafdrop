@@ -1,7 +1,7 @@
 package kafdrop.config;
 
 public final class KafkaConfigurationException extends RuntimeException {
-  KafkaConfigurationException(Throwable cause) {
+  public KafkaConfigurationException(Throwable cause) {
     super(cause);
   }
 }
