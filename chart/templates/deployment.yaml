@@ -52,6 +52,9 @@ spec:
             value: "{{ .Values.kafka.keystoreFile }}"
           - name: SERVER_PORT
             value: "{{ .Values.server.port }}"
+          {{- if .Values.extraEnvVars }}
+          {{- .Values.extraEnvVars | toYaml | nindent 10 }}
+          {{- end }}
           - name: CMD_ARGS
 {{- if .Values.mountProtoDesc.enabled }}
             value: "--message.format=PROTOBUF --protobufdesc.directory=/protodesc/ {{ .Values.cmdArgs }}"
