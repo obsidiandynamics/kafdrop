@@ -30,8 +30,10 @@ spec:
           env:
           - name: KAFKA_BROKERCONNECT
             value: "{{ .Values.kafka.brokerConnect }}"
+          {{- if .Values.kafka.properties }}
           - name: KAFKA_PROPERTIES
             value: "{{ .Values.kafka.properties }}"
+          {{- end }}
           - name: KAFKA_TRUSTSTORE
             value: "{{ .Values.kafka.truststore }}"
           - name: KAFKA_KEYSTORE
