@@ -266,14 +266,19 @@ docker run -d --rm -p 9000:9000 \
 |`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
-|Name                   |Description
-|-----------------------|-------------------------------
-|`JVM_OPTS`             |JVM options.
-|`JMX_PORT`             |Port to use for JMX. No default; if unspecified, JMX will not be exposed.
-|`HOST`                 |The hostname to report for the RMI registry (used for JMX). Defaults to `localhost`.
-|`KAFKA_PROPERTIES_FILE`|Internal location where the Kafka properties file will be written to (if `KAFKA_PROPERTIES` is set). Defaults to `kafka.properties`.
-|`KAFKA_TRUSTSTORE_FILE`|Internal location where the truststore file will be written to (if `KAFKA_TRUSTSTORE` is set). Defaults to `kafka.truststore.jks`.
-|`KAFKA_KEYSTORE_FILE`  |Internal location where the keystore file will be written to (if `KAFKA_KEYSTORE` is set). Defaults to `kafka.keystore.jks`.
+| Name                     |Description
+|--------------------------|-------------------------------
+| `JVM_OPTS`               |JVM options.
+| `JMX_PORT`               |Port to use for JMX. No default; if unspecified, JMX will not be exposed.
+| `HOST`                   |The hostname to report for the RMI registry (used for JMX). Defaults to `localhost`.
+| `KAFKA_PROPERTIES_FILE`  |Internal location where the Kafka properties file will be written to (if `KAFKA_PROPERTIES` is set). Defaults to `kafka.properties`.
+| `KAFKA_TRUSTSTORE_FILE`  |Internal location where the truststore file will be written to (if `KAFKA_TRUSTSTORE` is set). Defaults to `kafka.truststore.jks`.
+| `KAFKA_KEYSTORE_FILE`    |Internal location where the keystore file will be written to (if `KAFKA_KEYSTORE` is set). Defaults to `kafka.keystore.jks`.
+| `SSL_ENABLED`            | Enabling HTTPS (SSL) for Kafdrop server. Default is `false`
+| `SSL_KEY_STORE_TYPE`     | Type of SSL keystore. Default is `PKCS12`
+| `SSL_KEY_STORE`          | Path to keystore file
+| `SSL_KEY_STORE_PASSWORD` | Keystore password
+| `SSL_KEY_ALIAS`          | Key alias
 
 ### Using Helm
 Like in the Docker example, supply the files in base-64 form:
