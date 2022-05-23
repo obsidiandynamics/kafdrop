@@ -99,11 +99,9 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public List<TopicVO> getTopics() {
-    final var topicVos = getTopicMetadata(highLevelConsumer.getAllTopics()).values().stream()
+    return getTopicMetadata(highLevelConsumer.getAllTopics()).values().stream()
         .sorted(Comparator.comparing(TopicVO::getName))
         .collect(Collectors.toList());
-
-    return topicVos;
   }
 
   public List<TopicVO> getTopics(String[] topics) {
