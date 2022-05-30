@@ -26,12 +26,22 @@ public class ProtobufDescriptorConfiguration {
     // detail screen
     private String directory;
 
+    private Boolean parseAnyProto = Boolean.FALSE;
+
     public String getDirectory() {
       return directory;
     }
 
     public void setDirectory(String directory) {
       this.directory = directory;
+    }
+
+    public Boolean getParseAnyProto() {
+      return parseAnyProto;
+    }
+
+    public void setParseAnyProto(Boolean parseAnyProto) {
+      this.parseAnyProto = parseAnyProto;
     }
 
     public List<String> getDescFilesList() {

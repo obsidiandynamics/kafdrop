@@ -49,12 +49,14 @@
 	    {
 	        $('#protobufDescriptor').hide();
 	        $('#protobufMsgType').hide();
+            $('#protobufIsAnyProto').hide();
 	    }
 	    else
 	    {
 	        $('#protobufDescriptor').show();
 	        $('#protobufMsgType').show();
 	        $('#descFile').prop('required',true);
+            $('#protobufIsAnyProto').show();
 	    }
 	}  
 	$(document).ready(function(){
@@ -72,6 +74,7 @@
 <#assign selectedPartition=messageForm.partition!0?number>
 <#assign selectedFormat=messageForm.format!defaultFormat>
 <#assign selectedKeyFormat=messageForm.keyFormat!defaultFormat>
+<#assign selectedIsAnyProtoOpt=messageForm.isAnyProto>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
@@ -147,6 +150,15 @@
               <label class=control-label" for="format">Protobuf message type name</label>
               <@spring.formInput path="messageForm.msgTypeName" attributes='class="form-control"'/>
             </#if>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group" id="protobufIsAnyProto">
+        	<label class=control-label" for="format">Is Any proto?</label>
+            <select class="form-control" id="isAnyProto" name="isAnyProto">
+                 <#list isAnyProtoOpts as opt>
+                    <option value="${opt?c}" <#if opt == selectedIsAnyProtoOpt>selected="selected"</#if>>${opt?string('Yes', 'No')}</option>
+                </#list>
+            </select>
         </div>
         &nbsp;&nbsp;
         <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
