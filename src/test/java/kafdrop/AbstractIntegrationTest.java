@@ -20,7 +20,7 @@ abstract class AbstractIntegrationTest {
 
         public static Map<String, Object> getProperties() {
             Startables.deepStart(List.of(kafka)).join();
-            return Map.of("kafka.brokerConnect", kafka.getBootstrapServers());
+			return Map.of("kafka.brokerConnect", kafka.getBootstrapServers(), "protobufdesc.directory","./src/test/resources", "protobufdesc.parseAnyProto", true);
         }
 
         @Override
