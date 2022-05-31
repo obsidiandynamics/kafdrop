@@ -134,7 +134,7 @@
           <label for="format">Protobuf descriptor</label>
 	        <select class="form-control" id="descFile" name="descFile">
 	          <#list descFiles as f>
-	           <option value="${f}">${f}</option>
+	           <option value="${f}" <#if f == defaultDescFile>selected="selected"</#if>>${f}</option>
 	          </#list>
 	        </select>
         <#else>

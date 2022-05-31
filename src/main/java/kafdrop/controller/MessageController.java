@@ -149,6 +149,9 @@ public final class MessageController {
     final TopicVO topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
+    // pre-select a descriptor file for a specific topic if available
+    model.addAttribute("defaultDescFile", protobufProperties.getDescFilesList().stream()
+        .filter(descFile -> descFile.replace(".desc", "").equals(topicName)).findFirst().orElse(""));
 
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
