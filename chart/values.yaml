@@ -45,6 +45,7 @@ ingress:
   apiVersion: ~
   annotations: {}
   path: /
+  pathType: ~
   hosts: []
   tls: []
 
