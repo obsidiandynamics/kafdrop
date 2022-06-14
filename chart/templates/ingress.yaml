@@ -32,7 +32,7 @@ spec:
                 port:
                   name: http
           {{- else }}
-            {{- with (pick $ingress "path" "pathType") }}
+          - {{- with (pick $ingress "path" "pathType") }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
             backend:
