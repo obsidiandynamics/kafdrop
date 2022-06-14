@@ -42,8 +42,9 @@ service:
 
 ingress:
   enabled: false
-  apiVersion: ~
   annotations: {}
+  apiVersion: ~
+  ingressClassName: ~
   path: /
   pathType: ~
   hosts: []

@@ -1,6 +1,6 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "chart.fullname" . -}}
-{{- $ingressPath := .Values.ingress.path -}}
+{{- $ingress := .Values.ingress -}}
 apiVersion: {{ include "ingress.apiVersion" . }}
 kind: Ingress
 metadata:
@@ -10,36 +10,31 @@ metadata:
     helm.sh/chart: {{ include "chart.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- with .Values.ingress.annotations }}
+{{- with $ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
-{{- if .Values.ingress.tls }}
-  tls:
-  {{- range .Values.ingress.tls }}
-    - hosts:
-      {{- range .hosts }}
-        - {{ . | quote }}
-      {{- end }}
-      secretName: {{ .secretName }}
+  {{- with (pick $ingress "ingressClassName" "tls") }}
+  {{- . | toYaml | nindent 2 }}
   {{- end }}
-{{- end }}
   rules:
   {{- range .Values.ingress.hosts }}
     - host: {{ . | quote }}
       http:
         paths:
           {{- if eq "networking.k8s.io/v1" (include "ingress.apiVersion" $) }}
-          - path: {{ $ingressPath }}
-            pathType: Prefix
+          - path: {{ $ingress.path }}
+            pathType: {{ $ingress.pathType | default "ImplementationSpecific" }}
             backend:
               service:
                 name: {{ $fullName }}
                 port:
                   name: http
           {{- else }}
-          - path: {{ $ingressPath }}
+            {{- with (pick $ingress "path" "pathType") }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
             backend:
               serviceName: {{ $fullName }}
               servicePort: http
