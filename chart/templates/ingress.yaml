@@ -1,7 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "chart.fullname" . -}}
 {{- $ingressPath := .Values.ingress.path -}}
-apiVersion: extensions/v1beta1
+apiVersion: {{ include "ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}
@@ -30,9 +30,19 @@ spec:
     - host: {{ . | quote }}
       http:
         paths:
+          {{- if eq "networking.k8s.io/v1" (include "ingress.apiVersion" $) }}
+          - path: {{ $ingressPath }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  name: http
+          {{- else }}
           - path: {{ $ingressPath }}
             backend:
               serviceName: {{ $fullName }}
               servicePort: http
+          {{- end }}
   {{- end }}
 {{- end }}
