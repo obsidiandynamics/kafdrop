@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  kafdrop:
+  - apiVersion: v2
+    appVersion: 3.30.0
+    created: "2021-07-21T17:07:46.553708+01:00"
+    description: A Helm chart for Kafdrop on Kubernetes
+    digest: a3e3ee4cdcdb32223e872c26c5d130c4753652064a57d0b76608332a29e19b27
+    home: https://github.com/ricardo-aires/helm-charts
+    icon: https://svn.apache.org/repos/asf/comdev/project-logos/originals/kafka.svg
+    keywords:
+    - kafka
+    - kafdrop
+    maintainers:
+    - email: ricardoaireshenriques@gmail.com
+      name: Ricardo Henriques
+      url: https://github.com/ricardo-aires
+    name: kafdrop
+    sources:
+    - https://github.com/ricardo-aires/helm-charts
+    - https://github.com/obsidiandynamics/kafdrop
+    type: application
+    urls:
+    - https://ricardo-aires.github.io/helm-charts/kafdrop-0.1.0.tgz
+    version: 0.1.0
