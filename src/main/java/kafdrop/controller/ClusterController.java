@@ -121,5 +121,16 @@ public final class ClusterController {
     ClusterSummaryVO summary;
     List<BrokerVO> brokers;
     List<TopicVO> topics;
+    public ClusterSummaryVO getSummary() {
+      return summary;
+    }
+
+    public List<BrokerVO> getBrokers() {
+      return brokers;
+    }
+
+    public List<TopicVO> getTopics() {
+      return topics;
+    }
   }
 }
