@@ -69,6 +69,7 @@ public class CorsConfiguration {
     return new Filter() {
       @Override
       public void init(FilterConfig filterConfig) {
+        // nothing to init
       }
 
       @Override
@@ -91,6 +92,7 @@ public class CorsConfiguration {
 
       @Override
       public void destroy() {
+        // nothing to destroy
       }
     };
   }

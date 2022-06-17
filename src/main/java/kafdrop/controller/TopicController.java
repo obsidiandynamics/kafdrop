@@ -19,10 +19,10 @@
 package kafdrop.controller;
 
 import io.swagger.annotations.*;
+import kafdrop.config.MessageFormatConfiguration;
 import kafdrop.model.*;
 import kafdrop.service.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import kafdrop.util.MessageFormat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.*;
@@ -37,30 +37,38 @@ import java.util.*;
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
-  private static final Logger LOG = LoggerFactory.getLogger(TopicController.class);
   private final KafkaMonitor kafkaMonitor;
   private final boolean topicDeleteEnabled;
   private final boolean topicCreateEnabled;
+  private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
+  private final MessageFormatConfiguration.MessageFormatProperties keyFormatProperties;
 
   public TopicController(KafkaMonitor kafkaMonitor,
-                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
+                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled, MessageFormatConfiguration.MessageFormatProperties messageFormatProperties, MessageFormatConfiguration.MessageFormatProperties keyFormatProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.topicDeleteEnabled = topicDeleteEnabled;
     this.topicCreateEnabled = topicCreateEnabled;
+    this.messageFormatProperties = messageFormatProperties;
+    this.keyFormatProperties = keyFormatProperties;
   }
 
   @RequestMapping("/{name:.+}")
   public String topicDetails(@PathVariable("name") String topicName, Model model) {
+    final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
+
     final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
-    model.addAttribute("consumers", kafkaMonitor.getConsumers(Collections.singleton(topic)));
+    model.addAttribute("consumers", kafkaMonitor.getConsumersByTopics(Collections.singleton(topic)));
     model.addAttribute("topicDeleteEnabled", topicDeleteEnabled);
+    model.addAttribute("keyFormat", defaultKeyFormat);
+    model.addAttribute("format", defaultFormat);
 
     return "topic-detail";
   }
 
-  @RequestMapping(value = "/{name:.+}/delete", method = RequestMethod.POST)
+  @PostMapping(value = "/{name:.+}/delete")
   public String deleteTopic(@PathVariable("name") String topicName, Model model) {
     if (!topicDeleteEnabled) {
       model.addAttribute("deleteErrorMessage", "Not configured to be deleted.");
@@ -93,7 +101,7 @@ public final class TopicController {
       @ApiResponse(code = 200, message = "Success", response = TopicVO.class),
       @ApiResponse(code = 404, message = "Invalid topic name")
   })
-  @RequestMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @GetMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody TopicVO getTopic(@PathVariable("name") String topicName) {
     return kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
@@ -103,7 +111,7 @@ public final class TopicController {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List")
   })
-  @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<TopicVO> getAllTopics() {
     return kafkaMonitor.getTopics();
   }
@@ -113,11 +121,11 @@ public final class TopicController {
       @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List"),
       @ApiResponse(code = 404, message = "Invalid topic name")
   })
-  @RequestMapping(path = "/{name:.+}/consumers", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @GetMapping(path = "/{name:.+}/consumers", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<ConsumerVO> getConsumers(@PathVariable("name") String topicName) {
     final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
-    return kafkaMonitor.getConsumers(Collections.singleton(topic));
+    return kafkaMonitor.getConsumersByTopics(Collections.singleton(topic));
   }
 
   /**
@@ -128,7 +136,7 @@ public final class TopicController {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Success", response = String.class)
   })
-  @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+  @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public String createTopic(CreateTopicVO createTopicVO, Model model) {
     model.addAttribute("topicCreateEnabled", topicCreateEnabled);
     model.addAttribute("topicName", createTopicVO.getName());

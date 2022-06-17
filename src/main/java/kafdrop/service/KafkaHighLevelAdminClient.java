@@ -110,6 +110,7 @@ public final class KafkaHighLevelAdminClient {
         return Map.of();
       } else if (e.getCause() instanceof TopicAuthorizationException) {
         printAcls();
+        return Map.of();
       }
       throw new KafkaAdminClientException(e);
     }

@@ -37,11 +37,8 @@ public final class ConsumerController {
 
   @RequestMapping("/{groupId:.+}")
   public String consumerDetail(@PathVariable("groupId") String groupId, Model model) throws ConsumerNotFoundException {
-    final var topicVos = kafkaMonitor.getTopics();
-    final var consumer = kafkaMonitor.getConsumers(topicVos)
-        .stream()
-        .filter(c -> c.getGroupId().equals(groupId))
-        .findAny();
+    final var consumer = kafkaMonitor.getConsumersByGroup(groupId).stream().findAny();
+
     model.addAttribute("consumer", consumer.orElseThrow(() -> new ConsumerNotFoundException(groupId)));
     return "consumer-detail";
   }
@@ -51,13 +48,10 @@ public final class ConsumerController {
       @ApiResponse(code = 200, message = "Success", response = ConsumerVO.class),
       @ApiResponse(code = 404, message = "Invalid consumer group")
   })
-  @RequestMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @GetMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId) throws ConsumerNotFoundException {
-    final var topicVos = kafkaMonitor.getTopics();
-    final var consumer = kafkaMonitor.getConsumers(topicVos)
-        .stream()
-        .filter(c -> c.getGroupId().equals(groupId))
-        .findAny();
+    final var consumer = kafkaMonitor.getConsumersByGroup(groupId).stream().findAny();
+
     return consumer.orElseThrow(() -> new ConsumerNotFoundException(groupId));
   }
 }

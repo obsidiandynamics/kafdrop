@@ -36,8 +36,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -151,6 +149,9 @@ public final class MessageController {
     final TopicVO topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
+    // pre-select a descriptor file for a specific topic if available
+    model.addAttribute("defaultDescFile", protobufProperties.getDescFilesList().stream()
+        .filter(descFile -> descFile.replace(".desc", "").equals(topicName)).findFirst().orElse(""));
 
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
@@ -210,7 +211,7 @@ public final class MessageController {
       @ApiResponse(code = 200, message = "Success", response = List.class),
       @ApiResponse(code = 404, message = "Invalid topic name")
   })
-  @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/topic/{name:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody
   List<Object> getPartitionOrMessages(
       @PathVariable("name") String topicName,
@@ -264,10 +265,10 @@ public final class MessageController {
       // filter the input file name
 
       final var descFileName = descFile.replace(".desc", "")
-          .replaceAll("\\.", "")
-          .replaceAll("/", "");
+          .replace(".", "")
+          .replace("/", "");
       final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
-      deserializer = new ProtobufMessageDeserializer(topicName, fullDescFile, msgTypeName);
+      deserializer = new ProtobufMessageDeserializer(fullDescFile, msgTypeName);
     } else if (format == MessageFormat.PROTOBUF) {
       final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
       final var schemaRegistryAuth = schemaRegistryProperties.getAuth();

@@ -3,8 +3,15 @@ server:
   servlet:
     context-path: /
   error:
+    path: /error
     whitelabel:
       enabled: false
+  ssl:
+    key-store-type: ${SSL_KEY_STORE_TYPE:PKCS12}
+    key-store: ${SSL_KEY_STORE:}
+    key-store-password: ${SSL_KEY_STORE_PASSWORD:}
+    key-alias: ${SSL_KEY_ALIAS:}
+    enabled: ${SSL_ENABLED:false}
 
 spring:
   jmx:
@@ -14,6 +21,9 @@ spring:
     deserialization:
       fail_on_unknown_properties: false
       read_unknown_enum_values_as_null: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 management:
   endpoints:

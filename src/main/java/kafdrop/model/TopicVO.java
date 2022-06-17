@@ -44,10 +44,6 @@ public final class TopicVO implements Comparable<TopicVO> {
     this.config = config;
   }
 
-  public Map<Integer, TopicPartitionVO> getPartitionMap() {
-    return Collections.unmodifiableMap(partitions);
-  }
-
   public Collection<TopicPartitionVO> getPartitions() {
     return Collections.unmodifiableCollection(partitions.values());
   }
