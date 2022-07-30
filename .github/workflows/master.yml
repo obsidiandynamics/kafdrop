@@ -26,7 +26,7 @@ jobs:
         echo "app_ver=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
     -
       name: Build with Maven
-      run: mvn -B clean integration-test package assembly:single docker:build
+      run: mvn -B clean integration-test package docker:build
 
 # github_release:
     -

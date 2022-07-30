@@ -1,7 +1,7 @@
-FROM eclipse-temurin:11
+FROM ${docker.base.image}
 
 ADD kafdrop.sh /
-ADD kafdrop*tar.gz /
+ADD ${project.build.finalName} /${project.build.finalName}
 
 RUN chmod +x /kafdrop.sh
 
