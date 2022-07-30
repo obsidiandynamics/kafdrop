@@ -23,6 +23,7 @@
         <protobuf.version>3.19.1</protobuf.version>
         <testcontainers.version>1.16.2</testcontainers.version>
         <kafka-libs.version>6.1.4</kafka-libs.version>
+        <docker.base.image>eclipse-temurin:11</docker.base.image>
     </properties>
 
     <scm>
@@ -221,14 +222,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/bin.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
-            <plugin>
                 <!-- Build an executable JAR -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -243,24 +236,29 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.spotify</groupId>
+                <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>1.2.0</version>
+                <version>0.40.1</version>
                 <configuration>
-                    <imageName>obsidiandynamics/kafdrop</imageName>
-                    <forceTags>true</forceTags>
-                    <dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
-                    <imageTags>
-                        <imageTag>${project.version}</imageTag>
-                        <imageTag>latest</imageTag>
-                    </imageTags>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}-bin.tar.gz</include>
-                        </resource>
-                    </resources>
+                    <verbose>true</verbose>
+                    <sourceDirectory>src/main/assembly</sourceDirectory>
+                    <images>
+                        <image>
+                            <name>obsidiandynamics/kafdrop</name>
+                            <build>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                    <tag>latest</tag>
+                                </tags>
+                                <contextDir>${project.build.directory}/docker-ready</contextDir>
+                                <assembly>
+                                    <name>${project.build.finalName}</name>
+                                    <mode>tar</mode>
+                                    <descriptor>bin.xml</descriptor>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
                 </configuration>
             </plugin>
             <plugin>
