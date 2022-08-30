@@ -28,6 +28,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.*;
 import org.springframework.ui.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.*;
 
@@ -151,5 +152,22 @@ public final class TopicController {
     }
     model.addAttribute("brokersCount", kafkaMonitor.getBrokers().size());
     return "topic-create";
+  }
+
+  @ApiOperation(value = "createTopic", notes = "Create topic")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Success", response = String.class)
+  })
+  @PostMapping(path = "/{name:.+}/set-retention-period", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ModelAndView createTopic(@PathVariable("name") String topicName,
+                            UpdateTopicRetentionVO updateTopicRetentionVO,
+                            Model model) {
+    try {
+      kafkaMonitor.addTopicMessageRetentionPeriodInMs(topicName, updateTopicRetentionVO.getRetentionTime());
+    } catch (Exception ex) {
+      model.addAttribute("errorMessage", ex.getMessage());
+    }
+
+    return new ModelAndView("redirect:/topic/" + topicName);
   }
 }

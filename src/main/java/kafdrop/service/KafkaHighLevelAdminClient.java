@@ -153,6 +153,27 @@ public final class KafkaHighLevelAdminClient {
     }
   }
 
+  void addTopicMessageRetentionPeriodInMs(String topic, int retentionTimeInMs) {
+    ConfigResource resource = new ConfigResource(Type.TOPIC, topic);
+
+    ConfigEntry configEntry = new ConfigEntry(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionTimeInMs));
+    AlterConfigOp config = new AlterConfigOp(configEntry, AlterConfigOp.OpType.SET);
+
+    Collection<AlterConfigOp> alterConfigOps = new ArrayList<>();
+    alterConfigOps.add(config);
+
+    Map<ConfigResource, Collection<AlterConfigOp>> configs = new HashMap<>();
+    configs.put(resource, alterConfigOps);
+
+    try {
+      adminClient.incrementalAlterConfigs(configs);
+      LOG.info("Topic {} retention time successfully set to {}ms", topic, retentionTimeInMs);
+    } catch (Exception e) {
+      LOG.error("Error while update retention period topic", e);
+      throw new KafkaAdminClientException(e);
+    }
+  }
+
   Collection<AclBinding> listAcls() {
     final Collection<AclBinding> aclsBindings;
     try {

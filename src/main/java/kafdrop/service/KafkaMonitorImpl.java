@@ -240,6 +240,11 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   }
 
   @Override
+  public void addTopicMessageRetentionPeriodInMs(String topic, int retentionTimeInMs) {
+    highLevelAdminClient.addTopicMessageRetentionPeriodInMs(topic, retentionTimeInMs);
+  }
+
+  @Override
   public List<AclVO> getAcls() {
     final var acls = highLevelAdminClient.listAcls();
     final var aclVos = new ArrayList<AclVO>(acls.size());

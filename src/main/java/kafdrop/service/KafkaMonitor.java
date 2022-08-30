@@ -60,5 +60,7 @@ public interface KafkaMonitor {
    */
   void deleteTopic(String topic);
 
-  List<AclVO> getAcls();
+    void addTopicMessageRetentionPeriodInMs(String topic, int retentionTimeInMs);
+
+    List<AclVO> getAcls();
 }
