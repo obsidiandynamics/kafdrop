@@ -124,7 +124,7 @@
                 <tbody>
                 <#list topic.partitions as p>
                     <tr>
-                        <td><a href="<@spring.url '/topic/${topic.name}/messages?partition=${p.id}&offset=${p.firstOffset}&count=100&keyFormat${keyFormat}=&format=${format}'/>">${p.id}</a></td>
+                        <td><a href="<@spring.url '/topic/${topic.name}/messages?partition=${p.id}&offset=${p.firstOffset}&count=100&keyFormat=${keyFormat}&format=${format}'/>">${p.id}</a></td>
                         <td>${p.firstOffset}</td>
                         <td>${p.size}</td>
                         <td>${p.size - p.firstOffset}</td>
