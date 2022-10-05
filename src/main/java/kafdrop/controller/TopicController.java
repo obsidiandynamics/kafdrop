@@ -41,21 +41,19 @@ public final class TopicController {
   private final boolean topicDeleteEnabled;
   private final boolean topicCreateEnabled;
   private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
-  private final MessageFormatConfiguration.MessageFormatProperties keyFormatProperties;
 
   public TopicController(KafkaMonitor kafkaMonitor,
-                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled, MessageFormatConfiguration.MessageFormatProperties messageFormatProperties, MessageFormatConfiguration.MessageFormatProperties keyFormatProperties) {
+                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled, MessageFormatConfiguration.MessageFormatProperties messageFormatProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.topicDeleteEnabled = topicDeleteEnabled;
     this.topicCreateEnabled = topicCreateEnabled;
     this.messageFormatProperties = messageFormatProperties;
-    this.keyFormatProperties = keyFormatProperties;
   }
 
   @RequestMapping("/{name:.+}")
   public String topicDetails(@PathVariable("name") String topicName, Model model) {
     final MessageFormat defaultFormat = messageFormatProperties.getFormat();
-    final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
 
     final var topic = kafkaMonitor.getTopic(topicName)
         .orElseThrow(() -> new TopicNotFoundException(topicName));
