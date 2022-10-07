@@ -31,4 +31,26 @@ public class MessageFormatConfiguration {
       this.format = format;
     }
   }
+
+  @Component
+  @ConfigurationProperties(prefix = "key")
+  public static final class KeyFormatProperties {
+    private MessageFormat format;
+
+    @PostConstruct
+    public void init() {
+      // Set a default message format if not configured.
+      if (format == null) {
+        format = MessageFormat.DEFAULT;
+      }
+    }
+
+    public MessageFormat getFormat() {
+      return format;
+    }
+
+    public void setFormat(MessageFormat format) {
+      this.format = format;
+    }
+  }
 }
