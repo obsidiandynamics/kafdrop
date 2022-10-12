@@ -60,11 +60,13 @@ and if you also require basic auth for your schema registry connection you shoul
 --schemaregistry.auth=username:password
 ```
 
-Finally, a default message format (e.g. to deserialize Avro messages) can optionally be configured as follows:
+Finally, a default message and key format (e.g. to deserialize Avro messages or keys) can optionally be configured as follows:
 ```
 --message.format=AVRO
+--message.keyFormat=DEFAULT
 ```
-Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
+Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages. 
+If key format is unspecified, message format will be used for key too.
 
 ## Configure Protobuf message type
 ### Option 1: Using Protobuf Descriptor 

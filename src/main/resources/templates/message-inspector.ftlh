@@ -73,7 +73,7 @@
 
 <#assign selectedPartition=messageForm.partition!0?number>
 <#assign selectedFormat=messageForm.format!defaultFormat>
-<#assign selectedKeyFormat=messageForm.keyFormat!defaultFormat>
+<#assign selectedKeyFormat=messageForm.keyFormat!defaultKeyFormat>
 <#assign selectedIsAnyProtoOpt=messageForm.isAnyProto>
 
 <div id="partitionSizes">
