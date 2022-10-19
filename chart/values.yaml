@@ -66,6 +66,8 @@ affinity: {}
 
 podAnnotations: {}
 
+hostAliases: []
+
 mountProtoDesc: 
   enabled: false
   hostPath:
