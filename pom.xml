@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>3.21.7</protobuf.version>
         <testcontainers.version>1.17.5</testcontainers.version>
-        <kafka-libs.version>7.2.2</kafka-libs.version>
+        <kafka-libs.version>7.3.0</kafka-libs.version>
     </properties>
 
     <scm>
