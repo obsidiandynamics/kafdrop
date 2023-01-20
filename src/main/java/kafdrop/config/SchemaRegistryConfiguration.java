@@ -19,6 +19,9 @@ public class SchemaRegistryConfiguration {
     private String connect;
     private String auth;
 
+    private String truststoreLocation;
+    private String truststorePassword;
+
     public String getConnect() {
       return connect;
     }
@@ -30,6 +33,22 @@ public class SchemaRegistryConfiguration {
     public String getAuth() { return auth; }
 
     public void setAuth(String auth) { this.auth = auth; }
+
+    public String getTruststoreLocation() {
+      return truststoreLocation;
+    }
+
+    public String getTruststorePassword() {
+      return truststorePassword;
+    }
+
+    public void setTruststoreLocation(String truststoreLocation) {
+      this.truststoreLocation = truststoreLocation;
+    }
+
+    public void setTruststorePassword(String truststorePassword) {
+      this.truststorePassword = truststorePassword;
+    }
 
     public List<String> getConnectList() {
       return CONNECT_SEPARATOR.splitAsStream(this.connect)
