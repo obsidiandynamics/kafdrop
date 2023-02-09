@@ -12,3 +12,6 @@ updates:
     directory: "/src/main/docker/"
     schedule:
       interval: "daily"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
