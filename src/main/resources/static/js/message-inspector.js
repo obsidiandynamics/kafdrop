@@ -26,10 +26,10 @@ jQuery(document).ready(function () {
 
         linkIcon.toggleClass('fa-chevron-circle-right fa-chevron-circle-down');
         if (true == body.data('expanded')) {
-            body.text(JSON.stringify(JSON.parse(body.text())));
+            body.text(jsonBigint.stringify(jsonBigint.parse(body.text())));
             body.data('expanded', false);
         } else {
-            body.text(JSON.stringify(JSON.parse(body.text()), null, 3));
+            body.text(jsonBigint.stringify(jsonBigint.parse(body.text()), null, 3));
             body.data('expanded', true);
         }
     });
