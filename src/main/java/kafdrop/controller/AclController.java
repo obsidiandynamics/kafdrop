@@ -18,9 +18,10 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kafdrop.model.AclVO;
 import kafdrop.service.KafkaMonitor;
 import org.springframework.http.MediaType;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
+@Tag(name = "acl-controller")
 @Controller
 public final class AclController {
   private final KafkaMonitor kafkaMonitor;
@@ -44,14 +46,11 @@ public final class AclController {
   public String acls(Model model) {
     final var acls = kafkaMonitor.getAcls();
     model.addAttribute("acls", acls);
-
     return "acl-overview";
   }
 
-  @ApiOperation(value = "getAllAcls", notes = "Get list of all acls")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List")
-  })
+  @Operation(summary = "getAllAcls", description = "Get list of all acls", operationId = "getAllTopicsUsingGET")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Success")})
   @GetMapping(path = "/acl", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<AclVO> getAllTopics() {
     return kafkaMonitor.getAcls();

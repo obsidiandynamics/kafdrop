@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.*;
 
-import javax.annotation.*;
+import jakarta.annotation.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.*;

@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 
-import javax.annotation.*;
+import jakarta.annotation.*;
 
 
 @Configuration
