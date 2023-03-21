@@ -60,6 +60,12 @@ and if you also require basic auth for your schema registry connection you shoul
 --schemaregistry.auth=username:password
 ```
 
+or, if you are using the AWS Glue Schema Registry
+```
+--schemaregistry.glue.region=us-east-1 --schemaregistry.glue.registryName=demo-registry
+```
+
+
 Finally, a default message and key format (e.g. to deserialize Avro messages or keys) can optionally be configured as follows:
 ```
 --message.format=AVRO

@@ -120,6 +120,13 @@
             <version>0.9.3</version>
         </dependency>
 
+        <!-- AWS Glue Schema Registry -->
+        <dependency>
+            <groupId>software.amazon.glue</groupId>
+            <artifactId>schema-registry-serde</artifactId>
+            <version>1.1.15</version>
+        </dependency>
+
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
