@@ -5,4 +5,6 @@ ADD kafdrop*tar.gz /
 
 RUN chmod +x /kafdrop.sh
 
+EXPOSE 9000
+
 ENTRYPOINT ["/kafdrop.sh"]
