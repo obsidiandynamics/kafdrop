@@ -1,6 +1,14 @@
 package kafdrop.util;
 
+import com.amazonaws.services.schemaregistry.deserializers.avro.AWSKafkaAvroDeserializer;
+import com.amazonaws.services.schemaregistry.utils.AWSSchemaRegistryConstants;
+import com.amazonaws.services.schemaregistry.utils.AvroRecordType;
 import io.confluent.kafka.serializers.*;
+import kafdrop.config.GlueSchemaRegistryConfiguration;
+import kafdrop.config.SchemaRegistryConfiguration;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.common.serialization.Deserializer;
+import software.amazon.awssdk.services.glue.model.DataFormat;
 
 import java.nio.*;
 import java.util.*;
@@ -8,21 +16,44 @@ import java.util.*;
 
 public final class AvroMessageDeserializer implements MessageDeserializer {
   private final String topicName;
-  private final KafkaAvroDeserializer deserializer;
 
-  public AvroMessageDeserializer(String topicName, String schemaRegistryUrl, String schemaRegistryAuth) {
+  private final Deserializer avroDeserializer;
+
+  public AvroMessageDeserializer(String topicName,
+                                 SchemaRegistryConfiguration.SchemaRegistryProperties schemaRegistryProperties,
+                                 GlueSchemaRegistryConfiguration.GlueSchemaRegistryProperties glueSchemaRegistryProperties) {
     this.topicName = topicName;
-    this.deserializer = getDeserializer(schemaRegistryUrl, schemaRegistryAuth);
+
+    if(glueSchemaRegistryProperties.isConfigured()){
+      this.avroDeserializer =  getAWSDeserializer(glueSchemaRegistryProperties.getRegion(),
+              glueSchemaRegistryProperties.getRegistryName(),
+              glueSchemaRegistryProperties.getAwsEndpoint());
+    }
+    else{
+      this.avroDeserializer = getDeserializer(schemaRegistryProperties.getConnect(), schemaRegistryProperties.getAuth());
+    }
   }
 
   @Override
   public String deserializeMessage(ByteBuffer buffer) {
     // Convert byte buffer to byte array
     final var bytes = ByteUtils.convertToByteArray(buffer);
-    return deserializer.deserialize(topicName, bytes).toString();
+    return avroDeserializer.deserialize(topicName, bytes).toString();
   }
 
-  private static KafkaAvroDeserializer getDeserializer(String schemaRegistryUrl, String schemaRegistryAuth) {
+  private static Deserializer getAWSDeserializer(String region, String registryName, String awsEndpoint) {
+    final var config = new HashMap<String, Object>();
+    config.put(AWSSchemaRegistryConstants.AWS_REGION, region);
+    config.put(AWSSchemaRegistryConstants.REGISTRY_NAME, registryName);
+    config.put(AWSSchemaRegistryConstants.AVRO_RECORD_TYPE, AvroRecordType.GENERIC_RECORD.getName());
+    config.put(AWSSchemaRegistryConstants.DATA_FORMAT, DataFormat.AVRO.name());
+    if(StringUtils.isNotEmpty(awsEndpoint))
+      config.put(AWSSchemaRegistryConstants.AWS_ENDPOINT, awsEndpoint);
+    final var awsKafkaAvroDeserializer = new AWSKafkaAvroDeserializer(config);
+    return awsKafkaAvroDeserializer;
+  }
+
+  private static Deserializer getDeserializer(String schemaRegistryUrl, String schemaRegistryAuth) {
     final var config = new HashMap<String, Object>();
     config.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
     if (schemaRegistryAuth != null) {

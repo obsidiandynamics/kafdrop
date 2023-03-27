@@ -28,6 +28,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import kafdrop.config.GlueSchemaRegistryConfiguration;
 import kafdrop.util.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -48,6 +49,7 @@ import io.swagger.annotations.ApiResponses;
 import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
+import kafdrop.config.GlueSchemaRegistryConfiguration.GlueSchemaRegistryProperties;
 import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
@@ -65,14 +67,17 @@ public final class MessageController {
 
   private final SchemaRegistryProperties schemaRegistryProperties;
 
+  private final GlueSchemaRegistryProperties glueSchemaRegistryProperties;
+
   private final ProtobufDescriptorProperties protobufProperties;
 
-  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties, GlueSchemaRegistryProperties glueSchemaRegistryProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
     this.schemaRegistryProperties = schemaRegistryProperties;
-    this.protobufProperties = protobufProperties; 
+    this.glueSchemaRegistryProperties = glueSchemaRegistryProperties;
+    this.protobufProperties = protobufProperties;
   }
 
   /**
@@ -259,10 +264,7 @@ public final class MessageController {
     final MessageDeserializer deserializer;
 
     if (format == MessageFormat.AVRO) {
-      final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
-      final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
-
-      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
+      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryProperties, glueSchemaRegistryProperties);
     } else if (format == MessageFormat.PROTOBUF && null != descFile) {
       // filter the input file name
 
