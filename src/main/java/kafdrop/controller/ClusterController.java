@@ -21,6 +21,7 @@ package kafdrop.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kafdrop.config.KafkaConfiguration;
 import kafdrop.model.BrokerVO;
 import kafdrop.model.ClusterSummaryVO;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+@Tag(name = "cluster-controller", description = "Cluster Controller")
 @Controller
 public final class ClusterController {
   private final KafkaConfiguration kafkaConfiguration;

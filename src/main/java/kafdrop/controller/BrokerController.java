@@ -21,6 +21,7 @@ package kafdrop.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kafdrop.model.BrokerVO;
 import kafdrop.service.BrokerNotFoundException;
 import kafdrop.service.KafkaMonitor;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
+@Tag(name = "broker-controller", description = "Broker Controller")
 @Controller
 public final class BrokerController {
   private final KafkaMonitor kafkaMonitor;

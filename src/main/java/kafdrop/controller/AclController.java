@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
-@Tag(name = "acl-controller")
+@Tag(name = "acl-controller", description = "ACL Controller")
 @Controller
 public final class AclController {
   private final KafkaMonitor kafkaMonitor;

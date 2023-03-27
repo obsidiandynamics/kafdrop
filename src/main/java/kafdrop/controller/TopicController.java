@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kafdrop.config.MessageFormatConfiguration;
 import kafdrop.model.*;
 import kafdrop.service.*;
@@ -39,6 +40,7 @@ import java.util.*;
 /**
  * Handles requests for the topic page.
  */
+@Tag(name = "topic-controller", description = "Topic Controller")
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
@@ -48,7 +50,9 @@ public final class TopicController {
   private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
 
   public TopicController(KafkaMonitor kafkaMonitor,
-                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled, MessageFormatConfiguration.MessageFormatProperties messageFormatProperties) {
+                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled,
+                         @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled,
+                         MessageFormatConfiguration.MessageFormatProperties messageFormatProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.topicDeleteEnabled = topicDeleteEnabled;
     this.topicCreateEnabled = topicCreateEnabled;

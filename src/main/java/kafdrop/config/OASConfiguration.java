@@ -25,11 +25,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- *  Auto configuration for Swagger. Can be disabled by setting {@code swagger.enabled=false}.
+ *  Autoconfiguration for OpenAPI Specification (OAS).
+ *  Can be disabled by setting {@code springdoc.api-docs.enabled=false}.
  */
 @Configuration
-@ConditionalOnProperty(value = "swagger.enabled", matchIfMissing = true)
-public class SwaggerConfiguration {
+@ConditionalOnProperty(value = "springdoc.api-docs.enabled", matchIfMissing = true)
+public class OASConfiguration {
 
   @Bean
   public OpenAPI httpApi() {
