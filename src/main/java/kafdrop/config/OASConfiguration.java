@@ -20,7 +20,6 @@ package kafdrop.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +28,6 @@ import org.springframework.context.annotation.Configuration;
  *  Can be disabled by setting {@code springdoc.api-docs.enabled=false}.
  */
 @Configuration
-@ConditionalOnProperty(value = "springdoc.api-docs.enabled", matchIfMissing = true)
 public class OASConfiguration {
 
   @Bean
