@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -57,6 +58,7 @@ import kafdrop.service.TopicNotFoundException;
 
 @Controller
 public final class MessageController {
+  public static final String DESC = ".desc";
   private final KafkaMonitor kafkaMonitor;
 
   private final MessageInspector messageInspector;
@@ -151,7 +153,7 @@ public final class MessageController {
     model.addAttribute("topic", topic);
     // pre-select a descriptor file for a specific topic if available
     model.addAttribute("defaultDescFile", protobufProperties.getDescFilesList().stream()
-        .filter(descFile -> descFile.replace(".desc", "").equals(topicName)).findFirst().orElse(""));
+        .filter(descFile -> descFile.replace(DESC, "").equals(topicName)).findFirst().orElse(""));
 
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
@@ -261,15 +263,18 @@ public final class MessageController {
     if (format == MessageFormat.AVRO) {
       final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
       final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
+      final var truststoreLocation = Optional.ofNullable(schemaRegistryProperties.getTruststoreLocation());
+      final var truststorePassword = Optional.ofNullable(schemaRegistryProperties.getTruststorePassword());
 
-      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
+      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth,
+              truststoreLocation,truststorePassword);
     } else if (format == MessageFormat.PROTOBUF && null != descFile) {
       // filter the input file name
 
-      final var descFileName = descFile.replace(".desc", "")
+      final var descFileName = descFile.replace(DESC, "")
           .replace(".", "")
           .replace("/", "");
-      final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
+      final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + DESC;
       deserializer = new ProtobufMessageDeserializer(fullDescFile, msgTypeName, isAnyProto);
     } else if (format == MessageFormat.PROTOBUF) {
       final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
@@ -310,7 +315,7 @@ public final class MessageController {
      */
     @NotNull
     @Min(1)
-    @Max(100)
+    @Max(1000)
     @JsonProperty("lastOffset")
     private Long count;
 
