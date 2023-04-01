@@ -18,7 +18,13 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kafdrop.config.MessageFormatConfiguration;
 import kafdrop.model.*;
 import kafdrop.service.*;
@@ -34,6 +40,7 @@ import java.util.*;
 /**
  * Handles requests for the topic page.
  */
+@Tag(name = "topic-controller", description = "Topic Controller")
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
@@ -43,7 +50,9 @@ public final class TopicController {
   private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
 
   public TopicController(KafkaMonitor kafkaMonitor,
-                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled, MessageFormatConfiguration.MessageFormatProperties messageFormatProperties) {
+                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled,
+                         @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled,
+                         MessageFormatConfiguration.MessageFormatProperties messageFormatProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.topicDeleteEnabled = topicDeleteEnabled;
     this.topicCreateEnabled = topicCreateEnabled;
@@ -94,10 +103,10 @@ public final class TopicController {
     return "topic-create";
   }
 
-  @ApiOperation(value = "getTopic", notes = "Get details for a topic")
+  @Operation(summary = "getTopic", description = "Get details for a topic")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = TopicVO.class),
-      @ApiResponse(code = 404, message = "Invalid topic name")
+      @ApiResponse(responseCode = "200", description = "Success"),
+      @ApiResponse(responseCode = "404", description = "Invalid topic name")
   })
   @GetMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody TopicVO getTopic(@PathVariable("name") String topicName) {
@@ -105,19 +114,17 @@ public final class TopicController {
         .orElseThrow(() -> new TopicNotFoundException(topicName));
   }
 
-  @ApiOperation(value = "getAllTopics", notes = "Get list of all topics")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List")
-  })
+  @Operation(summary = "getAllTopics", description = "Get list of all topics")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Success")})
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<TopicVO> getAllTopics() {
     return kafkaMonitor.getTopics();
   }
 
-  @ApiOperation(value = "getConsumers", notes = "Get consumers for a topic")
+  @Operation(summary = "getConsumers", description = "Get consumers for a topic")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List"),
-      @ApiResponse(code = 404, message = "Invalid topic name")
+      @ApiResponse(responseCode = "200", description = "Success"),
+      @ApiResponse(responseCode = "404", description = "Invalid topic name")
   })
   @GetMapping(path = "/{name:.+}/consumers", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<ConsumerVO> getConsumers(@PathVariable("name") String topicName) {
@@ -130,10 +137,8 @@ public final class TopicController {
    * API for topic creation
    * @param createTopicVO request
    */
-  @ApiOperation(value = "createTopic", notes = "Create topic")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class)
-  })
+  @Operation(summary = "createTopic", description = "Create topic")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Success")})
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public String createTopic(CreateTopicVO createTopicVO, Model model) {
     model.addAttribute("topicCreateEnabled", topicCreateEnabled);

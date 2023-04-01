@@ -9,7 +9,7 @@ import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 import java.util.*;
 
 @Controller

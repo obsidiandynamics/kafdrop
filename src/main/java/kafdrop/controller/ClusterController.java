@@ -18,21 +18,32 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.*;
-import kafdrop.config.*;
-import kafdrop.model.*;
-import kafdrop.service.*;
-import org.springframework.beans.factory.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kafdrop.config.KafkaConfiguration;
+import kafdrop.model.BrokerVO;
+import kafdrop.model.ClusterSummaryVO;
+import kafdrop.model.TopicVO;
+import kafdrop.service.BrokerNotFoundException;
+import kafdrop.service.BuildInfo;
+import kafdrop.service.KafkaMonitor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.info.*;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.ui.*;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
+@Tag(name = "cluster-controller", description = "Cluster Controller")
 @Controller
 public final class ClusterController {
   private final KafkaConfiguration kafkaConfiguration;
@@ -88,9 +99,9 @@ public final class ClusterController {
     return "cluster-overview";
   }
 
-  @ApiOperation(value = "getCluster", notes = "Get high level broker, topic, and partition data for the Kafka cluster")
+  @Operation(summary = "getCluster", description = "Get high level broker, topic, and partition data for the Kafka cluster")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = ClusterInfoVO.class)
+      @ApiResponse(responseCode = "200", description = "Success")
   })
   @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody ClusterInfoVO getCluster() {

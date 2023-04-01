@@ -24,7 +24,7 @@ This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the 
 
 # Requirements
 
-* Java 11 or newer
+* Java 17 or newer
 * Kafka (version 0.11.0 or newer) or Azure Event Hubs
 
 Optional, additional integration:
@@ -180,22 +180,25 @@ Starting with version 2.0.0, Kafdrop offers a set of Kafka APIs that mirror the 
 
 * `/topic`: Returns a list of all topics.
 
-## Swagger
-To help document the Kafka APIs, Swagger has been included. The Swagger output is available by default at the following Kafdrop URL:
+## OpenAPI Specification (OAS)
+To help document the Kafka APIs, OpenAPI Specification (OAS) has been included. The OpenAPI Specification output is available by default at the following Kafdrop URL:
 ```
-/v2/api-docs
+/v3/api-docs
+```
+
+It is also possible to access the Swagger UI (the HTML views) from the following URL:
+```
+/swagger-ui.html
 ```
 
 This can be overridden with the following configuration:
 ```
-springfox.documentation.swagger.v2.path=/new/swagger/path
+springdoc.api-docs.path=/new/oas/path
 ```
 
-Currently only the JSON endpoints are included in the Swagger output; the HTML views and Spring Boot debug endpoints are excluded.
-
-You can disable Swagger output with the following configuration:
+You can disable OpenAPI Specification output with the following configuration:
 ```
-swagger.enabled=false
+springdoc.api-docs.enabled=false
 ```
 
 ## CORS Headers

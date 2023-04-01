@@ -23,7 +23,7 @@ import org.springframework.stereotype.*;
 import org.springframework.web.servlet.*;
 import org.springframework.web.servlet.config.annotation.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 @Component
 public class InterceptorConfiguration implements WebMvcConfigurer {

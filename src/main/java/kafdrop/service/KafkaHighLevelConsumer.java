@@ -11,7 +11,7 @@ import org.apache.kafka.common.serialization.*;
 import org.slf4j.*;
 import org.springframework.stereotype.*;
 
-import javax.annotation.PostConstruct;
+import  jakarta.annotation.PostConstruct;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.*;

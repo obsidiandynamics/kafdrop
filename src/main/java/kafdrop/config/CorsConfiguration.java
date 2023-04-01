@@ -25,8 +25,8 @@ import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 import org.springframework.http.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import java.io.*;
 
 /**
