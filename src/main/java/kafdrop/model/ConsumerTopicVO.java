@@ -18,7 +18,9 @@
 
 package kafdrop.model;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 public final class ConsumerTopicVO {
   private final String topic;
@@ -38,9 +40,9 @@ public final class ConsumerTopicVO {
 
   public long getLag() {
     return offsets.values().stream()
-        .map(ConsumerPartitionVO::getLag)
-        .filter(lag -> lag >= 0)
-        .reduce(0L, Long::sum);
+      .map(ConsumerPartitionVO::getLag)
+      .filter(lag -> lag >= 0)
+      .reduce(0L, Long::sum);
   }
 
   public Collection<ConsumerPartitionVO> getPartitions() {

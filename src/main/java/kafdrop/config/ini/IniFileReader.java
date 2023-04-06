@@ -18,9 +18,11 @@
 
 package kafdrop.config.ini;
 
-import org.apache.commons.lang3.*;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 
 public class IniFileReader {
   private static final String COMMENT_CHARS = "#;";

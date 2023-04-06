@@ -24,8 +24,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- *  Autoconfiguration for OpenAPI Specification (OAS).
- *  Can be disabled by setting {@code springdoc.api-docs.enabled=false}.
+ * Autoconfiguration for OpenAPI Specification (OAS).
+ * Can be disabled by setting {@code springdoc.api-docs.enabled=false}.
  */
 @Configuration
 public class OASConfiguration {
@@ -33,7 +33,7 @@ public class OASConfiguration {
   @Bean
   public OpenAPI httpApi() {
     return new OpenAPI().info(new Info()
-            .title("Kafdrop API")
-            .description("JSON APIs for Kafdrop"));
+      .title("Kafdrop API")
+      .description("JSON APIs for Kafdrop"));
   }
 }

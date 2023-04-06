@@ -19,23 +19,28 @@
 package kafdrop.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kafdrop.config.MessageFormatConfiguration;
-import kafdrop.model.*;
-import kafdrop.service.*;
+import kafdrop.model.ConsumerVO;
+import kafdrop.model.CreateTopicVO;
+import kafdrop.model.TopicVO;
+import kafdrop.service.KafkaMonitor;
+import kafdrop.service.TopicNotFoundException;
 import kafdrop.util.MessageFormat;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.ui.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Handles requests for the topic page.
@@ -65,7 +70,7 @@ public final class TopicController {
     final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
 
     final var topic = kafkaMonitor.getTopic(topicName)
-        .orElseThrow(() -> new TopicNotFoundException(topicName));
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
     model.addAttribute("consumers", kafkaMonitor.getConsumersByTopics(Collections.singleton(topic)));
     model.addAttribute("topicDeleteEnabled", topicDeleteEnabled);
@@ -93,6 +98,7 @@ public final class TopicController {
 
   /**
    * Topic create page
+   *
    * @param model
    * @return creation page
    */
@@ -105,13 +111,13 @@ public final class TopicController {
 
   @Operation(summary = "getTopic", description = "Get details for a topic")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Success"),
-      @ApiResponse(responseCode = "404", description = "Invalid topic name")
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid topic name")
   })
   @GetMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody TopicVO getTopic(@PathVariable("name") String topicName) {
     return kafkaMonitor.getTopic(topicName)
-        .orElseThrow(() -> new TopicNotFoundException(topicName));
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
   }
 
   @Operation(summary = "getAllTopics", description = "Get list of all topics")
@@ -123,18 +129,19 @@ public final class TopicController {
 
   @Operation(summary = "getConsumers", description = "Get consumers for a topic")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Success"),
-      @ApiResponse(responseCode = "404", description = "Invalid topic name")
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid topic name")
   })
   @GetMapping(path = "/{name:.+}/consumers", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<ConsumerVO> getConsumers(@PathVariable("name") String topicName) {
     final var topic = kafkaMonitor.getTopic(topicName)
-        .orElseThrow(() -> new TopicNotFoundException(topicName));
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
     return kafkaMonitor.getConsumersByTopics(Collections.singleton(topic));
   }
 
   /**
    * API for topic creation
+   *
    * @param createTopicVO request
    */
   @Operation(summary = "createTopic", description = "Create topic")
@@ -148,7 +155,7 @@ public final class TopicController {
       return createTopicPage(model);
     }
     try {
-        kafkaMonitor.createTopic(createTopicVO);
+      kafkaMonitor.createTopic(createTopicVO);
     } catch (Exception ex) {
       model.addAttribute("errorMessage", ex.getMessage());
     }

@@ -18,9 +18,12 @@
 
 package kafdrop.model;
 
-import org.apache.commons.lang3.*;
+import org.apache.commons.lang3.Validate;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 public final class ConsumerVO implements Comparable<ConsumerVO> {
   private final String groupId;

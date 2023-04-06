@@ -1,20 +1,34 @@
 package kafdrop.service;
 
-import kafdrop.config.*;
-import kafdrop.model.*;
-import kafdrop.util.*;
+import jakarta.annotation.PostConstruct;
+import kafdrop.config.KafkaConfiguration;
+import kafdrop.model.TopicPartitionVO;
+import kafdrop.model.TopicVO;
+import kafdrop.util.Deserializers;
+import kafdrop.util.MessageDeserializer;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.Node;
-import org.apache.kafka.common.*;
-import org.apache.kafka.common.serialization.*;
-import org.slf4j.*;
-import org.springframework.stereotype.*;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import  jakarta.annotation.PostConstruct;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,9 +97,10 @@ public final class KafkaHighLevelConsumer {
 
   /**
    * Retrieves latest records from the given offset.
-   * @param partition Topic partition
-   * @param offset Offset to seek from
-   * @param count Maximum number of records returned
+   *
+   * @param partition     Topic partition
+   * @param offset        Offset to seek from
+   * @param count         Maximum number of records returned
    * @param deserializers Key and Value deserialiser
    * @return Latest records
    */
@@ -108,7 +123,7 @@ public final class KafkaHighLevelConsumer {
     while (rawRecords.size() < count && currentOffset < latestOffset) {
       final var polled = kafkaConsumer.poll(Duration.ofMillis(POLL_TIMEOUT_MS)).records(partition);
 
-      if (! polled.isEmpty()) {
+      if (!polled.isEmpty()) {
         rawRecords.addAll(polled);
         currentOffset = polled.get(polled.size() - 1).offset();
         emptyPolls = 0;
@@ -118,25 +133,26 @@ public final class KafkaHighLevelConsumer {
     }
 
     return rawRecords
-        .subList(0, Math.min(count, rawRecords.size()))
-        .stream()
-        .map(rec -> new ConsumerRecord<>(rec.topic(),
-                                         rec.partition(),
-                                         rec.offset(),
-                                         rec.timestamp(),
-                                         rec.timestampType(),
-                                         rec.serializedKeySize(),
-                                         rec.serializedValueSize(),
-                                         deserialize(deserializers.getKeyDeserializer(),rec.key()),
-                                         deserialize(deserializers.getValueDeserializer(), rec.value()),
-                                         rec.headers(),
-                                         rec.leaderEpoch()))
-        .collect(Collectors.toList());
+      .subList(0, Math.min(count, rawRecords.size()))
+      .stream()
+      .map(rec -> new ConsumerRecord<>(rec.topic(),
+        rec.partition(),
+        rec.offset(),
+        rec.timestamp(),
+        rec.timestampType(),
+        rec.serializedKeySize(),
+        rec.serializedValueSize(),
+        deserialize(deserializers.getKeyDeserializer(), rec.key()),
+        deserialize(deserializers.getValueDeserializer(), rec.value()),
+        rec.headers(),
+        rec.leaderEpoch()))
+      .collect(Collectors.toList());
   }
 
   /**
    * Gets records from all partitions of a given topic.
-   * @param count The maximum number of records getting back.
+   *
+   * @param count         The maximum number of records getting back.
    * @param deserializers Key and Value deserializers
    * @return A list of consumer records for a given topic.
    */
@@ -146,9 +162,9 @@ public final class KafkaHighLevelConsumer {
     initializeClient();
     final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
     final var partitions = partitionInfoSet.stream()
-        .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
-            partitionInfo.partition()))
-        .collect(Collectors.toList());
+      .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+        partitionInfo.partition()))
+      .collect(Collectors.toList());
     kafkaConsumer.assign(partitions);
     final var latestOffsets = kafkaConsumer.endOffsets(partitions);
 
@@ -159,7 +175,7 @@ public final class KafkaHighLevelConsumer {
 
     final var totalCount = count * partitions.size();
     final Map<TopicPartition, List<ConsumerRecord<byte[], byte[]>>> rawRecords
-        = partitions.stream().collect(Collectors.toMap(p -> p , p -> new ArrayList<>(count)));
+      = partitions.stream().collect(Collectors.toMap(p -> p, p -> new ArrayList<>(count)));
 
     var moreRecords = true;
     while (rawRecords.size() < totalCount && moreRecords) {
@@ -176,21 +192,21 @@ public final class KafkaHighLevelConsumer {
     }
 
     return rawRecords
-        .values()
-        .stream()
-        .flatMap(Collection::stream)
-        .map(rec -> new ConsumerRecord<>(rec.topic(),
-            rec.partition(),
-            rec.offset(),
-            rec.timestamp(),
-            rec.timestampType(),
-            rec.serializedKeySize(),
-            rec.serializedValueSize(),
-            deserialize(deserializers.getKeyDeserializer(), rec.key()),
-            deserialize(deserializers.getValueDeserializer(), rec.value()),
-            rec.headers(),
-            rec.leaderEpoch()))
-        .collect(Collectors.toList());
+      .values()
+      .stream()
+      .flatMap(Collection::stream)
+      .map(rec -> new ConsumerRecord<>(rec.topic(),
+        rec.partition(),
+        rec.offset(),
+        rec.timestamp(),
+        rec.timestampType(),
+        rec.serializedKeySize(),
+        rec.serializedValueSize(),
+        deserialize(deserializers.getKeyDeserializer(), rec.key()),
+        deserialize(deserializers.getValueDeserializer(), rec.value()),
+        rec.headers(),
+        rec.leaderEpoch()))
+      .collect(Collectors.toList());
   }
 
   private static String deserialize(MessageDeserializer deserializer, byte[] bytes) {
@@ -215,7 +231,7 @@ public final class KafkaHighLevelConsumer {
       .filter(topicSet::contains)
       .map(topic -> Pair.of(topic, getTopicInfo(topic, allTopicsMap.get(topic))))
       .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-   }
+  }
 
   private TopicVO getTopicInfo(String topic, List<PartitionInfo> partitionInfoList) {
     final var topicVo = new TopicVO(topic);

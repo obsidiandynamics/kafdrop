@@ -1,9 +1,10 @@
 package kafdrop.util;
 
-import java.nio.ByteBuffer;
-import java.util.HashMap;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
+
+import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 public class ProtobufSchemaRegistryMessageDeserializer implements MessageDeserializer {
 

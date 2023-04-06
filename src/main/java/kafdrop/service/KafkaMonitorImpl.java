@@ -18,20 +18,40 @@
 
 package kafdrop.service;
 
-import kafdrop.model.*;
-import kafdrop.util.*;
-import org.apache.kafka.clients.admin.*;
-import org.apache.kafka.clients.admin.ConfigEntry.*;
-import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.common.*;
-import org.apache.kafka.common.header.*;
-import org.slf4j.*;
-import org.springframework.stereotype.*;
+import kafdrop.model.AclVO;
+import kafdrop.model.BrokerVO;
+import kafdrop.model.ClusterSummaryVO;
+import kafdrop.model.ConsumerPartitionVO;
+import kafdrop.model.ConsumerTopicVO;
+import kafdrop.model.ConsumerVO;
+import kafdrop.model.CreateTopicVO;
+import kafdrop.model.MessageVO;
+import kafdrop.model.TopicPartitionVO;
+import kafdrop.model.TopicVO;
+import kafdrop.util.Deserializers;
+import org.apache.kafka.clients.admin.ConfigEntry.ConfigSource;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.header.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.Map.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
 
@@ -67,31 +87,31 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   @Override
   public ClusterSummaryVO getClusterSummary(Collection<TopicVO> topics) {
     final var topicSummary = topics.stream()
-        .map(topic -> {
-          final var summary = new ClusterSummaryVO();
-          summary.setPartitionCount(topic.getPartitions().size());
-          summary.setUnderReplicatedCount(topic.getUnderReplicatedPartitions().size());
-          summary.setPreferredReplicaPercent(topic.getPreferredReplicaPercent());
-          topic.getPartitions()
-              .forEach(partition -> {
-                if (partition.getLeader() != null) {
-                  summary.addBrokerLeaderPartition(partition.getLeader().getId());
-                }
-                if (partition.getPreferredLeader() != null) {
-                  summary.addBrokerPreferredLeaderPartition(partition.getPreferredLeader().getId());
-                }
-              });
-          return summary;
-        })
-        .reduce((s1, s2) -> {
-          s1.setPartitionCount(s1.getPartitionCount() + s2.getPartitionCount());
-          s1.setUnderReplicatedCount(s1.getUnderReplicatedCount() + s2.getUnderReplicatedCount());
-          s1.setPreferredReplicaPercent(s1.getPreferredReplicaPercent() + s2.getPreferredReplicaPercent());
-          s2.getBrokerLeaderPartitionCount().forEach(s1::addBrokerLeaderPartition);
-          s2.getBrokerPreferredLeaderPartitionCount().forEach(s1::addBrokerPreferredLeaderPartition);
-          return s1;
-        })
-        .orElseGet(ClusterSummaryVO::new);
+      .map(topic -> {
+        final var summary = new ClusterSummaryVO();
+        summary.setPartitionCount(topic.getPartitions().size());
+        summary.setUnderReplicatedCount(topic.getUnderReplicatedPartitions().size());
+        summary.setPreferredReplicaPercent(topic.getPreferredReplicaPercent());
+        topic.getPartitions()
+          .forEach(partition -> {
+            if (partition.getLeader() != null) {
+              summary.addBrokerLeaderPartition(partition.getLeader().getId());
+            }
+            if (partition.getPreferredLeader() != null) {
+              summary.addBrokerPreferredLeaderPartition(partition.getPreferredLeader().getId());
+            }
+          });
+        return summary;
+      })
+      .reduce((s1, s2) -> {
+        s1.setPartitionCount(s1.getPartitionCount() + s2.getPartitionCount());
+        s1.setUnderReplicatedCount(s1.getUnderReplicatedCount() + s2.getUnderReplicatedCount());
+        s1.setPreferredReplicaPercent(s1.getPreferredReplicaPercent() + s2.getPreferredReplicaPercent());
+        s2.getBrokerLeaderPartitionCount().forEach(s1::addBrokerLeaderPartition);
+        s2.getBrokerPreferredLeaderPartitionCount().forEach(s1::addBrokerPreferredLeaderPartition);
+        return s1;
+      })
+      .orElseGet(ClusterSummaryVO::new);
     topicSummary.setTopicCount(topics.size());
     topicSummary.setPreferredReplicaPercent(topics.isEmpty() ? 0 : topicSummary.getPreferredReplicaPercent() / topics.size());
     return topicSummary;
@@ -100,8 +120,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   @Override
   public List<TopicVO> getTopics() {
     return getTopicMetadata(highLevelConsumer.getAllTopics()).values().stream()
-        .sorted(Comparator.comparing(TopicVO::getName))
-        .collect(Collectors.toList());
+      .sorted(Comparator.comparing(TopicVO::getName))
+      .collect(Collectors.toList());
   }
 
   public List<TopicVO> getTopics(String[] topics) {
@@ -115,7 +135,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   @Override
   public Optional<TopicVO> getTopic(String topic) {
-    String[] topics = { topic };
+    String[] topics = {topic};
 
     return getTopics(topics).stream().findAny();
   }
@@ -131,7 +151,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         final var configMap = new TreeMap<String, String>();
         for (var configEntry : config.entries()) {
           if (configEntry.source() != ConfigSource.DEFAULT_CONFIG &&
-              configEntry.source() != ConfigSource.STATIC_BROKER_CONFIG) {
+            configEntry.source() != ConfigSource.STATIC_BROKER_CONFIG) {
             configMap.put(configEntry.name(), configEntry.value());
           }
         }
@@ -206,7 +226,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
     String[] uniqueTopicNames = consumerGroupOffsets.stream()
       .flatMap(consumerGroupOffset -> consumerGroupOffset.offsets.keySet()
-      .stream().map(TopicPartition::topic))
+        .stream().map(TopicPartition::topic))
       .distinct()
       .toArray(String[]::new);
 
@@ -229,7 +249,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   @Override
   public void createTopic(CreateTopicVO createTopicDto) {
     var newTopic = new NewTopic(
-            createTopicDto.getName(), createTopicDto.getPartitionsNumber(), (short) createTopicDto.getReplicationFactor()
+      createTopicDto.getName(), createTopicDto.getPartitionsNumber(), (short) createTopicDto.getReplicationFactor()
     );
     highLevelAdminClient.createTopic(newTopic);
   }
@@ -245,9 +265,9 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     final var aclVos = new ArrayList<AclVO>(acls.size());
     for (var acl : acls) {
       aclVos.add(new AclVO(acl.pattern().resourceType().toString(), acl.pattern().name(),
-              acl.pattern().patternType().toString(), acl.entry().principal(),
-              acl.entry().host(), acl.entry().operation().toString(),
-              acl.entry().permissionType().toString()));
+        acl.pattern().patternType().toString(), acl.entry().principal(),
+        acl.entry().host(), acl.entry().operation().toString(),
+        acl.entry().permissionType().toString()));
     }
     Collections.sort(aclVos);
     return aclVos;
@@ -265,9 +285,9 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         final var partition = topicPartitionOffset.getKey().partition();
         final var offset = topicPartitionOffset.getValue().offset();
         groupTopicPartitionOffsetMap
-            .computeIfAbsent(groupId, unused -> new TreeMap<>())
-            .computeIfAbsent(topic, unused -> new TreeMap<>())
-            .put(partition, offset);
+          .computeIfAbsent(groupId, unused -> new TreeMap<>())
+          .computeIfAbsent(topic, unused -> new TreeMap<>())
+          .put(partition, offset);
       }
     }
 
@@ -314,9 +334,9 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
     ConsumerGroupOffsets forTopics(Set<String> topics) {
       final var filteredOffsets = offsets.entrySet().stream()
-          .filter(e -> e.getValue() != null)
-          .filter(e -> topics.contains(e.getKey().topic()))
-          .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        .filter(e -> e.getValue() != null)
+        .filter(e -> topics.contains(e.getKey().topic()))
+        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
       return new ConsumerGroupOffsets(groupId, filteredOffsets);
     }
 
@@ -337,9 +357,9 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   private List<ConsumerGroupOffsets> getConsumerOffsets(Set<String> topics) {
     final var consumerGroups = highLevelAdminClient.listConsumerGroups();
     return consumerGroups.stream()
-        .map(this::resolveOffsets)
-        .map(offsets -> offsets.forTopics(topics))
-        .filter(not(ConsumerGroupOffsets::isEmpty))
-        .collect(Collectors.toList());
+      .map(this::resolveOffsets)
+      .map(offsets -> offsets.forTopics(topics))
+      .filter(not(ConsumerGroupOffsets::isEmpty))
+      .collect(Collectors.toList());
   }
 }

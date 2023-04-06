@@ -1,11 +1,10 @@
 package kafdrop.config;
 
-import kafdrop.util.*;
-import org.springframework.boot.context.properties.*;
-import org.springframework.context.annotation.*;
-import org.springframework.stereotype.*;
-
-import jakarta.annotation.*;
+import jakarta.annotation.PostConstruct;
+import kafdrop.util.MessageFormat;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 
 @Configuration

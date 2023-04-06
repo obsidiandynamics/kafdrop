@@ -1,12 +1,12 @@
 package kafdrop.service;
 
-import org.slf4j.*;
-import org.springframework.boot.autoconfigure.condition.*;
-import org.springframework.boot.info.*;
-import org.springframework.stereotype.*;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnResource(resources="${spring.info.build.location:classpath:META-INF/build-info.properties}")
+@ConditionalOnResource(resources = "${spring.info.build.location:classpath:META-INF/build-info.properties}")
 public final class BuildInfo {
   private final BuildProperties buildProperties;
 

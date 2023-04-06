@@ -1,13 +1,18 @@
 package kafdrop.config;
 
-import java.io.*;
-import java.util.*;
-import lombok.*;
-import org.apache.kafka.clients.*;
-import org.apache.kafka.common.config.*;
-import org.slf4j.*;
-import org.springframework.boot.context.properties.*;
-import org.springframework.stereotype.*;
+import lombok.Data;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.common.config.SaslConfigs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
 
 
 @Component
@@ -31,7 +36,7 @@ public final class KafkaConfiguration {
       properties.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
     }
 
-    if(isSecured || securityProtocol.equals("SSL")) {
+    if (isSecured || securityProtocol.equals("SSL")) {
       properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
     }
 

@@ -47,15 +47,15 @@ public final class BrokerController {
   @RequestMapping("/broker/{id}")
   public String brokerDetails(@PathVariable("id") int brokerId, Model model) {
     model.addAttribute("broker", kafkaMonitor.getBroker(brokerId)
-        .orElseThrow(() -> new BrokerNotFoundException("No such broker " + brokerId)));
+      .orElseThrow(() -> new BrokerNotFoundException("No such broker " + brokerId)));
     model.addAttribute("topics", kafkaMonitor.getTopics());
     return "broker-detail";
   }
 
   @Operation(summary = "getBroker", description = "Get details for a specific Kafka broker")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Success"),
-      @ApiResponse(responseCode = "404", description = "Invalid Broker ID")
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid Broker ID")
   })
   @GetMapping(path = "/broker/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody BrokerVO brokerDetailsJson(@PathVariable("id") int brokerId) {
@@ -64,7 +64,7 @@ public final class BrokerController {
 
   @Operation(summary = "getAllBrokers", description = "Get details for all known Kafka brokers")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Success")
+    @ApiResponse(responseCode = "200", description = "Success")
   })
   @GetMapping(path = "/broker", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<BrokerVO> brokerDetailsJson() {
