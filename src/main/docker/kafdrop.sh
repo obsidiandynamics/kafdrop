@@ -40,7 +40,7 @@ if [ "$KAFKA_PROPERTIES" != "" ]; then
   echo Writing Kafka properties into $KAFKA_PROPERTIES_FILE
   echo "$KAFKA_PROPERTIES" | base64 --decode --ignore-garbage > $KAFKA_PROPERTIES_FILE
 else
-  rm $KAFKA_PROPERTIES_FILE |& > /dev/null | true
+  touch $KAFKA_PROPERTIES_FILE
 fi
 
 KAFKA_TRUSTSTORE_FILE=${KAFKA_TRUSTSTORE_FILE:-kafka.truststore.jks}
