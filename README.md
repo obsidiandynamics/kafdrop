@@ -11,7 +11,7 @@
 
 ![Overview Screenshot](docs/images/overview.png?raw=true)
 
-This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the world of JDK 11+, Kafka 2.x, Helm and Kubernetes. It's a lightweight application that runs on Spring Boot and is dead-easy to configure, supporting SASL and TLS-secured brokers.
+This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the world of Java 17+, Kafka 2.x, Helm and Kubernetes. It's a lightweight application that runs on Spring Boot and is dead-easy to configure, supporting SASL and TLS-secured brokers.
 
 # Features
 * **View Kafka brokers** — topic and partition assignments, and controller status
