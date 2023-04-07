@@ -268,10 +268,12 @@ EOF
 
 docker run -d --rm -p 9000:9000 \
     -v $(pwd)/kafka.properties:/tmp/kafka.properties:ro \
+    -v $(pwd)/kafka.truststore.jks:/tmp/kafka.truststore.jks:ro \
+    -v $(pwd)/kafka.keystore.jks:/tmp/kafka.keystore.jks:ro \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
     -e KAFKA_PROPERTIES_FILE=/tmp/kafka.properties \
-    -e KAFKA_TRUSTSTORE="$(cat kafka.truststore.jks | base64)" \   # optional
-    -e KAFKA_KEYSTORE="$(cat kafka.keystore.jks | base64)" \       # optional
+    -e KAFKA_TRUSTSTORE_FILE=/tmp/kafka.truststore.jks \   # optional
+    -e KAFKA_KEYSTORE_FILE=/tmp/kafka.keystore.jks \       # optional
     obsidiandynamics/kafdrop
 ```
 
