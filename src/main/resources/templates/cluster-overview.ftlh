@@ -37,6 +37,10 @@
                 <td>${clusterSummary.topicCount}</td>
             </tr>
             <tr>
+                <td><i class="fa fa-object-group"></i>&nbsp;&nbsp;Total consumer groups</td>
+                <td>${consumerGroupCount}</td>
+            </tr>
+            <tr>
                 <td><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Total partitions</td>
                 <td>${clusterSummary.partitionCount}</td>
             </tr>

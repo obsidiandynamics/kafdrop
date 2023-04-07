@@ -342,4 +342,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         .filter(not(ConsumerGroupOffsets::isEmpty))
         .collect(Collectors.toList());
   }
+
+  public Integer getConsumerGroupCount() {
+    return highLevelAdminClient.listConsumerGroups().size();
+  }
 }
