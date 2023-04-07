@@ -256,6 +256,19 @@ docker run -d --rm -p 9000:9000 \
     -e KAFKA_KEYSTORE="$(cat kafka.keystore.jks | base64)" \       # optional
     obsidiandynamics/kafdrop
 ```
+
+Rather than passing `KAFKA_PROPERTIES` as a base64-encoded string, you can also place a pre-populated `KAFKA_PROPERTIES_FILE` into the container:
+
+```sh
+docker run -d --rm -p 9000:9000 \
+    -v $(pwd)/kafka.properties:/tmp/kafka.properties:ro \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e KAFKA_PROPERTIES_FILE=/tmp/kafka.properties \
+    -e KAFKA_TRUSTSTORE="$(cat kafka.truststore.jks | base64)" \   # optional
+    -e KAFKA_KEYSTORE="$(cat kafka.keystore.jks | base64)" \       # optional
+    obsidiandynamics/kafdrop
+```
+
 #### Environment Variables
 ##### Basic configuration
 |Name                   |Description
