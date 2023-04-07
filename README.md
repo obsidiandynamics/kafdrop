@@ -256,6 +256,27 @@ docker run -d --rm -p 9000:9000 \
     -e KAFKA_KEYSTORE="$(cat kafka.keystore.jks | base64)" \       # optional
     obsidiandynamics/kafdrop
 ```
+
+Rather than passing `KAFKA_PROPERTIES` as a base64-encoded string, you can also place a pre-populated `KAFKA_PROPERTIES_FILE` into the container:
+
+```sh
+cat << EOF > kafka.properties
+security.protocol=SASL_SSL
+sasl.mechanism=SCRAM-SHA-512
+sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="foo" password="bar"
+EOF
+
+docker run -d --rm -p 9000:9000 \
+    -v $(pwd)/kafka.properties:/tmp/kafka.properties:ro \
+    -v $(pwd)/kafka.truststore.jks:/tmp/kafka.truststore.jks:ro \
+    -v $(pwd)/kafka.keystore.jks:/tmp/kafka.keystore.jks:ro \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e KAFKA_PROPERTIES_FILE=/tmp/kafka.properties \
+    -e KAFKA_TRUSTSTORE_FILE=/tmp/kafka.truststore.jks \   # optional
+    -e KAFKA_KEYSTORE_FILE=/tmp/kafka.keystore.jks \       # optional
+    obsidiandynamics/kafdrop
+```
+
 #### Environment Variables
 ##### Basic configuration
 |Name                   |Description
