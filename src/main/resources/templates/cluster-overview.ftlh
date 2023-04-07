@@ -154,6 +154,10 @@
                 <i class="fa fa-plus"></i> New
             </a>
         </#if>
+         <a class="btn btn-outline-light" href="<@spring.url '/publish/ui'/>">
+                        <i class="fa fa-plus"></i> Publish Payload
+          </a>
+
     </div>
 </div>
 
