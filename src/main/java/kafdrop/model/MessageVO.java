@@ -18,8 +18,9 @@
 
 package kafdrop.model;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class MessageVO {
   private int partition;
@@ -29,11 +30,21 @@ public final class MessageVO {
   private Map<String, String> headers;
   private Date timestamp;
 
-  public int getPartition() { return partition; }
-  public void setPartition(int partition) { this.partition = partition; }
+  public int getPartition() {
+    return partition;
+  }
 
-  public long getOffset() { return offset; }
-  public void setOffset(long offset) { this.offset = offset; }
+  public void setPartition(int partition) {
+    this.partition = partition;
+  }
+
+  public long getOffset() {
+    return offset;
+  }
+
+  public void setOffset(long offset) {
+    this.offset = offset;
+  }
 
   public String getMessage() {
     return message;
@@ -64,8 +75,8 @@ public final class MessageVO {
       return "empty";
     } else {
       return headers.entrySet().stream()
-          .map(e -> e.getKey() + ": " + e.getValue())
-          .collect(Collectors.joining(", "));
+        .map(e -> e.getKey() + ": " + e.getValue())
+        .collect(Collectors.joining(", "));
     }
   }
 

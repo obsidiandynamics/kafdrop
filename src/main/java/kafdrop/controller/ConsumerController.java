@@ -52,8 +52,8 @@ public final class ConsumerController {
 
   @Operation(summary = "getConsumer", description = "Get topic and partition details for a consumer group")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Success"),
-      @ApiResponse(responseCode = "404", description = "Invalid consumer group")
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid consumer group")
   })
   @GetMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId) throws ConsumerNotFoundException {

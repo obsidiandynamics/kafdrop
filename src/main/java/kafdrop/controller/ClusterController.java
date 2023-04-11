@@ -36,7 +36,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Collections;
 import java.util.List;
@@ -55,13 +60,13 @@ public final class ClusterController {
   private final boolean topicCreateEnabled;
 
   public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ObjectProvider<BuildInfo> buildInfoProvider,
-          @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
+                           @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
     this.kafkaConfiguration = kafkaConfiguration;
     this.kafkaMonitor = kafkaMonitor;
     this.buildProperties = buildInfoProvider.stream()
-        .map(BuildInfo::getBuildProperties)
-        .findAny()
-        .orElseGet(ClusterController::blankBuildProperties);
+      .map(BuildInfo::getBuildProperties)
+      .findAny()
+      .orElseGet(ClusterController::blankBuildProperties);
     this.topicCreateEnabled = topicCreateEnabled;
   }
 
@@ -83,8 +88,8 @@ public final class ClusterController {
     final var clusterSummary = kafkaMonitor.getClusterSummary(topics);
 
     final var missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
-        .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
-        .collect(Collectors.toList());
+      .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
+      .collect(Collectors.toList());
 
     model.addAttribute("brokers", brokers);
     model.addAttribute("missingBrokerIds", missingBrokerIds);
@@ -101,7 +106,7 @@ public final class ClusterController {
 
   @Operation(summary = "getCluster", description = "Get high level broker, topic, and partition data for the Kafka cluster")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Success")
+    @ApiResponse(responseCode = "200", description = "Success")
   })
   @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody ClusterInfoVO getCluster() {
@@ -132,6 +137,7 @@ public final class ClusterController {
     ClusterSummaryVO summary;
     List<BrokerVO> brokers;
     List<TopicVO> topics;
+
     public ClusterSummaryVO getSummary() {
       return summary;
     }

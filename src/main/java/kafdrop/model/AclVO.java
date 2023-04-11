@@ -20,67 +20,69 @@ package kafdrop.model;
 
 import java.util.Objects;
 
-public final class AclVO implements Comparable<AclVO>{
-    private final String name;
-    private final String resourceType;
-    private final String patternType;
+public final class AclVO implements Comparable<AclVO> {
+  private final String name;
+  private final String resourceType;
+  private final String patternType;
 
-    private final String principal;
-    private final String host;
-    private final String operation;
-    private final String permissionType;
+  private final String principal;
+  private final String host;
+  private final String operation;
+  private final String permissionType;
 
-    public AclVO(String resourceType, String name, String patternType, String principal, String host, String operation, String permissionType) {
-        this.resourceType = resourceType;
-        this.name = name;
-        this.patternType = patternType;
-        this.principal = principal;
-        this.host = host;
-        this.operation = operation;
-        this.permissionType = permissionType;
-    }
+  public AclVO(String resourceType, String name, String patternType, String principal, String host, String operation, String permissionType) {
+    this.resourceType = resourceType;
+    this.name = name;
+    this.patternType = patternType;
+    this.principal = principal;
+    this.host = host;
+    this.operation = operation;
+    this.permissionType = permissionType;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getResourceType() {
-        return resourceType;
-    }
+  public String getResourceType() {
+    return resourceType;
+  }
 
-    public String getPatternType() {
-        return patternType;
-    }
+  public String getPatternType() {
+    return patternType;
+  }
 
-    public String getPrincipal() {
-        return principal;
-    }
+  public String getPrincipal() {
+    return principal;
+  }
 
-    public String getHost() {
-        return host;
-    }
+  public String getHost() {
+    return host;
+  }
 
-    public String getOperation() {
-        return operation;
-    }
+  public String getOperation() {
+    return operation;
+  }
 
-    public String getPermissionType() {
-        return permissionType;
-    }
+  public String getPermissionType() {
+    return permissionType;
+  }
 
-    @Override
-    public int compareTo(AclVO that) { return this.name.compareTo(that.name) ; }
+  @Override
+  public int compareTo(AclVO that) {
+    return this.name.compareTo(that.name);
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AclVO aclVO = (AclVO) o;
-        return name.equals(aclVO.name);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    AclVO aclVO = (AclVO) o;
+    return name.equals(aclVO.name);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(name);
+  }
 }

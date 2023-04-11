@@ -7,14 +7,16 @@ package kafdrop.protos;
  * Protobuf type {@code kafdrop.Person}
  */
 public final class Person extends
-    com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:kafdrop.Person)
-    PersonOrBuilder {
-private static final long serialVersionUID = 0L;
+  com.google.protobuf.GeneratedMessageV3 implements
+  // @@protoc_insertion_point(message_implements:kafdrop.Person)
+  PersonOrBuilder {
+  private static final long serialVersionUID = 0L;
+
   // Use Person.newBuilder() to construct.
   private Person(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
+
   private Person() {
     name_ = "";
     email_ = "";
@@ -25,7 +27,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
-      UnusedPrivateParameter unused) {
+    UnusedPrivateParameter unused) {
     return new Person();
   }
 
@@ -34,17 +36,18 @@ private static final long serialVersionUID = 0L;
   getUnknownFields() {
     return this.unknownFields;
   }
+
   private Person(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
+    com.google.protobuf.CodedInputStream input,
+    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+    throws com.google.protobuf.InvalidProtocolBufferException {
     this();
     if (extensionRegistry == null) {
       throw new java.lang.NullPointerException();
     }
     int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-        com.google.protobuf.UnknownFieldSet.newBuilder();
+      com.google.protobuf.UnknownFieldSet.newBuilder();
     try {
       boolean done = false;
       while (!done) {
@@ -87,7 +90,7 @@ private static final long serialVersionUID = 0L;
           }
           default: {
             if (!parseUnknownField(
-                input, unknownFields, extensionRegistry, tag)) {
+              input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
             break;
@@ -98,7 +101,7 @@ private static final long serialVersionUID = 0L;
       throw e.setUnfinishedMessage(this);
     } catch (java.io.IOException e) {
       throw new com.google.protobuf.InvalidProtocolBufferException(
-          e).setUnfinishedMessage(this);
+        e).setUnfinishedMessage(this);
     } finally {
       if (((mutable_bitField0_ & 0x00000001) != 0)) {
         data_ = data_.getUnmodifiableView();
@@ -107,24 +110,25 @@ private static final long serialVersionUID = 0L;
       makeExtensionsImmutable();
     }
   }
+
   public static final com.google.protobuf.Descriptors.Descriptor
-      getDescriptor() {
+  getDescriptor() {
     return kafdrop.protos.PersonProto.internal_static_kafdrop_Person_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internalGetFieldAccessorTable() {
+  internalGetFieldAccessorTable() {
     return kafdrop.protos.PersonProto.internal_static_kafdrop_Person_fieldAccessorTable
-        .ensureFieldAccessorsInitialized(
-            kafdrop.protos.Person.class, kafdrop.protos.Person.Builder.class);
+      .ensureFieldAccessorsInitialized(
+        kafdrop.protos.Person.class, kafdrop.protos.Person.Builder.class);
   }
 
   /**
    * Protobuf enum {@code kafdrop.Person.Contact}
    */
   public enum Contact
-      implements com.google.protobuf.ProtocolMessageEnum {
+    implements com.google.protobuf.ProtocolMessageEnum {
     /**
      * <code>TELEPHONE = 0;</code>
      */
@@ -149,7 +153,7 @@ private static final long serialVersionUID = 0L;
     public final int getNumber() {
       if (this == UNRECOGNIZED) {
         throw new java.lang.IllegalArgumentException(
-            "Can't get the number of an unknown enum value.");
+          "Can't get the number of an unknown enum value.");
       }
       return value;
     }
@@ -170,45 +174,51 @@ private static final long serialVersionUID = 0L;
      */
     public static Contact forNumber(int value) {
       switch (value) {
-        case 0: return TELEPHONE;
-        case 1: return MOBILE;
-        default: return null;
+        case 0:
+          return TELEPHONE;
+        case 1:
+          return MOBILE;
+        default:
+          return null;
       }
     }
 
     public static com.google.protobuf.Internal.EnumLiteMap<Contact>
-        internalGetValueMap() {
+    internalGetValueMap() {
       return internalValueMap;
     }
+
     private static final com.google.protobuf.Internal.EnumLiteMap<
-        Contact> internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<Contact>() {
-            public Contact findValueByNumber(int number) {
-              return Contact.forNumber(number);
-            }
-          };
+      Contact> internalValueMap =
+      new com.google.protobuf.Internal.EnumLiteMap<Contact>() {
+        public Contact findValueByNumber(int number) {
+          return Contact.forNumber(number);
+        }
+      };
 
     public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
+    getValueDescriptor() {
       if (this == UNRECOGNIZED) {
         throw new java.lang.IllegalStateException(
-            "Can't get the descriptor of an unrecognized enum value.");
+          "Can't get the descriptor of an unrecognized enum value.");
       }
       return getDescriptor().getValues().get(ordinal());
     }
+
     public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
+    getDescriptorForType() {
       return getDescriptor();
     }
+
     public static final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
+    getDescriptor() {
       return kafdrop.protos.Person.getDescriptor().getEnumTypes().get(0);
     }
 
     private static final Contact[] VALUES = values();
 
     public static Contact valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
       if (desc.getType() != getDescriptor()) {
         throw new java.lang.IllegalArgumentException(
           "EnumValueDescriptor is not for this type.");
@@ -230,8 +240,10 @@ private static final long serialVersionUID = 0L;
 
   public static final int NAME_FIELD_NUMBER = 1;
   private volatile java.lang.Object name_;
+
   /**
    * <code>string name = 1;</code>
+   *
    * @return The name.
    */
   @java.lang.Override
@@ -240,25 +252,27 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
+      com.google.protobuf.ByteString bs =
+        (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       name_ = s;
       return s;
     }
   }
+
   /**
    * <code>string name = 1;</code>
+   *
    * @return The bytes for name.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getNameBytes() {
+  getNameBytes() {
     java.lang.Object ref = name_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
+      com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString.copyFromUtf8(
+          (java.lang.String) ref);
       name_ = b;
       return b;
     } else {
@@ -268,8 +282,10 @@ private static final long serialVersionUID = 0L;
 
   public static final int ID_FIELD_NUMBER = 2;
   private int id_;
+
   /**
    * <code>int32 id = 2;</code>
+   *
    * @return The id.
    */
   @java.lang.Override
@@ -279,8 +295,10 @@ private static final long serialVersionUID = 0L;
 
   public static final int EMAIL_FIELD_NUMBER = 3;
   private volatile java.lang.Object email_;
+
   /**
    * <code>string email = 3;</code>
+   *
    * @return The email.
    */
   @java.lang.Override
@@ -289,25 +307,27 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
+      com.google.protobuf.ByteString bs =
+        (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       email_ = s;
       return s;
     }
   }
+
   /**
    * <code>string email = 3;</code>
+   *
    * @return The bytes for email.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getEmailBytes() {
+  getEmailBytes() {
     java.lang.Object ref = email_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
+      com.google.protobuf.ByteString b =
+        com.google.protobuf.ByteString.copyFromUtf8(
+          (java.lang.String) ref);
       email_ = b;
       return b;
     } else {
@@ -317,18 +337,24 @@ private static final long serialVersionUID = 0L;
 
   public static final int CONTACT_FIELD_NUMBER = 4;
   private int contact_;
+
   /**
    * <code>.kafdrop.Person.Contact contact = 4;</code>
+   *
    * @return The enum numeric value on the wire for contact.
    */
-  @java.lang.Override public int getContactValue() {
+  @java.lang.Override
+  public int getContactValue() {
     return contact_;
   }
+
   /**
    * <code>.kafdrop.Person.Contact contact = 4;</code>
+   *
    * @return The contact.
    */
-  @java.lang.Override public kafdrop.protos.Person.Contact getContact() {
+  @java.lang.Override
+  public kafdrop.protos.Person.Contact getContact() {
     @SuppressWarnings("deprecation")
     kafdrop.protos.Person.Contact result = kafdrop.protos.Person.Contact.valueOf(contact_);
     return result == null ? kafdrop.protos.Person.Contact.UNRECOGNIZED : result;
@@ -336,40 +362,49 @@ private static final long serialVersionUID = 0L;
 
   public static final int DATA_FIELD_NUMBER = 5;
   private com.google.protobuf.LazyStringList data_;
+
   /**
    * <code>repeated string data = 5;</code>
+   *
    * @return A list containing the data.
    */
   public com.google.protobuf.ProtocolStringList
-      getDataList() {
+  getDataList() {
     return data_;
   }
+
   /**
    * <code>repeated string data = 5;</code>
+   *
    * @return The count of data.
    */
   public int getDataCount() {
     return data_.size();
   }
+
   /**
    * <code>repeated string data = 5;</code>
+   *
    * @param index The index of the element to return.
    * @return The data at the given index.
    */
   public java.lang.String getData(int index) {
     return data_.get(index);
   }
+
   /**
    * <code>repeated string data = 5;</code>
+   *
    * @param index The index of the value to return.
    * @return The bytes of the data at the given index.
    */
   public com.google.protobuf.ByteString
-      getDataBytes(int index) {
+  getDataBytes(int index) {
     return data_.getByteString(index);
   }
 
   private byte memoizedIsInitialized = -1;
+
   @java.lang.Override
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
@@ -382,7 +417,7 @@ private static final long serialVersionUID = 0L;
 
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
-                      throws java.io.IOException {
+    throws java.io.IOException {
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
     }
@@ -437,7 +472,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public boolean equals(final java.lang.Object obj) {
     if (obj == this) {
-     return true;
+      return true;
     }
     if (!(obj instanceof kafdrop.protos.Person)) {
       return super.equals(obj);
@@ -445,14 +480,14 @@ private static final long serialVersionUID = 0L;
     kafdrop.protos.Person other = (kafdrop.protos.Person) obj;
 
     if (!getName()
-        .equals(other.getName())) return false;
+      .equals(other.getName())) return false;
     if (getId()
-        != other.getId()) return false;
+      != other.getId()) return false;
     if (!getEmail()
-        .equals(other.getEmail())) return false;
+      .equals(other.getEmail())) return false;
     if (contact_ != other.contact_) return false;
     if (!getDataList()
-        .equals(other.getDataList())) return false;
+      .equals(other.getDataList())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -482,113 +517,130 @@ private static final long serialVersionUID = 0L;
   }
 
   public static kafdrop.protos.Person parseFrom(
-      java.nio.ByteBuffer data)
-      throws com.google.protobuf.InvalidProtocolBufferException {
+    java.nio.ByteBuffer data)
+    throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static kafdrop.protos.Person parseFrom(
-      java.nio.ByteBuffer data,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
+    java.nio.ByteBuffer data,
+    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+    throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static kafdrop.protos.Person parseFrom(
-      com.google.protobuf.ByteString data)
-      throws com.google.protobuf.InvalidProtocolBufferException {
+    com.google.protobuf.ByteString data)
+    throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static kafdrop.protos.Person parseFrom(
-      com.google.protobuf.ByteString data,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
+    com.google.protobuf.ByteString data,
+    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+    throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static kafdrop.protos.Person parseFrom(byte[] data)
-      throws com.google.protobuf.InvalidProtocolBufferException {
+    throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static kafdrop.protos.Person parseFrom(
-      byte[] data,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws com.google.protobuf.InvalidProtocolBufferException {
+    byte[] data,
+    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+    throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static kafdrop.protos.Person parseFrom(java.io.InputStream input)
-      throws java.io.IOException {
+    throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-        .parseWithIOException(PARSER, input);
+      .parseWithIOException(PARSER, input);
   }
+
   public static kafdrop.protos.Person parseFrom(
-      java.io.InputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws java.io.IOException {
+    java.io.InputStream input,
+    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+    throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-        .parseWithIOException(PARSER, input, extensionRegistry);
+      .parseWithIOException(PARSER, input, extensionRegistry);
   }
+
   public static kafdrop.protos.Person parseDelimitedFrom(java.io.InputStream input)
-      throws java.io.IOException {
+    throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-        .parseDelimitedWithIOException(PARSER, input);
+      .parseDelimitedWithIOException(PARSER, input);
   }
+
   public static kafdrop.protos.Person parseDelimitedFrom(
-      java.io.InputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws java.io.IOException {
+    java.io.InputStream input,
+    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+    throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-        .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
+
   public static kafdrop.protos.Person parseFrom(
-      com.google.protobuf.CodedInputStream input)
-      throws java.io.IOException {
+    com.google.protobuf.CodedInputStream input)
+    throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-        .parseWithIOException(PARSER, input);
+      .parseWithIOException(PARSER, input);
   }
+
   public static kafdrop.protos.Person parseFrom(
-      com.google.protobuf.CodedInputStream input,
-      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-      throws java.io.IOException {
+    com.google.protobuf.CodedInputStream input,
+    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+    throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
-        .parseWithIOException(PARSER, input, extensionRegistry);
+      .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() { return newBuilder(); }
+  public Builder newBuilderForType() {
+    return newBuilder();
+  }
+
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
+
   public static Builder newBuilder(kafdrop.protos.Person prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
+
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
+      ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
   protected Builder newBuilderForType(
-      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+    com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
+
   /**
    * Protobuf type {@code kafdrop.Person}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:kafdrop.Person)
-      kafdrop.protos.PersonOrBuilder {
+    com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+    // @@protoc_insertion_point(builder_implements:kafdrop.Person)
+    kafdrop.protos.PersonOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return kafdrop.protos.PersonProto.internal_static_kafdrop_Person_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
+    internalGetFieldAccessorTable() {
       return kafdrop.protos.PersonProto.internal_static_kafdrop_Person_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              kafdrop.protos.Person.class, kafdrop.protos.Person.Builder.class);
+        .ensureFieldAccessorsInitialized(
+          kafdrop.protos.Person.class, kafdrop.protos.Person.Builder.class);
     }
 
     // Construct using kafdrop.protos.Person.newBuilder()
@@ -597,15 +649,17 @@ private static final long serialVersionUID = 0L;
     }
 
     private Builder(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
       maybeForceBuilderInitialization();
     }
+
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
+        .alwaysUseFieldBuilders) {
       }
     }
+
     @java.lang.Override
     public Builder clear() {
       super.clear();
@@ -624,7 +678,7 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
-        getDescriptorForType() {
+    getDescriptorForType() {
       return kafdrop.protos.PersonProto.internal_static_kafdrop_Person_descriptor;
     }
 
@@ -663,38 +717,44 @@ private static final long serialVersionUID = 0L;
     public Builder clone() {
       return super.clone();
     }
+
     @java.lang.Override
     public Builder setField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
+      com.google.protobuf.Descriptors.FieldDescriptor field,
+      java.lang.Object value) {
       return super.setField(field, value);
     }
+
     @java.lang.Override
     public Builder clearField(
-        com.google.protobuf.Descriptors.FieldDescriptor field) {
+      com.google.protobuf.Descriptors.FieldDescriptor field) {
       return super.clearField(field);
     }
+
     @java.lang.Override
     public Builder clearOneof(
-        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+      com.google.protobuf.Descriptors.OneofDescriptor oneof) {
       return super.clearOneof(oneof);
     }
+
     @java.lang.Override
     public Builder setRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        int index, java.lang.Object value) {
+      com.google.protobuf.Descriptors.FieldDescriptor field,
+      int index, java.lang.Object value) {
       return super.setRepeatedField(field, index, value);
     }
+
     @java.lang.Override
     public Builder addRepeatedField(
-        com.google.protobuf.Descriptors.FieldDescriptor field,
-        java.lang.Object value) {
+      com.google.protobuf.Descriptors.FieldDescriptor field,
+      java.lang.Object value) {
       return super.addRepeatedField(field, value);
     }
+
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof kafdrop.protos.Person) {
-        return mergeFrom((kafdrop.protos.Person)other);
+        return mergeFrom((kafdrop.protos.Person) other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -739,9 +799,9 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder mergeFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws java.io.IOException {
       kafdrop.protos.Person parsedMessage = null;
       try {
         parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -755,18 +815,21 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
+
     private int bitField0_;
 
     private java.lang.Object name_ = "";
+
     /**
      * <code>string name = 1;</code>
+     *
      * @return The name.
      */
     public java.lang.String getName() {
       java.lang.Object ref = name_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
+          (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         name_ = s;
         return s;
@@ -774,106 +837,122 @@ private static final long serialVersionUID = 0L;
         return (java.lang.String) ref;
       }
     }
+
     /**
      * <code>string name = 1;</code>
+     *
      * @return The bytes for name.
      */
     public com.google.protobuf.ByteString
-        getNameBytes() {
+    getNameBytes() {
       java.lang.Object ref = name_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+        com.google.protobuf.ByteString b =
+          com.google.protobuf.ByteString.copyFromUtf8(
+            (java.lang.String) ref);
         name_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
+
     /**
      * <code>string name = 1;</code>
+     *
      * @param value The name to set.
      * @return This builder for chaining.
      */
     public Builder setName(
-        java.lang.String value) {
+      java.lang.String value) {
       if (value == null) {
-    throw new NullPointerException();
-  }
-  
-      name_ = value;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string name = 1;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearName() {
-      
-      name_ = getDefaultInstance().getName();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string name = 1;</code>
-     * @param value The bytes for name to set.
-     * @return This builder for chaining.
-     */
-    public Builder setNameBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
+        throw new NullPointerException();
+      }
+
       name_ = value;
       onChanged();
       return this;
     }
 
-    private int id_ ;
+    /**
+     * <code>string name = 1;</code>
+     *
+     * @return This builder for chaining.
+     */
+    public Builder clearName() {
+
+      name_ = getDefaultInstance().getName();
+      onChanged();
+      return this;
+    }
+
+    /**
+     * <code>string name = 1;</code>
+     *
+     * @param value The bytes for name to set.
+     * @return This builder for chaining.
+     */
+    public Builder setNameBytes(
+      com.google.protobuf.ByteString value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      checkByteStringIsUtf8(value);
+
+      name_ = value;
+      onChanged();
+      return this;
+    }
+
+    private int id_;
+
     /**
      * <code>int32 id = 2;</code>
+     *
      * @return The id.
      */
     @java.lang.Override
     public int getId() {
       return id_;
     }
+
     /**
      * <code>int32 id = 2;</code>
+     *
      * @param value The id to set.
      * @return This builder for chaining.
      */
     public Builder setId(int value) {
-      
+
       id_ = value;
       onChanged();
       return this;
     }
+
     /**
      * <code>int32 id = 2;</code>
+     *
      * @return This builder for chaining.
      */
     public Builder clearId() {
-      
+
       id_ = 0;
       onChanged();
       return this;
     }
 
     private java.lang.Object email_ = "";
+
     /**
      * <code>string email = 3;</code>
+     *
      * @return The email.
      */
     public java.lang.String getEmail() {
       java.lang.Object ref = email_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
+          (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         email_ = s;
         return s;
@@ -881,86 +960,101 @@ private static final long serialVersionUID = 0L;
         return (java.lang.String) ref;
       }
     }
+
     /**
      * <code>string email = 3;</code>
+     *
      * @return The bytes for email.
      */
     public com.google.protobuf.ByteString
-        getEmailBytes() {
+    getEmailBytes() {
       java.lang.Object ref = email_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+        com.google.protobuf.ByteString b =
+          com.google.protobuf.ByteString.copyFromUtf8(
+            (java.lang.String) ref);
         email_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
+
     /**
      * <code>string email = 3;</code>
+     *
      * @param value The email to set.
      * @return This builder for chaining.
      */
     public Builder setEmail(
-        java.lang.String value) {
+      java.lang.String value) {
       if (value == null) {
-    throw new NullPointerException();
-  }
-  
+        throw new NullPointerException();
+      }
+
       email_ = value;
       onChanged();
       return this;
     }
+
     /**
      * <code>string email = 3;</code>
+     *
      * @return This builder for chaining.
      */
     public Builder clearEmail() {
-      
+
       email_ = getDefaultInstance().getEmail();
       onChanged();
       return this;
     }
+
     /**
      * <code>string email = 3;</code>
+     *
      * @param value The bytes for email to set.
      * @return This builder for chaining.
      */
     public Builder setEmailBytes(
-        com.google.protobuf.ByteString value) {
+      com.google.protobuf.ByteString value) {
       if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-      
+        throw new NullPointerException();
+      }
+      checkByteStringIsUtf8(value);
+
       email_ = value;
       onChanged();
       return this;
     }
 
     private int contact_ = 0;
+
     /**
      * <code>.kafdrop.Person.Contact contact = 4;</code>
+     *
      * @return The enum numeric value on the wire for contact.
      */
-    @java.lang.Override public int getContactValue() {
+    @java.lang.Override
+    public int getContactValue() {
       return contact_;
     }
+
     /**
      * <code>.kafdrop.Person.Contact contact = 4;</code>
+     *
      * @param value The enum numeric value on the wire for contact to set.
      * @return This builder for chaining.
      */
     public Builder setContactValue(int value) {
-      
+
       contact_ = value;
       onChanged();
       return this;
     }
+
     /**
      * <code>.kafdrop.Person.Contact contact = 4;</code>
+     *
      * @return The contact.
      */
     @java.lang.Override
@@ -969,8 +1063,10 @@ private static final long serialVersionUID = 0L;
       kafdrop.protos.Person.Contact result = kafdrop.protos.Person.Contact.valueOf(contact_);
       return result == null ? kafdrop.protos.Person.Contact.UNRECOGNIZED : result;
     }
+
     /**
      * <code>.kafdrop.Person.Contact contact = 4;</code>
+     *
      * @param value The contact to set.
      * @return This builder for chaining.
      */
@@ -978,107 +1074,126 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-      
+
       contact_ = value.getNumber();
       onChanged();
       return this;
     }
+
     /**
      * <code>.kafdrop.Person.Contact contact = 4;</code>
+     *
      * @return This builder for chaining.
      */
     public Builder clearContact() {
-      
+
       contact_ = 0;
       onChanged();
       return this;
     }
 
     private com.google.protobuf.LazyStringList data_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+
     private void ensureDataIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
         data_ = new com.google.protobuf.LazyStringArrayList(data_);
         bitField0_ |= 0x00000001;
-       }
+      }
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @return A list containing the data.
      */
     public com.google.protobuf.ProtocolStringList
-        getDataList() {
+    getDataList() {
       return data_.getUnmodifiableView();
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @return The count of data.
      */
     public int getDataCount() {
       return data_.size();
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @param index The index of the element to return.
      * @return The data at the given index.
      */
     public java.lang.String getData(int index) {
       return data_.get(index);
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @param index The index of the value to return.
      * @return The bytes of the data at the given index.
      */
     public com.google.protobuf.ByteString
-        getDataBytes(int index) {
+    getDataBytes(int index) {
       return data_.getByteString(index);
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @param index The index to set the value at.
      * @param value The data to set.
      * @return This builder for chaining.
      */
     public Builder setData(
-        int index, java.lang.String value) {
+      int index, java.lang.String value) {
       if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureDataIsMutable();
+        throw new NullPointerException();
+      }
+      ensureDataIsMutable();
       data_.set(index, value);
       onChanged();
       return this;
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @param value The data to add.
      * @return This builder for chaining.
      */
     public Builder addData(
-        java.lang.String value) {
+      java.lang.String value) {
       if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureDataIsMutable();
+        throw new NullPointerException();
+      }
+      ensureDataIsMutable();
       data_.add(value);
       onChanged();
       return this;
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @param values The data to add.
      * @return This builder for chaining.
      */
     public Builder addAllData(
-        java.lang.Iterable<java.lang.String> values) {
+      java.lang.Iterable<java.lang.String> values) {
       ensureDataIsMutable();
       com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, data_);
+        values, data_);
       onChanged();
       return this;
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @return This builder for chaining.
      */
     public Builder clearData() {
@@ -1087,31 +1202,34 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>repeated string data = 5;</code>
+     *
      * @param value The bytes of the data to add.
      * @return This builder for chaining.
      */
     public Builder addDataBytes(
-        com.google.protobuf.ByteString value) {
+      com.google.protobuf.ByteString value) {
       if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
+        throw new NullPointerException();
+      }
+      checkByteStringIsUtf8(value);
       ensureDataIsMutable();
       data_.add(value);
       onChanged();
       return this;
     }
+
     @java.lang.Override
     public final Builder setUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
+      final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override
     public final Builder mergeUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
+      final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
     }
 
@@ -1121,6 +1239,7 @@ private static final long serialVersionUID = 0L;
 
   // @@protoc_insertion_point(class_scope:kafdrop.Person)
   private static final kafdrop.protos.Person DEFAULT_INSTANCE;
+
   static {
     DEFAULT_INSTANCE = new kafdrop.protos.Person();
   }
@@ -1130,12 +1249,12 @@ private static final long serialVersionUID = 0L;
   }
 
   private static final com.google.protobuf.Parser<Person>
-      PARSER = new com.google.protobuf.AbstractParser<Person>() {
+    PARSER = new com.google.protobuf.AbstractParser<Person>() {
     @java.lang.Override
     public Person parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      com.google.protobuf.CodedInputStream input,
+      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return new Person(input, extensionRegistry);
     }
   };

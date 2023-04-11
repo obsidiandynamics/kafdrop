@@ -1,13 +1,12 @@
 package kafdrop.util;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessageUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.msgpack.core.MessagePack;
-import org.msgpack.core.MessageUnpacker;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class MsgPackMessageDeserializer implements MessageDeserializer {
 

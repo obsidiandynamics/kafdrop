@@ -1,9 +1,10 @@
 package kafdrop.util;
 
-import io.confluent.kafka.serializers.*;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 
-import java.nio.*;
-import java.util.*;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 
 public final class AvroMessageDeserializer implements MessageDeserializer {
