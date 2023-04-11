@@ -396,7 +396,7 @@ To logout, browse to [/logout](http://localhost:8080/logout).
 
 # Contributing Guidelines
 
-All contributions are more than welcomed. Contributions may close an issue, fix a bug (reported or not reported), add new design blocks, improve the existing code, add new feature, and so on. In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone.
+See [here](CONTRIBUTING.md).
 
 ## Release workflow
 
