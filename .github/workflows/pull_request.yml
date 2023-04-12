@@ -21,6 +21,7 @@ jobs:
         LOG_LEVEL: DEBUG
         VALIDATE_ALL_CODEBASE: false
         VALIDATE_EDITORCONFIG: true
+        EDITORCONFIG_FILE_NAME: '.ecrc'
         DEFAULT_BRANCH: master
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Set up JDK
