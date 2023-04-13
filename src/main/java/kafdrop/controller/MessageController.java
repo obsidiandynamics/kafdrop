@@ -149,7 +149,7 @@ public final class MessageController {
       defaultForm.setOffset(0l);
       defaultForm.setPartition(0);
       defaultForm.setFormat(defaultFormat);
-      defaultForm.setKeyFormat(defaultFormat);
+      defaultForm.setKeyFormat(defaultKeyFormat);
       defaultForm.setIsAnyProto(protobufProperties.getParseAnyProto());
 
       model.addAttribute("messageForm", defaultForm);
