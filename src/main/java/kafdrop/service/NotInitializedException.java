@@ -19,5 +19,6 @@
 package kafdrop.service;
 
 public final class NotInitializedException extends RuntimeException {
-  NotInitializedException() {}
+  NotInitializedException() {
+  }
 }

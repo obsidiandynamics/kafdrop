@@ -1,8 +1,8 @@
 <img src="https://raw.githubusercontent.com/wiki/obsidiandynamics/kafdrop/images/kafdrop-logo.png" width="90px" alt="logo"/> Kafdrop – Kafka Web UI &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fobsidiandynamics%2Fkafdrop&text=Get%20Kafdrop%20%E2%80%94%20a%20web-based%20UI%20for%20viewing%20%23ApacheKafka%20topics%20and%20browsing%20consumers%20)
 ===
+
 [![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/obsidiandynamics/kafdrop/blob/master/LICENSE)
-[![Download](https://api.bintray.com/packages/obsidiandynamics/kafdrop/main/images/download.svg)](https://bintray.com/obsidiandynamics/kafdrop/main/_latestVersion)
-[![Build](https://travis-ci.org/obsidiandynamics/kafdrop.svg?branch=master)](https://travis-ci.org/obsidiandynamics/kafdrop#)
+[![Release with mvn](https://github.com/obsidiandynamics/kafdrop/actions/workflows/master.yml/badge.svg)](https://github.com/obsidiandynamics/kafdrop/actions/workflows/master.yml)
 [![Docker](https://img.shields.io/docker/pulls/obsidiandynamics/kafdrop.svg)](https://hub.docker.com/r/obsidiandynamics/kafdrop)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/obsidiandynamics/kafdrop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/obsidiandynamics/kafdrop/context:java)
 
@@ -11,7 +11,7 @@
 
 ![Overview Screenshot](docs/images/overview.png?raw=true)
 
-This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the world of JDK 11+, Kafka 2.x, Helm and Kubernetes. It's a lightweight application that runs on Spring Boot and is dead-easy to configure, supporting SASL and TLS-secured brokers.
+This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the world of Java 17+, Kafka 2.x, Helm and Kubernetes. It's a lightweight application that runs on Spring Boot and is dead-easy to configure, supporting SASL and TLS-secured brokers.
 
 # Features
 * **View Kafka brokers** — topic and partition assignments, and controller status
@@ -24,7 +24,7 @@ This project is a reboot of Kafdrop 2.x, dragged kicking and screaming into the 
 
 # Requirements
 
-* Java 11 or newer
+* Java 17 or newer
 * Kafka (version 0.11.0 or newer) or Azure Event Hubs
 
 Optional, additional integration:
@@ -60,11 +60,13 @@ and if you also require basic auth for your schema registry connection you shoul
 --schemaregistry.auth=username:password
 ```
 
-Finally, a default message format (e.g. to deserialize Avro messages) can optionally be configured as follows:
+Finally, a default message and key format (e.g. to deserialize Avro messages or keys) can optionally be configured as follows:
 ```
 --message.format=AVRO
+--message.keyFormat=DEFAULT
 ```
-Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
+Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages. 
+If key format is unspecified, message format will be used for key too.
 
 ## Configure Protobuf message type
 ### Option 1: Using Protobuf Descriptor 
@@ -178,22 +180,25 @@ Starting with version 2.0.0, Kafdrop offers a set of Kafka APIs that mirror the 
 
 * `/topic`: Returns a list of all topics.
 
-## Swagger
-To help document the Kafka APIs, Swagger has been included. The Swagger output is available by default at the following Kafdrop URL:
+## OpenAPI Specification (OAS)
+To help document the Kafka APIs, OpenAPI Specification (OAS) has been included. The OpenAPI Specification output is available by default at the following Kafdrop URL:
 ```
-/v2/api-docs
+/v3/api-docs
+```
+
+It is also possible to access the Swagger UI (the HTML views) from the following URL:
+```
+/swagger-ui.html
 ```
 
 This can be overridden with the following configuration:
 ```
-springfox.documentation.swagger.v2.path=/new/swagger/path
+springdoc.api-docs.path=/new/oas/path
 ```
 
-Currently only the JSON endpoints are included in the Swagger output; the HTML views and Spring Boot debug endpoints are excluded.
-
-You can disable Swagger output with the following configuration:
+You can disable OpenAPI Specification output with the following configuration:
 ```
-swagger.enabled=false
+springdoc.api-docs.enabled=false
 ```
 
 ## CORS Headers
@@ -251,6 +256,27 @@ docker run -d --rm -p 9000:9000 \
     -e KAFKA_KEYSTORE="$(cat kafka.keystore.jks | base64)" \       # optional
     obsidiandynamics/kafdrop
 ```
+
+Rather than passing `KAFKA_PROPERTIES` as a base64-encoded string, you can also place a pre-populated `KAFKA_PROPERTIES_FILE` into the container:
+
+```sh
+cat << EOF > kafka.properties
+security.protocol=SASL_SSL
+sasl.mechanism=SCRAM-SHA-512
+sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="foo" password="bar"
+EOF
+
+docker run -d --rm -p 9000:9000 \
+    -v $(pwd)/kafka.properties:/tmp/kafka.properties:ro \
+    -v $(pwd)/kafka.truststore.jks:/tmp/kafka.truststore.jks:ro \
+    -v $(pwd)/kafka.keystore.jks:/tmp/kafka.keystore.jks:ro \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e KAFKA_PROPERTIES_FILE=/tmp/kafka.properties \
+    -e KAFKA_TRUSTSTORE_FILE=/tmp/kafka.truststore.jks \   # optional
+    -e KAFKA_KEYSTORE_FILE=/tmp/kafka.keystore.jks \       # optional
+    obsidiandynamics/kafdrop
+```
+
 #### Environment Variables
 ##### Basic configuration
 |Name                   |Description
@@ -266,14 +292,19 @@ docker run -d --rm -p 9000:9000 \
 |`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
-|Name                   |Description
-|-----------------------|-------------------------------
-|`JVM_OPTS`             |JVM options.
-|`JMX_PORT`             |Port to use for JMX. No default; if unspecified, JMX will not be exposed.
-|`HOST`                 |The hostname to report for the RMI registry (used for JMX). Defaults to `localhost`.
-|`KAFKA_PROPERTIES_FILE`|Internal location where the Kafka properties file will be written to (if `KAFKA_PROPERTIES` is set). Defaults to `kafka.properties`.
-|`KAFKA_TRUSTSTORE_FILE`|Internal location where the truststore file will be written to (if `KAFKA_TRUSTSTORE` is set). Defaults to `kafka.truststore.jks`.
-|`KAFKA_KEYSTORE_FILE`  |Internal location where the keystore file will be written to (if `KAFKA_KEYSTORE` is set). Defaults to `kafka.keystore.jks`.
+| Name                     |Description
+|--------------------------|-------------------------------
+| `JVM_OPTS`               |JVM options.
+| `JMX_PORT`               |Port to use for JMX. No default; if unspecified, JMX will not be exposed.
+| `HOST`                   |The hostname to report for the RMI registry (used for JMX). Defaults to `localhost`.
+| `KAFKA_PROPERTIES_FILE`  |Internal location where the Kafka properties file will be written to (if `KAFKA_PROPERTIES` is set). Defaults to `kafka.properties`.
+| `KAFKA_TRUSTSTORE_FILE`  |Internal location where the truststore file will be written to (if `KAFKA_TRUSTSTORE` is set). Defaults to `kafka.truststore.jks`.
+| `KAFKA_KEYSTORE_FILE`    |Internal location where the keystore file will be written to (if `KAFKA_KEYSTORE` is set). Defaults to `kafka.keystore.jks`.
+| `SSL_ENABLED`            | Enabling HTTPS (SSL) for Kafdrop server. Default is `false`
+| `SSL_KEY_STORE_TYPE`     | Type of SSL keystore. Default is `PKCS12`
+| `SSL_KEY_STORE`          | Path to keystore file
+| `SSL_KEY_STORE_PASSWORD` | Keystore password
+| `SSL_KEY_ALIAS`          | Key alias
 
 ### Using Helm
 Like in the Docker example, supply the files in base-64 form:
@@ -364,4 +395,15 @@ To logout, browse to [/logout](http://localhost:8080/logout).
 > **Hey there!** We hope you really like Kafdrop! Please take a moment to [⭐](https://github.com/obsidiandynamics/kafdrop)the repo or [Tweet](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fobsidiandynamics%2Fkafdrop&text=Get%20Kafdrop%20%E2%80%94%20a%20web-based%20UI%20for%20viewing%20%23ApacheKafka%20topics%20and%20browsing%20consumers%20) about it.
 
 # Contributing Guidelines
-All contributions are more than welcomed. Contributions may close an issue, fix a bug (reported or not reported), add new design blocks, improve the existing code, add new feature, and so on. In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone.
+
+See [here](CONTRIBUTING.md).
+
+## Release workflow
+
+To cut an official release, these are the steps:
+
+1. Commit a new version on master that has the `-SNAPSHOT` suffix stripped (see `pom.xml`). Once the commit is merged, the CI will treat it as a release build, and will end up publishing more artifacts than the regular (non-release/snapshot) build. One of those will be a dockerhub push to the specific version and "latest" tags. (The regular build doesn't update "latest"). 
+
+2. You can then edit the release description in GitHub to describe what went into the release.
+
+3. After the release goes through successfully, you need to prepare the repo for the next version, which requires committing the next snapshot version on master again. So we should increment the minor version and add again the `-SNAPSHOT` suffix.

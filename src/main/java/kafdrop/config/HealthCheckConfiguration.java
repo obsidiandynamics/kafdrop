@@ -18,13 +18,17 @@
 
 package kafdrop.config;
 
-import org.springframework.boot.actuate.health.*;
-import org.springframework.context.annotation.*;
-import org.springframework.jmx.export.annotation.*;
-import org.springframework.stereotype.*;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.health.Status;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 public class HealthCheckConfiguration {
@@ -38,7 +42,7 @@ public class HealthCheckConfiguration {
     }
 
     @ManagedAttribute
-    public Map getHealth() {
+    public Map<String, Object> getHealth() {
       final var health = (Health) healthEndpoint.health();
       final var healthMap = new LinkedHashMap<String, Object>();
       healthMap.put("status", getStatus(health));
@@ -46,17 +50,17 @@ public class HealthCheckConfiguration {
       return healthMap;
     }
 
-    private Map getDetails(Map<String, Object> details) {
+    private Map<String, Object> getDetails(Map<String, Object> details) {
       return details.entrySet().stream()
-          .collect(Collectors.toMap(Map.Entry::getKey,
-                                    e -> {
-                                      final var health = (Health) e.getValue();
-                                      final var detail = new LinkedHashMap<String, Object>();
-                                      final var healthy = Status.UP.equals(health.getStatus());
-                                      detail.put("healthy", healthy);
-                                      detail.put("message", health.getDetails().toString());
-                                      return detail;
-                                    }));
+        .collect(Collectors.toMap(Map.Entry::getKey,
+          e -> {
+            final var health = (Health) e.getValue();
+            final var detail = new LinkedHashMap<String, Object>();
+            final var healthy = Status.UP.equals(health.getStatus());
+            detail.put("healthy", healthy);
+            detail.put("message", health.getDetails().toString());
+            return detail;
+          }));
     }
 
     private String getStatus(Health health) {

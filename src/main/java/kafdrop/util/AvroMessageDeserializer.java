@@ -1,9 +1,10 @@
 package kafdrop.util;
 
-import io.confluent.kafka.serializers.*;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 
-import java.nio.*;
-import java.util.*;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 
 public final class AvroMessageDeserializer implements MessageDeserializer {
@@ -24,10 +25,10 @@ public final class AvroMessageDeserializer implements MessageDeserializer {
 
   private static KafkaAvroDeserializer getDeserializer(String schemaRegistryUrl, String schemaRegistryAuth) {
     final var config = new HashMap<String, Object>();
-    config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+    config.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
     if (schemaRegistryAuth != null) {
-      config.put(AbstractKafkaAvroSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-      config.put(AbstractKafkaAvroSerDeConfig.USER_INFO_CONFIG, schemaRegistryAuth);
+      config.put(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+      config.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaRegistryAuth);
     }
     final var kafkaAvroDeserializer = new KafkaAvroDeserializer();
     kafkaAvroDeserializer.configure(config, false);

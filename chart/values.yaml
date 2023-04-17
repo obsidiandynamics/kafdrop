@@ -26,6 +26,9 @@ fullnameOverride: ""
 
 cmdArgs: ""
 
+global:
+  kubeVersion: ~
+
 server:
   port: 9000
   servlet:
@@ -40,7 +43,10 @@ service:
 ingress:
   enabled: false
   annotations: {}
+  apiVersion: ~
+  #ingressClassName: ~
   path: /
+  #pathType: ~
   hosts: []
   tls: []
 
@@ -59,6 +65,8 @@ tolerations: []
 affinity: {}
 
 podAnnotations: {}
+
+hostAliases: []
 
 mountProtoDesc: 
   enabled: false

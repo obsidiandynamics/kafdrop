@@ -1,25 +1,39 @@
 package kafdrop.service;
 
-import kafdrop.config.*;
-import org.apache.kafka.clients.admin.*;
+import jakarta.annotation.PostConstruct;
+import kafdrop.config.KafkaConfiguration;
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
-import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.common.*;
+import org.apache.kafka.clients.admin.ConsumerGroupListing;
+import org.apache.kafka.clients.admin.DeleteTopicsOptions;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.Node;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AccessControlEntryFilter;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclBindingFilter;
-import org.apache.kafka.common.config.*;
-import org.apache.kafka.common.config.ConfigResource.*;
-import org.apache.kafka.common.errors.*;
+import org.apache.kafka.common.config.ConfigResource;
+import org.apache.kafka.common.config.ConfigResource.Type;
+import org.apache.kafka.common.errors.GroupAuthorizationException;
+import org.apache.kafka.common.errors.SecurityDisabledException;
+import org.apache.kafka.common.errors.TopicAuthorizationException;
+import org.apache.kafka.common.errors.UnsupportedVersionException;
 import org.apache.kafka.common.resource.ResourcePatternFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.*;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 public final class KafkaHighLevelAdminClient {
@@ -72,7 +86,7 @@ public final class KafkaHighLevelAdminClient {
   Set<String> listConsumerGroups() {
     final Collection<ConsumerGroupListing> groupListing;
     try {
-      groupListing = adminClient.listConsumerGroups().all().get();
+      groupListing = adminClient.listConsumerGroups().valid().get();
     } catch (InterruptedException | ExecutionException e) {
       throw new KafkaAdminClientException(e);
     }
@@ -95,8 +109,8 @@ public final class KafkaHighLevelAdminClient {
 
   Map<String, Config> describeTopicConfigs(Set<String> topicNames) {
     final var resources = topicNames.stream()
-        .map(topic -> new ConfigResource(Type.TOPIC, topic))
-        .collect(Collectors.toList());
+      .map(topic -> new ConfigResource(Type.TOPIC, topic))
+      .collect(Collectors.toList());
     final var result = adminClient.describeConfigs(resources);
     final Map<String, Config> configsByTopic;
     try {
@@ -110,6 +124,7 @@ public final class KafkaHighLevelAdminClient {
         return Map.of();
       } else if (e.getCause() instanceof TopicAuthorizationException) {
         printAcls();
+        return Map.of();
       }
       throw new KafkaAdminClientException(e);
     }
@@ -156,7 +171,7 @@ public final class KafkaHighLevelAdminClient {
     final Collection<AclBinding> aclsBindings;
     try {
       aclsBindings = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY, AccessControlEntryFilter.ANY))
-          .values().get();
+        .values().get();
     } catch (InterruptedException | ExecutionException e) {
       if (e.getCause() instanceof SecurityDisabledException) {
         return Collections.emptyList();

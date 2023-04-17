@@ -1,9 +1,13 @@
 package kafdrop.util;
 
-import java.nio.*;
-import java.nio.charset.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 final class ByteUtils {
+  private ByteUtils() {
+    // no instance allowed, static utility class
+  }
+
   static String readString(ByteBuffer buffer) {
     return new String(readBytes(buffer), StandardCharsets.UTF_8);
   }

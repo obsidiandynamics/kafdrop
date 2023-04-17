@@ -18,12 +18,12 @@
 
 package kafdrop.service;
 
-import kafdrop.model.*;
-import kafdrop.util.*;
-import org.apache.kafka.common.*;
-import org.springframework.stereotype.*;
+import kafdrop.model.MessageVO;
+import kafdrop.util.Deserializers;
+import org.apache.kafka.common.TopicPartition;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
 
 @Service
 public final class MessageInspector {

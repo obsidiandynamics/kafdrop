@@ -1,12 +1,12 @@
 package kafdrop.config;
 
-import org.springframework.boot.context.properties.*;
-import org.springframework.context.annotation.*;
-import org.springframework.stereotype.*;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.regex.*;
-import java.util.stream.*;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @Configuration
@@ -27,15 +27,19 @@ public class SchemaRegistryConfiguration {
       this.connect = connect;
     }
 
-    public String getAuth() { return auth; }
+    public String getAuth() {
+      return auth;
+    }
 
-    public void setAuth(String auth) { this.auth = auth; }
+    public void setAuth(String auth) {
+      this.auth = auth;
+    }
 
     public List<String> getConnectList() {
       return CONNECT_SEPARATOR.splitAsStream(this.connect)
-          .map(String::trim)
-          .filter(s -> s.length() > 0)
-          .collect(Collectors.toList());
+        .map(String::trim)
+        .filter(s -> s.length() > 0)
+        .collect(Collectors.toList());
     }
   }
 }

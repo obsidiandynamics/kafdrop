@@ -18,8 +18,9 @@
 
 package kafdrop.controller;
 
-import kafdrop.service.*;
-import org.springframework.web.bind.annotation.*;
+import kafdrop.service.NotInitializedException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public final class KafkaExceptionHandler {

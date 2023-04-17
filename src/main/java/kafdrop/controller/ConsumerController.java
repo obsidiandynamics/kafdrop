@@ -18,14 +18,21 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.*;
-import kafdrop.model.*;
-import kafdrop.service.*;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.ui.*;
-import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kafdrop.model.ConsumerVO;
+import kafdrop.service.KafkaMonitor;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+@Tag(name = "consumer-controller", description = "Consumer Controller")
 @Controller
 @RequestMapping("/consumer")
 public final class ConsumerController {
@@ -37,27 +44,21 @@ public final class ConsumerController {
 
   @RequestMapping("/{groupId:.+}")
   public String consumerDetail(@PathVariable("groupId") String groupId, Model model) throws ConsumerNotFoundException {
-    final var topicVos = kafkaMonitor.getTopics();
-    final var consumer = kafkaMonitor.getConsumers(topicVos)
-        .stream()
-        .filter(c -> c.getGroupId().equals(groupId))
-        .findAny();
+    final var consumer = kafkaMonitor.getConsumersByGroup(groupId).stream().findAny();
+
     model.addAttribute("consumer", consumer.orElseThrow(() -> new ConsumerNotFoundException(groupId)));
     return "consumer-detail";
   }
 
-  @ApiOperation(value = "getConsumer", notes = "Get topic and partition details for a consumer group")
+  @Operation(summary = "getConsumer", description = "Get topic and partition details for a consumer group")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = ConsumerVO.class),
-      @ApiResponse(code = 404, message = "Invalid consumer group")
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid consumer group")
   })
-  @RequestMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+  @GetMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId) throws ConsumerNotFoundException {
-    final var topicVos = kafkaMonitor.getTopics();
-    final var consumer = kafkaMonitor.getConsumers(topicVos)
-        .stream()
-        .filter(c -> c.getGroupId().equals(groupId))
-        .findAny();
+    final var consumer = kafkaMonitor.getConsumersByGroup(groupId).stream().findAny();
+
     return consumer.orElseThrow(() -> new ConsumerNotFoundException(groupId));
   }
 }

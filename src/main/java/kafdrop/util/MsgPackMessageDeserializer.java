@@ -1,13 +1,12 @@
 package kafdrop.util;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessageUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.msgpack.core.MessagePack;
-import org.msgpack.core.MessageUnpacker;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class MsgPackMessageDeserializer implements MessageDeserializer {
 
@@ -15,8 +14,7 @@ public class MsgPackMessageDeserializer implements MessageDeserializer {
 
   @Override
   public String deserializeMessage(ByteBuffer buffer) {
-    MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(buffer);
-    try {
+    try (MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(buffer)) {
       return unpacker.unpackValue().toJson();
     } catch (IOException e) {
       final String errorMsg = "Unable to unpack msgpack message";

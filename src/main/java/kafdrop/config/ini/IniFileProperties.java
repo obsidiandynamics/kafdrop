@@ -18,9 +18,11 @@
 
 package kafdrop.config.ini;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Maps;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 public final class IniFileProperties {
   private Map<String, Map<String, String>> sectionProperties = Maps.newLinkedHashMap();

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package kafdrop;
+
+option java_multiple_files = true;
+option java_package = "kafdrop.protos";
+option java_outer_classname = "PersonProto";
+
+message Person {
+  string name = 1;
+  int32 id = 2;
+  string email = 3;
+  enum Contact {
+    TELEPHONE = 0;
+    MOBILE = 1;
+  }
+  Contact contact = 4;
+  repeated string data = 5;
+}

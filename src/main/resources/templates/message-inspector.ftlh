@@ -22,7 +22,7 @@
             margin-bottom: 16px;
         }
 
-        #messageFormPanel {
+        #messageFormPanel, #messageNavigationPanel {
             margin-top: 16px;
         }
 
@@ -49,12 +49,14 @@
 	    {
 	        $('#protobufDescriptor').hide();
 	        $('#protobufMsgType').hide();
+            $('#protobufIsAnyProto').hide();
 	    }
 	    else
 	    {
 	        $('#protobufDescriptor').show();
 	        $('#protobufMsgType').show();
 	        $('#descFile').prop('required',true);
+            $('#protobufIsAnyProto').show();
 	    }
 	}  
 	$(document).ready(function(){
@@ -71,7 +73,8 @@
 
 <#assign selectedPartition=messageForm.partition!0?number>
 <#assign selectedFormat=messageForm.format!defaultFormat>
-<#assign selectedKeyFormat=messageForm.keyFormat!defaultFormat>
+<#assign selectedKeyFormat=messageForm.keyFormat!defaultKeyFormat>
+<#assign selectedIsAnyProtoOpt=messageForm.isAnyProto>
 
 <div id="partitionSizes">
     <#assign curPartition=topic.getPartition(selectedPartition).get()>
@@ -134,7 +137,7 @@
           <label for="format">Protobuf descriptor</label>
 	        <select class="form-control" id="descFile" name="descFile">
 	          <#list descFiles as f>
-	           <option value="${f}">${f}</option>
+	           <option value="${f}" <#if f == defaultDescFile>selected="selected"</#if>>${f}</option>
 	          </#list>
 	        </select>
         <#else>
@@ -149,9 +152,50 @@
             </#if>
         </div>
         &nbsp;&nbsp;
+        <div class="form-group" id="protobufIsAnyProto">
+        	<label class=control-label" for="format">Is Any proto?</label>
+            <select class="form-control" id="isAnyProto" name="isAnyProto">
+                 <#list isAnyProtoOpts as opt>
+                    <option value="${opt?c}" <#if opt == selectedIsAnyProtoOpt>selected="selected"</#if>>${opt?string('Yes', 'No')}</option>
+                </#list>
+            </select>
+        </div>
+        &nbsp;&nbsp;
         <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
     </form>
 </div>
+
+<#if messages?? && messages?size gt 0 && (curPartition.size - curPartition.firstOffset gt messageForm.count)>
+    <div id="messageNavigationPanel">
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item <#if curPartition.firstOffset gte messageForm.offset>disabled</#if>">
+                    <a class="page-link btn-success" href="<@spring.url '/topic/${topic.name}/messages?partition=${curPartition.id}&offset=${curPartition.firstOffset}&count=${messageForm.count}&keyFormat=${selectedKeyFormat}&format=${selectedFormat}'/>"
+                    <#if curPartition.firstOffset gte messageForm.offset>tabindex="-1"</#if>>
+                        <i class="fa fa-fast-backward"></i>
+                    </a>
+                </li>
+                <li class="page-item <#if curPartition.firstOffset gte messageForm.offset>disabled</#if>">
+                    <a class="page-link btn-success" href="<@spring.url '/topic/${topic.name}/messages?partition=${curPartition.id}&offset=${[(curPartition.firstOffset),(messageForm.offset-messageForm.count)]?max}&count=${messageForm.count}&keyFormat=${selectedKeyFormat}&format=${selectedFormat}'/>"
+                    <#if curPartition.firstOffset gte messageForm.offset>tabindex="-1"</#if>>
+                        <i class="fa fa-step-backward"></i>
+                    </a>
+                </li>
+               <li class="page-item <#if messageForm.offset gte curPartition.size-messageForm.count>disabled</#if>">
+                    <a class="page-link btn-success" href="<@spring.url '/topic/${topic.name}/messages?partition=${curPartition.id}&offset=${[(curPartition.size-messageForm.count),(messageForm.offset+messageForm.count)]?min}&count=${messageForm.count}&keyFormat=${selectedKeyFormat}&format=${selectedFormat}'/>"
+                    <#if messageForm.offset gte curPartition.size-messageForm.count>tabindex="-1"</#if>>
+                        <i class="fa fa-step-forward"></i>
+                    </a>
+                </li>
+               <li class="page-item <#if messageForm.offset gte curPartition.size-messageForm.count>disabled</#if>">
+                    <a class="page-link btn-success" href="<@spring.url '/topic/${topic.name}/messages?partition=${curPartition.id}&offset=${[(curPartition.size-messageForm.count),curPartition.firstOffset]?max}&count=${messageForm.count}&keyFormat=${selectedKeyFormat}&format=${selectedFormat}'/>"
+                    <#if messageForm.offset gte curPartition.size-messageForm.count>tabindex="-1"</#if>>
+                        <i class="fa fa-fast-forward"></i>
+                    </a>
+                </li>
+        </nav>
+    </div>
+</#if>
 
 <@spring.bind path="messageForm.*"/>
 <div id="message-display" class="container">

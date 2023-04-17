@@ -18,10 +18,10 @@
 
 package kafdrop.config.ini;
 
-import com.google.common.collect.*;
-import org.springframework.core.env.*;
+import com.google.common.collect.Maps;
+import org.springframework.core.env.MapPropertySource;
 
-import java.util.*;
+import java.util.Map;
 
 public class IniFilePropertySource extends MapPropertySource {
   public IniFilePropertySource(String name, IniFileProperties source, String[] activeProfiles) {

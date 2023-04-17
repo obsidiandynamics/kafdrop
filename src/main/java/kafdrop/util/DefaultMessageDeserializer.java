@@ -1,6 +1,6 @@
 package kafdrop.util;
 
-import java.nio.*;
+import java.nio.ByteBuffer;
 
 public class DefaultMessageDeserializer implements MessageDeserializer {
   @Override

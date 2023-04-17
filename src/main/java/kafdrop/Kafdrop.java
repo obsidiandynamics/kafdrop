@@ -18,32 +18,42 @@
 
 package kafdrop;
 
-import com.google.common.base.*;
-import io.undertow.server.*;
-import io.undertow.websockets.jsr.*;
-import kafdrop.config.ini.*;
-import org.slf4j.*;
+import com.google.common.base.Strings;
+import io.undertow.server.DefaultByteBufferPool;
+import io.undertow.server.HandlerWrapper;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.DisallowedMethodsHandler;
+import io.undertow.util.HttpString;
+import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
+import kafdrop.config.ini.IniFilePropertySource;
+import kafdrop.config.ini.IniFileReader;
 import org.slf4j.Logger;
-import org.springframework.boot.Banner.*;
-import org.springframework.boot.autoconfigure.*;
-import org.springframework.boot.builder.*;
-import org.springframework.boot.context.event.*;
-import org.springframework.boot.web.embedded.undertow.*;
-import org.springframework.boot.web.server.*;
-import org.springframework.context.*;
-import org.springframework.context.annotation.*;
-import org.springframework.core.*;
-import org.springframework.core.env.*;
-import org.springframework.web.servlet.config.annotation.*;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.Banner.Mode;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
+import org.springframework.boot.web.embedded.undertow.UndertowDeploymentInfoCustomizer;
+import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.io.*;
-import java.nio.charset.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.stream.*;
+import java.util.stream.Stream;
 
 @SpringBootApplication
 public class Kafdrop {
-  private final static Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Kafdrop.class);
 
   public static void main(String[] args) {
     createApplicationBuilder()
@@ -54,7 +64,7 @@ public class Kafdrop {
     return new SpringApplicationBuilder(Kafdrop.class)
       .bannerMode(Mode.OFF)
       .listeners(new EnvironmentSetupListener(),
-              new LoggingConfigurationListener());
+        new LoggingConfigurationListener());
   }
 
   @Bean
@@ -64,6 +74,17 @@ public class Kafdrop {
         var inf = new WebSocketDeploymentInfo();
         inf.setBuffers(new DefaultByteBufferPool(false, 64));
         deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, inf);
+        // see https://stackoverflow.com/a/54129696
+        deploymentInfo.addInitialHandlerChainWrapper(new HandlerWrapper() {
+          @Override
+          public HttpHandler wrap(HttpHandler handler) {
+            HttpString[] disallowedHttpMethods = {
+              HttpString.tryFromString("TRACE"),
+              HttpString.tryFromString("TRACK")
+            };
+            return new DisallowedMethodsHandler(handler, disallowedHttpMethods);
+          }
+        });
       };
       factory.addDeploymentInfoCustomizers(customizer);
     };
@@ -99,12 +120,11 @@ public class Kafdrop {
         try {
           System.setProperty("logging.dir", new File(loggingFile).getParent());
         } catch (Exception ex) {
-          System.err.println("Unable to set up logging.dir from logging.file " + loggingFile + ": " +
-                                 Throwables.getStackTraceAsString(ex));
+          LOG.error("Unable to set up logging.dir from logging.file {}", loggingFile, ex);
         }
       }
       if (environment.containsProperty("debug") &&
-          !"false".equalsIgnoreCase(environment.getProperty("debug", String.class))) {
+        !"false".equalsIgnoreCase(environment.getProperty("debug", String.class))) {
         System.setProperty(PROP_SPRING_BOOT_LOG_LEVEL, "DEBUG");
       }
     }
@@ -142,10 +162,10 @@ public class Kafdrop {
 
       if (environment.containsProperty(SM_CONFIG_DIR)) {
         Stream.of("kafdrop", "global")
-            .map(name -> readProperties(environment, name))
-            .filter(Objects::nonNull)
-            .forEach(iniPropSource -> environment.getPropertySources()
-                .addBefore("applicationConfigurationProperties", iniPropSource));
+          .map(name -> readProperties(environment, name))
+          .filter(Objects::nonNull)
+          .forEach(iniPropSource -> environment.getPropertySources()
+            .addBefore("applicationConfigurationProperties", iniPropSource));
       }
     }
 
