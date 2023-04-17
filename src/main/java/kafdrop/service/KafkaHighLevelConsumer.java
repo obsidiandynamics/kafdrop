@@ -88,7 +88,8 @@ public final class KafkaHighLevelConsumer {
         Long startOffset = beginningOffset.get(topicPartition);
         Long endOffset = endOffsets.get(topicPartition);
 
-        LOG.debug("topic: {}, partition: {}, startOffset: {}, endOffset: {}", topicPartition.topic(), topicPartition.partition(), startOffset, endOffset);
+        LOG.debug("topic: {}, partition: {}, startOffset: {}, endOffset: {}", topicPartition.topic(),
+          topicPartition.partition(), startOffset, endOffset);
         p.setFirstOffset(startOffset);
         p.setSize(endOffset);
       });
@@ -239,8 +240,10 @@ public final class KafkaHighLevelConsumer {
 
     for (var partitionInfo : partitionInfoList) {
       final var topicPartitionVo = new TopicPartitionVO(partitionInfo.partition());
-      final var inSyncReplicaIds = Arrays.stream(partitionInfo.inSyncReplicas()).map(Node::id).collect(Collectors.toSet());
-      final var offlineReplicaIds = Arrays.stream(partitionInfo.offlineReplicas()).map(Node::id).collect(Collectors.toSet());
+      final var inSyncReplicaIds =
+        Arrays.stream(partitionInfo.inSyncReplicas()).map(Node::id).collect(Collectors.toSet());
+      final var offlineReplicaIds =
+        Arrays.stream(partitionInfo.offlineReplicas()).map(Node::id).collect(Collectors.toSet());
 
       for (var node : partitionInfo.replicas()) {
         final var isInSync = inSyncReplicaIds.contains(node.id());

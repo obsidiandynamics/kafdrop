@@ -30,7 +30,8 @@ public final class AclVO implements Comparable<AclVO> {
   private final String operation;
   private final String permissionType;
 
-  public AclVO(String resourceType, String name, String patternType, String principal, String host, String operation, String permissionType) {
+  public AclVO(String resourceType, String name, String patternType, String principal, String host, String operation,
+               String permissionType) {
     this.resourceType = resourceType;
     this.name = name;
     this.patternType = patternType;

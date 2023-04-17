@@ -143,6 +143,7 @@ public final class TopicPartitionVO {
 
   @Override
   public String toString() {
-    return TopicPartitionVO.class.getSimpleName() + " [id=" + id + ", firstOffset=" + firstOffset + ", size=" + size + "]";
+    return TopicPartitionVO.class.getSimpleName() + " [id=" + id + ", firstOffset=" + firstOffset + ", size=" + size
+      + "]";
   }
 }
