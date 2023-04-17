@@ -68,7 +68,8 @@ public class CorsConfiguration {
   @Value("${cors.allowCredentials:true}")
   private String corsAllowCredentials;
 
-  @Value("${cors.allowHeaders:Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization}")
+  @Value("${cors.allowHeaders:Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method," +
+    "Access-Control-Request-Headers,Authorization}")
   private String corsAllowHeaders;
 
   @Bean
@@ -81,7 +82,8 @@ public class CorsConfiguration {
       }
 
       @Override
-      public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+      public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
+        ServletException {
         final var response = (HttpServletResponse) res;
         final var request = (HttpServletRequest) req;
 

@@ -59,7 +59,8 @@ public final class BrokerController {
   })
   @GetMapping(path = "/broker/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody BrokerVO brokerDetailsJson(@PathVariable("id") int brokerId) {
-    return kafkaMonitor.getBroker(brokerId).orElseThrow(() -> new BrokerNotFoundException("No such broker " + brokerId));
+    return kafkaMonitor.getBroker(brokerId).orElseThrow(() ->
+      new BrokerNotFoundException("No such broker " + brokerId));
   }
 
   @Operation(summary = "getAllBrokers", description = "Get details for all known Kafka brokers")

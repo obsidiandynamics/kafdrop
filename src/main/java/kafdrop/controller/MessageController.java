@@ -74,7 +74,10 @@ public final class MessageController {
 
   private final ProtobufDescriptorProperties protobufProperties;
 
-  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties) {
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector,
+                           MessageFormatProperties messageFormatProperties,
+                           SchemaRegistryProperties schemaRegistryProperties,
+                           ProtobufDescriptorProperties protobufProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
@@ -172,8 +175,10 @@ public final class MessageController {
     if (!messageForm.isEmpty() && !errors.hasErrors()) {
 
       final var deserializers = new Deserializers(
-        getDeserializer(topicName, messageForm.getKeyFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName(), messageForm.getIsAnyProto()),
-        getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName(), messageForm.getIsAnyProto())
+        getDeserializer(topicName, messageForm.getKeyFormat(), messageForm.getDescFile(),
+          messageForm.getMsgTypeName(), messageForm.getIsAnyProto()),
+        getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName(),
+          messageForm.getIsAnyProto())
       );
 
       model.addAttribute("messages",
@@ -218,7 +223,8 @@ public final class MessageController {
    * @return Offset or message data.
    */
   @Operation(summary = "getPartitionOrMessages"
-    , description = "Get offset or message data for a topic. Without query params returns all partitions with offset data. With query params, returns actual messages (if valid offsets are provided).")
+    , description = "Get offset or message data for a topic. Without query params returns all partitions with offset " +
+    "data. With query params, returns actual messages (if valid offsets are provided).")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Success"),
     @ApiResponse(responseCode = "404", description = "Invalid topic name")
@@ -241,7 +247,8 @@ public final class MessageController {
         .orElseThrow(() -> new TopicNotFoundException(topicName));
 
       List<Object> partitionList = new ArrayList<>();
-      topic.getPartitions().forEach(vo -> partitionList.add(new PartitionOffsetInfo(vo.getId(), vo.getFirstOffset(), vo.getSize())));
+      topic.getPartitions().forEach(vo -> partitionList.add(new PartitionOffsetInfo(vo.getId(), vo.getFirstOffset(),
+        vo.getSize())));
 
       return partitionList;
     } else {
@@ -266,7 +273,8 @@ public final class MessageController {
     }
   }
 
-  private MessageDeserializer getDeserializer(String topicName, MessageFormat format, String descFile, String msgTypeName, boolean isAnyProto) {
+  private MessageDeserializer getDeserializer(String topicName, MessageFormat format, String descFile,
+                                              String msgTypeName, boolean isAnyProto) {
     final MessageDeserializer deserializer;
 
     if (format == MessageFormat.AVRO) {
