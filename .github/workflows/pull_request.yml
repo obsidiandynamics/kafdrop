@@ -16,7 +16,7 @@ jobs:
     - name: Checkout src repo
       uses: actions/checkout@v3
     - name: Lint code base
-      uses: github/super-linter@v4
+      uses: github/super-linter@v5
       env:
         VALIDATE_ALL_CODEBASE: false
         VALIDATE_EDITORCONFIG: true
