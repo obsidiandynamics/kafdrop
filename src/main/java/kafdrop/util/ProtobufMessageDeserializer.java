@@ -52,7 +52,8 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
         descs.add(fd);
       }
 
-      final var descriptors = descs.stream().flatMap(desc -> desc.getMessageTypes().stream()).collect(Collectors.toList());
+      final var descriptors =
+        descs.stream().flatMap(desc -> desc.getMessageTypes().stream()).collect(Collectors.toList());
       // automatically detect the message type name if the proto is "Any" and no message type name is given
       if (isAnyProto && msgTypeName.isBlank()) {
         String typeUrl = Any.parseFrom(buffer).getTypeUrl();
@@ -61,7 +62,9 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
         msgTypeNameRef.set(splittedTypeUrl[splittedTypeUrl.length - 1]);
       }
       // check for full name too if the proto is "Any"
-      final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeNameRef.get().equals(desc.getName()) || msgTypeNameRef.get().equals(desc.getFullName())).findFirst();
+      final var messageDescriptor =
+        descriptors.stream().filter(desc -> msgTypeNameRef.get().equals(desc.getName())
+          || msgTypeNameRef.get().equals(desc.getFullName())).findFirst();
       if (messageDescriptor.isEmpty()) {
         final String errorMsg = "Can't find specific message type: " + msgTypeNameRef.get();
         LOG.error(errorMsg);

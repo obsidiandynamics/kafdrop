@@ -100,7 +100,8 @@ public class Kafdrop {
     };
   }
 
-  private static final class LoggingConfigurationListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+  private static final class LoggingConfigurationListener
+    implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
     private static final String PROP_LOGGING_FILE = "logging.file";
     private static final String PROP_LOGGER = "LOGGER";
     private static final String PROP_SPRING_BOOT_LOG_LEVEL = "logging.level.org.springframework.boot";
@@ -130,7 +131,8 @@ public class Kafdrop {
     }
   }
 
-  private static final class EnvironmentSetupListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+  private static final class EnvironmentSetupListener
+    implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
     private static final String SM_CONFIG_DIR = "sm.config.dir";
     private static final String CONFIG_SUFFIX = "-config.ini";
 

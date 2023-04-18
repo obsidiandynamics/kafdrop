@@ -170,7 +170,8 @@ public final class KafkaHighLevelAdminClient {
   Collection<AclBinding> listAcls() {
     final Collection<AclBinding> aclsBindings;
     try {
-      aclsBindings = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY, AccessControlEntryFilter.ANY))
+      aclsBindings = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY,
+          AccessControlEntryFilter.ANY))
         .values().get();
     } catch (InterruptedException | ExecutionException e) {
       if (e.getCause() instanceof SecurityDisabledException) {
@@ -184,7 +185,8 @@ public final class KafkaHighLevelAdminClient {
 
   private void printAcls() {
     try {
-      final var acls = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY, AccessControlEntryFilter.ANY)).values().get();
+      final var acls = adminClient.describeAcls(new AclBindingFilter(ResourcePatternFilter.ANY,
+        AccessControlEntryFilter.ANY)).values().get();
       final var newlineDelimitedAcls = new StringBuilder();
       for (var acl : acls) {
         newlineDelimitedAcls.append('\n').append(acl);

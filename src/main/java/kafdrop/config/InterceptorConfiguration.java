@@ -42,7 +42,8 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
 
   public class ProfileHandlerInterceptor implements AsyncHandlerInterceptor {
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+                           ModelAndView modelAndView) {
       final var activeProfiles = environment.getActiveProfiles();
       if (modelAndView != null && activeProfiles != null && activeProfiles.length > 0) {
         modelAndView.addObject("profile", String.join(",", activeProfiles));

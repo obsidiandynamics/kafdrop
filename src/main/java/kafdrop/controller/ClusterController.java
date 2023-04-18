@@ -59,7 +59,8 @@ public final class ClusterController {
 
   private final boolean topicCreateEnabled;
 
-  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor, ObjectProvider<BuildInfo> buildInfoProvider,
+  public ClusterController(KafkaConfiguration kafkaConfiguration, KafkaMonitor kafkaMonitor,
+                           ObjectProvider<BuildInfo> buildInfoProvider,
                            @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled) {
     this.kafkaConfiguration = kafkaConfiguration;
     this.kafkaMonitor = kafkaMonitor;
@@ -104,7 +105,8 @@ public final class ClusterController {
     return "cluster-overview";
   }
 
-  @Operation(summary = "getCluster", description = "Get high level broker, topic, and partition data for the Kafka cluster")
+  @Operation(summary = "getCluster", description = "Get high level broker, topic, and partition data for the Kafka " +
+    "cluster")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Success")
   })

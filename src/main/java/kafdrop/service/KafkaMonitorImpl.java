@@ -113,7 +113,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
       })
       .orElseGet(ClusterSummaryVO::new);
     topicSummary.setTopicCount(topics.size());
-    topicSummary.setPreferredReplicaPercent(topics.isEmpty() ? 0 : topicSummary.getPreferredReplicaPercent() / topics.size());
+    topicSummary.setPreferredReplicaPercent(topics.isEmpty() ? 0 :
+      topicSummary.getPreferredReplicaPercent() / topics.size());
     return topicSummary;
   }
 
@@ -329,7 +330,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     return aclVos;
   }
 
-  private static List<ConsumerVO> convert(List<ConsumerGroupOffsets> consumerGroupOffsets, Collection<TopicVO> topicVos) {
+  private static List<ConsumerVO> convert(List<ConsumerGroupOffsets> consumerGroupOffsets,
+                                          Collection<TopicVO> topicVos) {
     final var topicVoMap = topicVos.stream().collect(Collectors.toMap(TopicVO::getName, Function.identity()));
     final var groupTopicPartitionOffsetMap = new TreeMap<String, Map<String, Map<Integer, Long>>>();
 

@@ -11,7 +11,8 @@ public class ProtobufSchemaRegistryMessageDeserializer implements MessageDeseria
   private final String topicName;
   private final KafkaProtobufDeserializer deserializer;
 
-  public ProtobufSchemaRegistryMessageDeserializer(String topicName, String schemaRegistryUrl, String schemaRegistryAuth) {
+  public ProtobufSchemaRegistryMessageDeserializer(String topicName, String schemaRegistryUrl,
+                                                   String schemaRegistryAuth) {
     this.topicName = topicName;
     this.deserializer = getDeserializer(schemaRegistryUrl, schemaRegistryAuth);
   }
