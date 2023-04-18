@@ -29,4 +29,4 @@ jobs:
         distribution: 'adopt'
         cache: maven
     - name: Build with Maven
-      run: mvn -B verify --file pom.xml
+      run: mvn -B verify --file pom.xml -Dskip.docker.resources=true
