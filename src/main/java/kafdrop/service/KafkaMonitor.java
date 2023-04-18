@@ -56,9 +56,9 @@ public interface KafkaMonitor {
 
   List<ConsumerVO> getConsumersByTopics(Collection<TopicVO> topicVos);
 
-  SearchResultsVO searchMessages(String topic, 
+  SearchResultsVO searchMessages(String topic,
                                  String searchString,
-                                 Integer maximumCount, 
+                                 Integer maximumCount,
                                  Date startTimestamp,
                                  Deserializers deserializers);
 

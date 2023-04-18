@@ -1,108 +1,106 @@
 package kafdrop.form;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import kafdrop.util.MessageFormat;
-
-import java.util.Date;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 public class SearchMessageForm {
 
-    @NotBlank
-    private String searchText;
+  @NotBlank
+  private String searchText;
 
-    @NotNull
-    @Min(1)
-    @Max(1000)
-    private Integer maximumCount;
+  @NotNull
+  @Min(1)
+  @Max(1000)
+  private Integer maximumCount;
 
-    private MessageFormat format;
+  private MessageFormat format;
 
-    private MessageFormat keyFormat;
+  private MessageFormat keyFormat;
 
-    private String descFile;
+  private String descFile;
 
-    private String msgTypeName;
-    
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private Date startTimestamp;
+  private String msgTypeName;
 
-    public SearchMessageForm(String searchText, MessageFormat format) {
-        this.searchText = searchText;
-        this.format = format;
-    }
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+  private Date startTimestamp;
 
-    public Date getStartTimestamp() {
-        return startTimestamp;
-    }
+  public SearchMessageForm(String searchText, MessageFormat format) {
+    this.searchText = searchText;
+    this.format = format;
+  }
 
-    public void setStartTimestamp(Date startTimestamp) {
-        this.startTimestamp = startTimestamp;
-    }
+  public Date getStartTimestamp() {
+    return startTimestamp;
+  }
 
-    public SearchMessageForm(String searchText) {
-        this(searchText, MessageFormat.DEFAULT);
-    }
+  public void setStartTimestamp(Date startTimestamp) {
+    this.startTimestamp = startTimestamp;
+  }
 
-    public SearchMessageForm() {}
+  public SearchMessageForm(String searchText) {
+    this(searchText, MessageFormat.DEFAULT);
+  }
 
-    @JsonIgnore
-    public boolean isEmpty() {
-        return searchText == null || searchText.isEmpty();
-    }
+  public SearchMessageForm() {
+  }
 
-    public String getSearchText() {
-        return searchText;
-    }
+  @JsonIgnore
+  public boolean isEmpty() {
+    return searchText == null || searchText.isEmpty();
+  }
 
-    public void setSearchText(String searchText) {
-        this.searchText = searchText;
-    }
+  public String getSearchText() {
+    return searchText;
+  }
 
-    public Integer getMaximumCount() {
-        return maximumCount;
-    }
+  public void setSearchText(String searchText) {
+    this.searchText = searchText;
+  }
 
-    public void setMaximumCount(Integer maximumCount) {
-        this.maximumCount = maximumCount;
-    }
+  public Integer getMaximumCount() {
+    return maximumCount;
+  }
 
-    public MessageFormat getKeyFormat() {
-        return keyFormat;
-    }
+  public void setMaximumCount(Integer maximumCount) {
+    this.maximumCount = maximumCount;
+  }
 
-    public void setKeyFormat(MessageFormat keyFormat) {
-        this.keyFormat = keyFormat;
-    }
+  public MessageFormat getKeyFormat() {
+    return keyFormat;
+  }
 
-    public MessageFormat getFormat() {
-        return format;
-    }
+  public void setKeyFormat(MessageFormat keyFormat) {
+    this.keyFormat = keyFormat;
+  }
 
-    public void setFormat(MessageFormat format) {
-        this.format = format;
-    }
+  public MessageFormat getFormat() {
+    return format;
+  }
 
-    public String getDescFile() {
-        return descFile;
-    }
+  public void setFormat(MessageFormat format) {
+    this.format = format;
+  }
 
-    public void setDescFile(String descFile) {
-        this.descFile = descFile;
-    }
+  public String getDescFile() {
+    return descFile;
+  }
 
-    public String getMsgTypeName() {
-        return msgTypeName;
-    }
+  public void setDescFile(String descFile) {
+    this.descFile = descFile;
+  }
 
-    public void setMsgTypeName(String msgTypeName) {
-        this.msgTypeName = msgTypeName;
-    }
+  public String getMsgTypeName() {
+    return msgTypeName;
+  }
+
+  public void setMsgTypeName(String msgTypeName) {
+    this.msgTypeName = msgTypeName;
+  }
 }

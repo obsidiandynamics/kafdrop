@@ -197,7 +197,8 @@ public final class MessageController {
 
   /**
    * Human friendly view of searching messages.
-   * @param topicName Name of topic
+   *
+   * @param topicName         Name of topic
    * @param searchMessageForm Message form for submitting requests to search messages.
    * @param errors
    * @param model
@@ -205,9 +206,9 @@ public final class MessageController {
    */
   @GetMapping("/topic/{name:.+}/search-messages")
   public String searchMessageForm(@PathVariable("name") String topicName,
-                                @Valid @ModelAttribute("searchMessageForm") SearchMessageForm searchMessageForm,
-                                BindingResult errors,
-                                Model model) {
+                                  @Valid @ModelAttribute("searchMessageForm") SearchMessageForm searchMessageForm,
+                                  BindingResult errors,
+                                  Model model) {
     final MessageFormat defaultFormat = messageFormatProperties.getFormat();
     final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
 
@@ -223,20 +224,22 @@ public final class MessageController {
     }
 
     final TopicVO topic = kafkaMonitor.getTopic(topicName)
-            .orElseThrow(() -> new TopicNotFoundException(topicName));
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
 
     model.addAttribute("topic", topic);
     model.addAttribute("defaultFormat", defaultFormat);
     model.addAttribute("messageFormats", MessageFormat.values());
     model.addAttribute("defaultKeyFormat", defaultKeyFormat);
-    model.addAttribute("keyFormats",KeyFormat.values());
+    model.addAttribute("keyFormats", KeyFormat.values());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
     if (!searchMessageForm.isEmpty() && !errors.hasErrors()) {
 
       final var deserializers = new Deserializers(
-              getDeserializer(topicName, searchMessageForm.getKeyFormat(), searchMessageForm.getDescFile(),searchMessageForm.getMsgTypeName()),
-              getDeserializer(topicName, searchMessageForm.getFormat(), searchMessageForm.getDescFile(), searchMessageForm.getMsgTypeName())
+        getDeserializer(topicName, searchMessageForm.getKeyFormat(), searchMessageForm.getDescFile(),
+          searchMessageForm.getMsgTypeName()),
+        getDeserializer(topicName, searchMessageForm.getFormat(), searchMessageForm.getDescFile(),
+          searchMessageForm.getMsgTypeName())
       );
 
       var searchResults = kafkaMonitor.searchMessages(
@@ -245,7 +248,7 @@ public final class MessageController {
         searchMessageForm.getMaximumCount(),
         searchMessageForm.getStartTimestamp(),
         deserializers);
-      
+
       model.addAttribute("messages", searchResults.getMessages());
       model.addAttribute("details", searchResults.getCompletionDetails());
     }

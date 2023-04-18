@@ -211,14 +211,15 @@ public final class KafkaHighLevelConsumer {
         rec.leaderEpoch()))
       .collect(Collectors.toList());
   }
- 
+
   /**
    * Searches records from all partitions of a given topic containing a given text.
-   * @param topic The topic
-   * @param searchString Searched text.
-   * @param maximumCount The maximum number of results to return
+   *
+   * @param topic          The topic
+   * @param searchString   Searched text.
+   * @param maximumCount   The maximum number of results to return
    * @param startTimestamp The begining message timestamp to search from
-   * @param deserializers Key and Value deserializers
+   * @param deserializers  Key and Value deserializers
    * @return A list of consumer records for a given topic.
    */
   synchronized SearchResults searchRecords(String topic,
@@ -229,14 +230,15 @@ public final class KafkaHighLevelConsumer {
     initializeClient();
     final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
     final var partitions = partitionInfoSet.stream()
-        .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
-            partitionInfo.partition()))
-        .collect(Collectors.toList());
+      .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+        partitionInfo.partition()))
+      .collect(Collectors.toList());
     kafkaConsumer.assign(partitions);
-    
+
     // make the consumer seek to the correct offsets for the start timestamp
-    final var partitionOffsets = kafkaConsumer.offsetsForTimes(partitions.stream().collect(Collectors.toMap(tp-> tp, tp-> startTimestamp.getTime())));
-    
+    final var partitionOffsets = kafkaConsumer.offsetsForTimes(partitions.stream().collect(Collectors.toMap(tp -> tp,
+      tp -> startTimestamp.getTime())));
+
     // Seek each partition to that correct offset
     for (var partition : partitionOffsets.keySet()) {
       var offset = partitionOffsets.get(partition);
@@ -269,36 +271,36 @@ public final class KafkaHighLevelConsumer {
         var records = polled.records(partition);
         if (!records.isEmpty()) {
 
-            // Keep track of the lowest timestamp among this batch of records.
-            // This is what we will report to the user in the event that the search terminates
-            // early, so that they can perform a new search with this new timestamp as a starting point
-            var firstTimestamp = records.get(0).timestamp();
-            if (firstTimestamp < endingTimestamp){
-              endingTimestamp = firstTimestamp;
-            }
+          // Keep track of the lowest timestamp among this batch of records.
+          // This is what we will report to the user in the event that the search terminates
+          // early, so that they can perform a new search with this new timestamp as a starting point
+          var firstTimestamp = records.get(0).timestamp();
+          if (firstTimestamp < endingTimestamp) {
+            endingTimestamp = firstTimestamp;
+          }
 
-            scannedCount += records.size();
-            //Add to found records if it matches the search cretirea
-            foundRecords.addAll(records.stream()
-              .filter(rec -> 
-                        deserialize(deserializers.getKeyDeserializer(), rec.key()).toLowerCase().contains(loweredSearchString) || 
-                        deserialize(deserializers.getValueDeserializer(), rec.value()).toLowerCase().contains(loweredSearchString))
-              .map(rec -> new ConsumerRecord<>(rec.topic(),
-                        rec.partition(),
-                        rec.offset(),
-                        rec.timestamp(),
-                        rec.timestampType(),
-                        0L,
-                        rec.serializedKeySize(),
-                        rec.serializedValueSize(),
-                        deserialize(deserializers.getKeyDeserializer(), rec.key()),
-                        deserialize(deserializers.getValueDeserializer(), rec.value()),
-                        rec.headers(),
-                        rec.leaderEpoch()))
-              .collect(Collectors.toList()));
+          scannedCount += records.size();
+          //Add to found records if it matches the search cretirea
+          foundRecords.addAll(records.stream()
+            .filter(rec ->
+              deserialize(deserializers.getKeyDeserializer(), rec.key()).toLowerCase().contains(loweredSearchString) ||
+                deserialize(deserializers.getValueDeserializer(), rec.value()).toLowerCase().contains(loweredSearchString))
+            .map(rec -> new ConsumerRecord<>(rec.topic(),
+              rec.partition(),
+              rec.offset(),
+              rec.timestamp(),
+              rec.timestampType(),
+              0L,
+              rec.serializedKeySize(),
+              rec.serializedValueSize(),
+              deserialize(deserializers.getKeyDeserializer(), rec.key()),
+              deserialize(deserializers.getValueDeserializer(), rec.value()),
+              rec.headers(),
+              rec.leaderEpoch()))
+            .collect(Collectors.toList()));
         }
       }
-      
+
       //If no more polled exit the loop
       moreRecords = !polled.isEmpty();
     }
@@ -306,11 +308,9 @@ public final class KafkaHighLevelConsumer {
     SearchResults.CompletionReason completionReason;
     if (!moreRecords) {
       completionReason = CompletionReason.NO_MORE_MESSAGES_IN_TOPIC;
-    }
-    else if (foundRecords.size() >= maximumCount) {
+    } else if (foundRecords.size() >= maximumCount) {
       completionReason = CompletionReason.FOUND_REQUESTED_NUMBER_OF_RESULTS;
-    }
-    else if (scannedCount >= SEARCH_MAX_MESSAGES_TO_SCAN){
+    } else if (scannedCount >= SEARCH_MAX_MESSAGES_TO_SCAN) {
       completionReason = CompletionReason.EXCEEDED_MAX_SCAN_COUNT;
     } else {
       completionReason = CompletionReason.REACHED_END_OF_TIMESPAN;

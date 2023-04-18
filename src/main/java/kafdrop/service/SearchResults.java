@@ -1,52 +1,52 @@
 package kafdrop.service;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+
 import java.util.Date;
 import java.util.List;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-
 public final class SearchResults {
-    
-    private Date finalMessageTimestamp;
-    
-    private long messagesScannedCount;
 
-    private CompletionReason completionReason;
+  private Date finalMessageTimestamp;
 
-    private List<ConsumerRecord<String,String>> results;
+  private long messagesScannedCount;
 
-    public enum CompletionReason {
-        NO_MORE_MESSAGES_IN_TOPIC,
-        FOUND_REQUESTED_NUMBER_OF_RESULTS,
-        EXCEEDED_MAX_SCAN_COUNT,
-        REACHED_END_OF_TIMESPAN
-    }
+  private CompletionReason completionReason;
 
-    public SearchResults(
-        List<ConsumerRecord<String, String>> results,
-        CompletionReason completionReason,
-        Date finalMessageTimestamp,
-        long messagesScannedCount) {
-             
-        this.finalMessageTimestamp = finalMessageTimestamp;
-        this.messagesScannedCount = messagesScannedCount;
-        this.completionReason = completionReason;
-        this.results = results;
-    }
+  private List<ConsumerRecord<String, String>> results;
 
-    public List<ConsumerRecord<String,String>> getResults() {
-        return results;
-    }
+  public enum CompletionReason {
+    NO_MORE_MESSAGES_IN_TOPIC,
+    FOUND_REQUESTED_NUMBER_OF_RESULTS,
+    EXCEEDED_MAX_SCAN_COUNT,
+    REACHED_END_OF_TIMESPAN
+  }
 
-    public CompletionReason getCompletionReason() {
-        return completionReason;
-    }
+  public SearchResults(
+    List<ConsumerRecord<String, String>> results,
+    CompletionReason completionReason,
+    Date finalMessageTimestamp,
+    long messagesScannedCount) {
 
-    public long getMessagesScannedCount() {
-        return messagesScannedCount;
-    }
+    this.finalMessageTimestamp = finalMessageTimestamp;
+    this.messagesScannedCount = messagesScannedCount;
+    this.completionReason = completionReason;
+    this.results = results;
+  }
 
-    public Date getFinalMessageTimestamp() {
-        return finalMessageTimestamp;
-    }
+  public List<ConsumerRecord<String, String>> getResults() {
+    return results;
+  }
+
+  public CompletionReason getCompletionReason() {
+    return completionReason;
+  }
+
+  public long getMessagesScannedCount() {
+    return messagesScannedCount;
+  }
+
+  public Date getFinalMessageTimestamp() {
+    return finalMessageTimestamp;
+  }
 }

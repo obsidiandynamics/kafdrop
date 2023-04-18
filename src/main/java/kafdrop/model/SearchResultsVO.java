@@ -16,28 +16,28 @@
  *
  */
 
- package kafdrop.model;
+package kafdrop.model;
 
 import java.util.List;
 
 public final class SearchResultsVO {
-    private List<MessageVO> messages;
+  private List<MessageVO> messages;
 
-    private String completionDetails;
+  private String completionDetails;
 
-    public List<MessageVO> getMessages() {
-        return messages;
-    }
+  public List<MessageVO> getMessages() {
+    return messages;
+  }
 
-    public String getCompletionDetails() {
-        return completionDetails;
-    }
+  public String getCompletionDetails() {
+    return completionDetails;
+  }
 
-    public void setCompletionDetails(String completionDetails) {
-        this.completionDetails = completionDetails;
-    }
+  public void setCompletionDetails(String completionDetails) {
+    this.completionDetails = completionDetails;
+  }
 
-    public void setMessages(List<MessageVO> messages) {
-        this.messages = messages;
-    }
+  public void setMessages(List<MessageVO> messages) {
+    this.messages = messages;
+  }
 }
