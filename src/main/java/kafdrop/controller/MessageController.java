@@ -210,7 +210,7 @@ public final class MessageController {
                                   BindingResult errors,
                                   Model model) {
     final MessageFormat defaultFormat = messageFormatProperties.getFormat();
-    final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
 
     if (searchMessageForm.isEmpty()) {
       final SearchMessageForm defaultForm = new SearchMessageForm();
@@ -237,9 +237,11 @@ public final class MessageController {
 
       final var deserializers = new Deserializers(
         getDeserializer(topicName, searchMessageForm.getKeyFormat(), searchMessageForm.getDescFile(),
-          searchMessageForm.getMsgTypeName()),
+          searchMessageForm.getMsgTypeName(),
+          protobufProperties.getParseAnyProto()),
         getDeserializer(topicName, searchMessageForm.getFormat(), searchMessageForm.getDescFile(),
-          searchMessageForm.getMsgTypeName())
+          searchMessageForm.getMsgTypeName(),
+          protobufProperties.getParseAnyProto())
       );
 
       var searchResults = kafkaMonitor.searchMessages(
@@ -257,8 +259,7 @@ public final class MessageController {
   }
 
   /**
-   * Returns the selected nessagr format based on the
-   * form submission
+   * Returns the selected message format based on the form submission
    *
    * @param format String representation of format name
    * @return

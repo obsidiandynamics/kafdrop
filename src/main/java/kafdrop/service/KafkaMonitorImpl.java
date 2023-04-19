@@ -26,6 +26,7 @@ import kafdrop.model.ConsumerTopicVO;
 import kafdrop.model.ConsumerVO;
 import kafdrop.model.CreateTopicVO;
 import kafdrop.model.MessageVO;
+import kafdrop.model.SearchResultsVO;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
 import kafdrop.util.Deserializers;

@@ -24,11 +24,13 @@ import kafdrop.model.ClusterSummaryVO;
 import kafdrop.model.ConsumerVO;
 import kafdrop.model.CreateTopicVO;
 import kafdrop.model.MessageVO;
+import kafdrop.model.SearchResultsVO;
 import kafdrop.model.TopicVO;
 import kafdrop.util.Deserializers;
 import org.apache.kafka.common.TopicPartition;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
