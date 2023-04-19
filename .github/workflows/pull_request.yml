@@ -15,6 +15,10 @@ jobs:
     steps:
     - name: Checkout src repo
       uses: actions/checkout@v3
+      with:
+        # Full git history is needed to get a proper list of changed files within `super-linter`
+        fetch-depth: 0
+
     - name: Lint code base
       uses: github/super-linter@v4
       env:
