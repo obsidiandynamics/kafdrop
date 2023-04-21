@@ -22,8 +22,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf.version>3.22.3</protobuf.version>
         <testcontainers.version>1.18.0</testcontainers.version>
-        <msk.auth.version>1.1.6</msk.auth.version>
         <kafka-libs.version>7.3.3</kafka-libs.version>
+        <msk.auth.version>1.0.0</msk.auth.version>
+        <sts.sdk.version>1.11.704</sts.sdk.version>
     </properties>
 
     <scm>
