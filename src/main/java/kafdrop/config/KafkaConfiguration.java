@@ -28,9 +28,9 @@ public final class KafkaConfiguration {
   private String truststoreFile;
   private String propertiesFile;
   private String keystoreFile;
-  private String jaasConfig;
-  private String clientCallback;
-  private String iamEnabled;
+  private String saslJaasConfig;
+  private String saslClientCallback;
+  private boolean iamEnabled = false;
 
   public void applyCommon(Properties properties) {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
@@ -52,11 +52,11 @@ public final class KafkaConfiguration {
       LOG.info("Assigning truststore location to {}", truststoreFile);
       properties.put("ssl.truststore.location", truststoreFile);
     }
-    LOG.info("Is iam enabled : {}", iamEnabled);
-    if (Boolean.parseBoolean(iamEnabled)) {
-      LOG.info("Setting sasl.jaas.config {} and sasl and callback callback properties {}", jaasConfig, clientCallback);
-      properties.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, clientCallback);
-      properties.put(SaslConfigs.SASL_JAAS_CONFIG, jaasConfig);
+    LOG.info("Is IAM enabled : {}", iamEnabled);
+    if (iamEnabled) {
+      LOG.info("Setting SASL client callback {} and JAAS config to {}", saslClientCallback, saslJaasConfig);
+      properties.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, saslClientCallback);
+      properties.put(SaslConfigs.SASL_JAAS_CONFIG, saslJaasConfig);
     }
 
     LOG.info("Checking keystore file {}", keystoreFile);

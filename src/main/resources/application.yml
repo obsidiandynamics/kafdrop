@@ -45,5 +45,5 @@ kafka:
   propertiesFile : "${KAFKA_PROPERTIES_FILE:kafka.properties}"
   keystoreFile: "${KAFKA_KEYSTORE_FILE:kafka.keystore.jks}"
   iamEnabled: "${KAFKA_IAM_ENABLED:false}"
-  jaasConfig: "${KAFKA_JAAS_CONFIG}"
-  clientCallback: "software.amazon.msk.auth.iam.IAMClientCallbackHandler"
+  saslJaasConfig: "${KAFKA_SASL_JAAS_CONFIG}"
+  saslClientCallback: "${KAFKA_SASL_CLIENT_CALLBACK}"
