@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.6_10-jdk
+FROM eclipse-temurin:17.0.7_7-jdk
 
 ADD kafdrop.sh /
 ADD kafdrop*tar.gz /
