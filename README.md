@@ -7,7 +7,7 @@
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/obsidiandynamics/kafdrop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/obsidiandynamics/kafdrop/context:java)
 
 
-<em>Kafdrop is a web UI for viewing Kafka topics and browsing consumer groups.</em> The tool displays information such as brokers, topics, partitions, consumers, and lets you view messages. 
+<em>Kafdrop is a web UI for viewing Kafka topics and browsing consumer groups.</em> The tool displays information such as brokers, topics, partitions, consumers, and lets you view messages.
 
 ![Overview Screenshot](docs/images/overview.png?raw=true)
 
@@ -65,14 +65,14 @@ Finally, a default message and key format (e.g. to deserialize Avro messages or 
 --message.format=AVRO
 --message.keyFormat=DEFAULT
 ```
-Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages. 
+Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
 If key format is unspecified, message format will be used for key too.
 
 ## Configure Protobuf message type
-### Option 1: Using Protobuf Descriptor 
-In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. 
-Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). 
-Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime. 
+### Option 1: Using Protobuf Descriptor
+In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file.
+Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s).
+Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime.
 
 To configure a folder with protobuf descriptor file(s) (.desc), follow:
 ```
@@ -289,7 +289,7 @@ docker run -d --rm -p 9000:9000 \
 |`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
 |`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro or Protobuf message
 |`SCHEMAREGISTRY_AUTH`  |Optional basic auth credentials in the form `username:password`.
-|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
+|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`.
 
 ##### Advanced configuration
 | Name                     |Description
@@ -305,6 +305,16 @@ docker run -d --rm -p 9000:9000 \
 | `SSL_KEY_STORE`          | Path to keystore file
 | `SSL_KEY_STORE_PASSWORD` | Keystore password
 | `SSL_KEY_ALIAS`          | Key alias
+
+##### AWS SASL IAM
+| Name                     |Description
+|--------------------------|-------------------------------
+| `KAFKA_IAM_ENABLED`      |Set to `true` to use AWS SASL IAM
+| `KAFKA_SASL_MECHANISM`   |Set to `AWS_MSK_IAM`
+| `KAFKA_SECURITY_PROTOCOL`|Set to `SASL_SSL`
+| `KAFKA_SASL_JAAS_CONFIG` |Set to `software.amazon.msk.auth.iam.IAMLoginModule;`
+| `KAFKA_SASL_CLIENT_CALLBACK`|Set to `software.amazon.msk.auth.iam.IAMClientCallbackHandler`
+| `KAFKA_IS_SECURED`       |Set to `true`
 
 ### Using Helm
 Like in the Docker example, supply the files in base-64 form:
@@ -342,7 +352,7 @@ Add a logout page in `/usr/local/opt/nginx/html/401.html`:
 Use the following snippet for `/usr/local/etc/nginx/nginx.conf`:
 ```
 worker_processes 4;
-  
+
 events {
   worker_connections 1024;
 }
@@ -402,7 +412,7 @@ See [here](CONTRIBUTING.md).
 
 To cut an official release, these are the steps:
 
-1. Commit a new version on master that has the `-SNAPSHOT` suffix stripped (see `pom.xml`). Once the commit is merged, the CI will treat it as a release build, and will end up publishing more artifacts than the regular (non-release/snapshot) build. One of those will be a dockerhub push to the specific version and "latest" tags. (The regular build doesn't update "latest"). 
+1. Commit a new version on master that has the `-SNAPSHOT` suffix stripped (see `pom.xml`). Once the commit is merged, the CI will treat it as a release build, and will end up publishing more artifacts than the regular (non-release/snapshot) build. One of those will be a dockerhub push to the specific version and "latest" tags. (The regular build doesn't update "latest").
 
 2. You can then edit the release description in GitHub to describe what went into the release.
 
