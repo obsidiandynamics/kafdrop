@@ -147,20 +147,8 @@ public class Kafdrop {
 
       LOG.info("Initializing JAAS config");
       final String env = environment.getProperty("kafka.env");
-      final boolean isSecured = environment.getProperty("kafka.isSecured", Boolean.class);
-      LOG.info("env: {} .isSecured kafka: {}", env, isSecured);
-      if (isSecured && Strings.isNullOrEmpty(env)) {
-        throw new IllegalArgumentException("Value of 'env' cannot be null if connecting to secured kafka.");
-      }
-
       LOG.info("Env: {}", env);
       String path;
-
-      if (isSecured) {
-        path = environment.getProperty("user.dir") + "/kaas_" + env.toLowerCase() + "_jaas.conf";
-        LOG.info("PATH: {}", path);
-        System.setProperty("java.security.auth.login.config", path);
-      }
 
       if (environment.containsProperty(SM_CONFIG_DIR)) {
         Stream.of("kafdrop", "global")
