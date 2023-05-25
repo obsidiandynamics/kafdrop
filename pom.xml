@@ -214,10 +214,6 @@
                     <source>17</source>
                     <target>17</target>
                     <fork>true</fork>
-                    <compilerVersion>17</compilerVersion>
-                    <compilerArgs>
-                        <arg>--add-exports=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
