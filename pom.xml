@@ -239,9 +239,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.spotify</groupId>
+                <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>1.2.2</version>
+                <version>0.43.0</version>
                 <configuration>
                     <imageName>obsidiandynamics/kafdrop</imageName>
                     <forceTags>true</forceTags>
