@@ -291,12 +291,6 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
               "Search reached the end of the topic before finding requested number of results.  Scanned %d messages.",
               records.getMessagesScannedCount()));
           break;
-        case REACHED_END_OF_TIMESPAN:
-          results.setCompletionDetails(
-            String.format(
-              "Search reached the end of the specified time span before finding requested number of results.  Scanned" +
-                " %d messages.",
-              records.getMessagesScannedCount()));
       }
 
     } else {

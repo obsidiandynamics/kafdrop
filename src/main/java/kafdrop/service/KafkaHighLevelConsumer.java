@@ -246,8 +246,7 @@ public final class KafkaHighLevelConsumer {
     } else if (scanStatus.scannedCount() >= SEARCH_MAX_MESSAGES_TO_SCAN) {
       completionReason = CompletionReason.EXCEEDED_MAX_SCAN_COUNT;
     } else {
-      // TODO: This situation cannot occur. There is no exit criterion on end of timespan
-      completionReason = CompletionReason.REACHED_END_OF_TIMESPAN;
+      throw new IllegalStateException("This situation is unexpected");
     }
 
     return new SearchResults(foundRecords, completionReason, new Date(scanStatus.endingTimestamp()),

@@ -18,8 +18,7 @@ public final class SearchResults {
   public enum CompletionReason {
     NO_MORE_MESSAGES_IN_TOPIC,
     FOUND_REQUESTED_NUMBER_OF_RESULTS,
-    EXCEEDED_MAX_SCAN_COUNT,
-    REACHED_END_OF_TIMESPAN
+    EXCEEDED_MAX_SCAN_COUNT
   }
 
   public SearchResults(
