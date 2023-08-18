@@ -279,17 +279,18 @@ docker run -d --rm -p 9000:9000 \
 
 #### Environment Variables
 ##### Basic configuration
-|Name                   |Description
-|-----------------------|-------------------------------
-|`KAFKA_BROKERCONNECT`  |Bootstrap list of Kafka host/port pairs. Defaults to `localhost:9092`.
-|`KAFKA_PROPERTIES`     |Additional properties to configure the broker connection (base-64 encoded).
-|`KAFKA_TRUSTSTORE`     |Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
-|`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
+|Name                        |Description
+|----------------------------|-------------------------------
+|`KAFKA_BROKERCONNECT`       |Bootstrap list of Kafka host/port pairs. Defaults to `localhost:9092`.
+|`KAFKA_PROPERTIES`          |Additional properties to configure the broker connection (base-64 encoded).
+|`KAFKA_TRUSTSTORE`          |Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
+|`KAFKA_KEYSTORE`            |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
-|`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
-|`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro or Protobuf message
-|`SCHEMAREGISTRY_AUTH`  |Optional basic auth credentials in the form `username:password`.
-|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
+|`SERVER_PORT`               |The web server port to listen on. Defaults to `9000`.
+|`MANAGEMENT_SERVER_PORT`    |The Spring Actuator server port to listen on. Defaults to `9000`.
+|`SCHEMAREGISTRY_CONNECT `   |The endpoint of Schema Registry for Avro or Protobuf message
+|`SCHEMAREGISTRY_AUTH`       |Optional basic auth credentials in the form `username:password`.
+|`CMD_ARGS`                  |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
 
 ##### Advanced configuration
 | Name                     |Description
