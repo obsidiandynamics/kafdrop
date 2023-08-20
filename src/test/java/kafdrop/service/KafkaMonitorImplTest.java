@@ -47,13 +47,13 @@ public class KafkaMonitorImplTest {
 
   @Test
   void getClusterSummmary_returns_expected_summary_for_cluster() {
-    var topics = Instancio.createSet(TopicVO.class); // коллекция топиков
+    var topics = Instancio.createSet(TopicVO.class);
     int topicCount = calculateTopicCount(topics);
     int partitionCount = calculatePartitions(topics);
     int underReplicatedCount = calculateReplicas(topics);
     double preferredReplicaPercent = calculatePreferredReplicaRepcent(topics);
 
-    var clusterSummary = kafkaMonitor.getClusterSummary(topics); // when
+    var clusterSummary = kafkaMonitor.getClusterSummary(topics);
 
     assertThat(clusterSummary)
       .returns(partitionCount, ClusterSummaryVO::getPartitionCount)
