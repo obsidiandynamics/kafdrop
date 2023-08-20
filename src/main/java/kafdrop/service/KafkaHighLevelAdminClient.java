@@ -2,6 +2,7 @@ package kafdrop.service;
 
 import jakarta.annotation.PostConstruct;
 import kafdrop.config.KafkaConfiguration;
+import kafdrop.model.ClusterDescriptionVO;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
@@ -55,19 +56,7 @@ public final class KafkaHighLevelAdminClient {
     adminClient = AdminClient.create(properties);
   }
 
-  final class ClusterDescription {
-    final Collection<Node> nodes;
-    final Node controller;
-    final String clusterId;
-
-    ClusterDescription(Collection<Node> nodes, Node controller, String clusterId) {
-      this.nodes = nodes;
-      this.controller = controller;
-      this.clusterId = clusterId;
-    }
-  }
-
-  ClusterDescription describeCluster() {
+  ClusterDescriptionVO describeCluster() {
     final var result = adminClient.describeCluster();
     final Collection<Node> nodes;
     final Node controller;
@@ -80,7 +69,7 @@ public final class KafkaHighLevelAdminClient {
       throw new KafkaAdminClientException(e);
     }
 
-    return new ClusterDescription(nodes, controller, clusterId);
+    return new ClusterDescriptionVO(nodes, controller, clusterId);
   }
 
   Set<String> listConsumerGroups() {
