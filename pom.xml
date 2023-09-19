@@ -6,11 +6,11 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.5</version>
+        <version>2.7.15</version>
     </parent>
     <groupId>com.obsidiandynamics.kafdrop</groupId>
     <artifactId>kafdrop</artifactId>
-    <version>3.31.0</version>
+    <version>3.31.1-SNAPSHOT</version>
 
     <description>For when you have a Kafka cluster to monitor</description>
 
@@ -20,9 +20,16 @@
         <!-- name of parameter changed in latest mvn javadoc plugin version-->
         <additionalOptions>-Xdoclint:none</additionalOptions>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <protobuf.version>3.22.2</protobuf.version>
-        <testcontainers.version>1.17.6</testcontainers.version>
-        <kafka-libs.version>7.3.2</kafka-libs.version>
+        <protobuf.version>3.24.3</protobuf.version>
+        <testcontainers.version>1.19.0</testcontainers.version>
+        <kafka-libs.version>7.4.1</kafka-libs.version>
+
+        <!-- Security hotfixes for Spring Boot 2.7 -->
+        <spring-kafka.version>2.9.12</spring-kafka.version> <!-- https://nvd.nist.gov/vuln/detail/CVE-2023-34040 -->
+        <okio.version>3.4.0</okio.version> <!-- https://nvd.nist.gov/vuln/detail/CVE-2023-3635 -->
+        <snappy-java.version>1.1.10.3</snappy-java.version> <!-- https://nvd.nist.gov/vuln/detail/CVE-2023-34453 -->
+        <snakeyaml.version>2.0</snakeyaml.version> <!-- not affected, but upgrading is possible since Spring Boot 2.7.10 -->
+        <jackson.version>2.15.2</jackson.version> <!-- jackson 2.15 needed for snakeyaml 2 -->
     </properties>
 
     <scm>
@@ -49,6 +56,21 @@
             <url>https://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>${okio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xerial.snappy</groupId>
+                <artifactId>snappy-java</artifactId>
+                <version>${snappy-java.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
@@ -112,12 +134,12 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.11.1</version>
+            <version>1.11.2</version>
         </dependency>
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack-core</artifactId>
-            <version>0.9.3</version>
+            <version>0.9.5</version>
         </dependency>
 
         <!-- Spring Boot -->
