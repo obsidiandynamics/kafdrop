@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.obsidiandynamics.kafdrop</groupId>
     <artifactId>kafdrop</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
 
     <description>For when you have a Kafka cluster to monitor</description>
 
