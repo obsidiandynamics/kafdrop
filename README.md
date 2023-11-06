@@ -99,7 +99,7 @@ docker run -d --rm -p 9000:9000 \
     obsidiandynamics/kafdrop
 ```
 
-Lunch container with some specific JVM options:
+Launch container with some specific JVM options:
 ```sh
 docker run -d --rm -p 9000:9000 \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
