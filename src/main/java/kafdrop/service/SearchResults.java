@@ -1,5 +1,6 @@
 package kafdrop.service;
 
+import java.text.SimpleDateFormat;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.util.Date;
@@ -47,5 +48,10 @@ public final class SearchResults {
 
   public Date getFinalMessageTimestamp() {
     return finalMessageTimestamp;
+  }
+
+  public String finalMessageTimestampFormatted() {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    return dateFormat.format(finalMessageTimestamp);
   }
 }
