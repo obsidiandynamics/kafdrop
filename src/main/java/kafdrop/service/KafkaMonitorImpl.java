@@ -280,8 +280,8 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         case EXCEEDED_MAX_SCAN_COUNT:
           results.setCompletionDetails(
             String.format(
-              "Search timed out after scanning %d messages. Last scanned message timestamp was %2$tF %2$tT. Adjust your time" +
-                " span for more results.",
+              "Search timed out after scanning %d messages. Last scanned message timestamp was %2$tF %2$tT." +
+                " Adjust your time span for more results.",
               records.getMessagesScannedCount(),
               records.getFinalMessageTimestamp()));
           break;
