@@ -281,7 +281,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
           results.setCompletionDetails(
             String.format(
               "Search timed out after scanning %d messages. Last scanned message timestamp was %2$tF %2$tT. Adjust your time" +
-              " span for more results.",
+                " span for more results.",
               records.getMessagesScannedCount(),
               records.getFinalMessageTimestamp()));
           break;
