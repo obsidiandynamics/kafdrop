@@ -117,7 +117,7 @@
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack-core</artifactId>
-            <version>0.9.7</version>
+            <version>0.9.8</version>
         </dependency>
 
         <!-- Spring Boot -->
