@@ -15,20 +15,23 @@ import java.util.Map;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = AbstractIntegrationTest.Initializer.class)
 abstract class AbstractIntegrationTest {
-    static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka").withTag("5.4.3"));
+  static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+    static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka").withTag("5.4.3"));
 
-        public static Map<String, Object> getProperties() {
-            Startables.deepStart(List.of(kafka)).join();
-			return Map.of("kafka.brokerConnect", kafka.getBootstrapServers(), "protobufdesc.directory","./src/test/resources", "protobufdesc.parseAnyProto", true);
-        }
-
-        @Override
-        public void initialize(ConfigurableApplicationContext context) {
-            var env = context.getEnvironment();
-            env.getPropertySources().addFirst(new MapPropertySource(
-                    "testcontainers", getProperties()
-            ));
-        }
+    public static Map<String, Object> getProperties() {
+      Startables.deepStart(List.of(kafka)).join();
+      return Map.of(
+        "kafka.brokerConnect", kafka.getBootstrapServers(),
+        "protobufdesc.directory", "./src/test/resources",
+        "protobufdesc.parseAnyProto", true);
     }
+
+    @Override
+    public void initialize(ConfigurableApplicationContext context) {
+      var env = context.getEnvironment();
+      env.getPropertySources().addFirst(new MapPropertySource(
+        "testcontainers", getProperties()
+      ));
+    }
+  }
 }

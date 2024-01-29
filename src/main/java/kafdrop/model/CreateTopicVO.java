@@ -1,20 +1,20 @@
 package kafdrop.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-@ApiModel("Create topic model")
+@Schema(description = "Create topic model")
 public final class CreateTopicVO {
-  @ApiParam("Topic name")
+  @Parameter(description = "Topic name")
   String name;
 
-  @ApiParam("Number of partitions")
+  @Parameter(description = "Number of partitions")
   int partitionsNumber;
 
-  @ApiParam("Replication factor")
+  @Parameter(description = "Replication factor")
   int replicationFactor;
 }

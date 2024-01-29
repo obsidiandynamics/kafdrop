@@ -18,16 +18,24 @@
 
 package kafdrop.config;
 
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.autoconfigure.condition.*;
-import org.springframework.context.annotation.*;
-import org.springframework.core.*;
-import org.springframework.core.annotation.*;
-import org.springframework.http.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
+import java.io.IOException;
 
 /**
  * Auto configuration for enabling CORS support. Can override behavior with
@@ -60,7 +68,8 @@ public class CorsConfiguration {
   @Value("${cors.allowCredentials:true}")
   private String corsAllowCredentials;
 
-  @Value("${cors.allowHeaders:Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization}")
+  @Value("${cors.allowHeaders:Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method," +
+    "Access-Control-Request-Headers,Authorization}")
   private String corsAllowHeaders;
 
   @Bean
@@ -73,7 +82,8 @@ public class CorsConfiguration {
       }
 
       @Override
-      public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+      public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
+        ServletException {
         final var response = (HttpServletResponse) res;
         final var request = (HttpServletRequest) req;
 

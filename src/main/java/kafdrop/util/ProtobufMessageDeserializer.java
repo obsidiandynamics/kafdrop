@@ -1,18 +1,5 @@
 package kafdrop.util;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.Any;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
@@ -23,6 +10,18 @@ import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.util.JsonFormat;
 import com.google.protobuf.util.JsonFormat.Printer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class ProtobufMessageDeserializer implements MessageDeserializer {
 
@@ -48,21 +47,24 @@ public class ProtobufMessageDeserializer implements MessageDeserializer {
       List<FileDescriptor> descs = new ArrayList<>();
       for (FileDescriptorProto ffdp : set.getFileList()) {
         FileDescriptor fd = Descriptors.FileDescriptor.buildFrom(
-                ffdp,
-                descs.toArray(new FileDescriptor[0]));
+          ffdp,
+          descs.toArray(new FileDescriptor[0]));
         descs.add(fd);
       }
 
-      final var descriptors = descs.stream().flatMap(desc -> desc.getMessageTypes().stream()).collect(Collectors.toList());
+      final var descriptors =
+        descs.stream().flatMap(desc -> desc.getMessageTypes().stream()).collect(Collectors.toList());
       // automatically detect the message type name if the proto is "Any" and no message type name is given
       if (isAnyProto && msgTypeName.isBlank()) {
         String typeUrl = Any.parseFrom(buffer).getTypeUrl();
-				String[] splittedTypeUrl = typeUrl.split("/");
-				// the last part in the type url is always the FQCN for this proto
-				msgTypeNameRef.set(splittedTypeUrl[splittedTypeUrl.length - 1]);
+        String[] splittedTypeUrl = typeUrl.split("/");
+        // the last part in the type url is always the FQCN for this proto
+        msgTypeNameRef.set(splittedTypeUrl[splittedTypeUrl.length - 1]);
       }
       // check for full name too if the proto is "Any"
-      final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeNameRef.get().equals(desc.getName()) || msgTypeNameRef.get().equals(desc.getFullName())).findFirst();
+      final var messageDescriptor =
+        descriptors.stream().filter(desc -> msgTypeNameRef.get().equals(desc.getName())
+          || msgTypeNameRef.get().equals(desc.getFullName())).findFirst();
       if (messageDescriptor.isEmpty()) {
         final String errorMsg = "Can't find specific message type: " + msgTypeNameRef.get();
         LOG.error(errorMsg);

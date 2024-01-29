@@ -20,7 +20,7 @@ package kafdrop.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class ConsumerPartitionVOTest {
   private void doLagTest(long first, long last, long offset, long expectedLag) {

@@ -18,10 +18,16 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kafdrop.config.MessageFormatConfiguration;
-import kafdrop.model.*;
-import kafdrop.service.*;
+import kafdrop.model.ConsumerVO;
+import kafdrop.model.CreateTopicVO;
+import kafdrop.model.TopicVO;
+import kafdrop.service.KafkaMonitor;
+import kafdrop.service.TopicNotFoundException;
 import kafdrop.util.MessageFormat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -29,12 +35,17 @@ import org.springframework.stereotype.*;
 import org.springframework.ui.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Handles requests for the topic page.
  */
+@Tag(name = "topic-controller", description = "Topic Controller")
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
@@ -42,24 +53,24 @@ public final class TopicController {
   private final boolean topicDeleteEnabled;
   private final boolean topicCreateEnabled;
   private final MessageFormatConfiguration.MessageFormatProperties messageFormatProperties;
-  private final MessageFormatConfiguration.MessageFormatProperties keyFormatProperties;
 
   public TopicController(KafkaMonitor kafkaMonitor,
-                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled, @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled, MessageFormatConfiguration.MessageFormatProperties messageFormatProperties, MessageFormatConfiguration.MessageFormatProperties keyFormatProperties) {
+                         @Value("${topic.deleteEnabled:true}") Boolean topicDeleteEnabled,
+                         @Value("${topic.createEnabled:true}") Boolean topicCreateEnabled,
+                         MessageFormatConfiguration.MessageFormatProperties messageFormatProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.topicDeleteEnabled = topicDeleteEnabled;
     this.topicCreateEnabled = topicCreateEnabled;
     this.messageFormatProperties = messageFormatProperties;
-    this.keyFormatProperties = keyFormatProperties;
   }
 
   @RequestMapping("/{name:.+}")
   public String topicDetails(@PathVariable("name") String topicName, Model model) {
     final MessageFormat defaultFormat = messageFormatProperties.getFormat();
-    final MessageFormat defaultKeyFormat = keyFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
 
     final var topic = kafkaMonitor.getTopic(topicName)
-        .orElseThrow(() -> new TopicNotFoundException(topicName));
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
     model.addAttribute("topic", topic);
     model.addAttribute("consumers", kafkaMonitor.getConsumersByTopics(Collections.singleton(topic)));
     model.addAttribute("topicDeleteEnabled", topicDeleteEnabled);
@@ -87,6 +98,7 @@ public final class TopicController {
 
   /**
    * Topic create page
+   *
    * @param model
    * @return creation page
    */
@@ -97,46 +109,43 @@ public final class TopicController {
     return "topic-create";
   }
 
-  @ApiOperation(value = "getTopic", notes = "Get details for a topic")
+  @Operation(summary = "getTopic", description = "Get details for a topic")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = TopicVO.class),
-      @ApiResponse(code = 404, message = "Invalid topic name")
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid topic name")
   })
   @GetMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody TopicVO getTopic(@PathVariable("name") String topicName) {
     return kafkaMonitor.getTopic(topicName)
-        .orElseThrow(() -> new TopicNotFoundException(topicName));
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
   }
 
-  @ApiOperation(value = "getAllTopics", notes = "Get list of all topics")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List")
-  })
+  @Operation(summary = "getAllTopics", description = "Get list of all topics")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Success")})
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<TopicVO> getAllTopics() {
     return kafkaMonitor.getTopics();
   }
 
-  @ApiOperation(value = "getConsumers", notes = "Get consumers for a topic")
+  @Operation(summary = "getConsumers", description = "Get consumers for a topic")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List"),
-      @ApiResponse(code = 404, message = "Invalid topic name")
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid topic name")
   })
   @GetMapping(path = "/{name:.+}/consumers", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody List<ConsumerVO> getConsumers(@PathVariable("name") String topicName) {
     final var topic = kafkaMonitor.getTopic(topicName)
-        .orElseThrow(() -> new TopicNotFoundException(topicName));
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
     return kafkaMonitor.getConsumersByTopics(Collections.singleton(topic));
   }
 
   /**
    * API for topic creation
+   *
    * @param createTopicVO request
    */
-  @ApiOperation(value = "createTopic", notes = "Create topic")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class)
-  })
+  @Operation(summary = "createTopic", description = "Create topic")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Success")})
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public String createTopic(CreateTopicVO createTopicVO, Model model) {
     model.addAttribute("topicCreateEnabled", topicCreateEnabled);
@@ -146,7 +155,7 @@ public final class TopicController {
       return createTopicPage(model);
     }
     try {
-        kafkaMonitor.createTopic(createTopicVO);
+      kafkaMonitor.createTopic(createTopicVO);
     } catch (Exception ex) {
       model.addAttribute("errorMessage", ex.getMessage());
     }

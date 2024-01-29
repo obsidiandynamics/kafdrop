@@ -18,8 +18,13 @@
 
 package kafdrop.model;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public final class TopicVO implements Comparable<TopicVO> {
   private final String name;
@@ -58,34 +63,36 @@ public final class TopicVO implements Comparable<TopicVO> {
 
   public Collection<TopicPartitionVO> getLeaderPartitions(int brokerId) {
     return partitions.values().stream()
-        .filter(tp -> tp.getLeader() != null && tp.getLeader().getId() == brokerId)
-        .collect(Collectors.toList());
+      .filter(tp -> tp.getLeader() != null && tp.getLeader().getId() == brokerId)
+      .collect(Collectors.toList());
   }
 
   public Collection<TopicPartitionVO> getUnderReplicatedPartitions() {
     return partitions.values().stream()
-        .filter(TopicPartitionVO::isUnderReplicated)
-        .collect(Collectors.toList());
+      .filter(TopicPartitionVO::isUnderReplicated)
+      .collect(Collectors.toList());
   }
 
   /**
    * Returns the total number of messages published to the topic, ever
+   *
    * @return
    */
   public long getTotalSize() {
     return partitions.values().stream()
-        .map(TopicPartitionVO::getSize)
-        .reduce(0L, Long::sum);
+      .map(TopicPartitionVO::getSize)
+      .reduce(0L, Long::sum);
   }
 
   /**
    * Returns the total number of messages available to consume from the topic.
+   *
    * @return
    */
   public long getAvailableSize() {
     return partitions.values().stream()
-        .map(p -> p.getSize() - p.getFirstOffset())
-        .reduce(0L, Long::sum);
+      .map(p -> p.getSize() - p.getFirstOffset())
+      .reduce(0L, Long::sum);
   }
 
   public double getPreferredReplicaPercent() {
@@ -93,8 +100,8 @@ public final class TopicVO implements Comparable<TopicVO> {
       return 0;
     } else {
       final var preferredLeaderCount = partitions.values().stream()
-          .filter(TopicPartitionVO::isLeaderPreferred)
-          .count();
+        .filter(TopicPartitionVO::isLeaderPreferred)
+        .count();
       return ((double) preferredLeaderCount) / ((double) partitions.size());
     }
   }
@@ -123,6 +130,6 @@ public final class TopicVO implements Comparable<TopicVO> {
 
   @Override
   public String toString() {
-    return TopicVO.class.getSimpleName() + " [name=" + name +", partitions=" + partitions + "]";
+    return TopicVO.class.getSimpleName() + " [name=" + name + ", partitions=" + partitions + "]";
   }
 }

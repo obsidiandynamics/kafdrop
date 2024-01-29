@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Kafdrop contributors.
+ * Copyright 2021 Kafdrop contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,28 @@
  *
  */
 
-package kafdrop.service;
+package kafdrop.model;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import java.util.List;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class TopicNotFoundException extends RuntimeException {
-  public TopicNotFoundException(String message) {
-    super(message);
+public final class SearchResultsVO {
+  private List<MessageVO> messages;
+
+  private String completionDetails;
+
+  public List<MessageVO> getMessages() {
+    return messages;
+  }
+
+  public String getCompletionDetails() {
+    return completionDetails;
+  }
+
+  public void setCompletionDetails(String completionDetails) {
+    this.completionDetails = completionDetails;
+  }
+
+  public void setMessages(List<MessageVO> messages) {
+    this.messages = messages;
   }
 }

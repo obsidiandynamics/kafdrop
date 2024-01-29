@@ -16,14 +16,24 @@
  *
  */
 
-package kafdrop.service;
+package kafdrop.config;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class TopicNotFoundException extends RuntimeException {
-  public TopicNotFoundException(String message) {
-    super(message);
+/**
+ * Autoconfiguration for OpenAPI Specification (OAS).
+ * Can be disabled by setting {@code springdoc.api-docs.enabled=false}.
+ */
+@Configuration
+public class OASConfiguration {
+
+  @Bean
+  public OpenAPI httpApi() {
+    return new OpenAPI().info(new Info()
+      .title("Kafdrop API")
+      .description("JSON APIs for Kafdrop"));
   }
 }

@@ -77,7 +77,7 @@ public final class ConsumerPartitionVO {
   @Override
   public String toString() {
     return ConsumerPartitionVO.class.getSimpleName() + " [groupId=" + groupId +
-        ", topic=" + topic + ", partitionId=" + partitionId + ", offset=" + offset +
-        ", size=" + size + ", firstOffset=" + firstOffset + "]";
+      ", topic=" + topic + ", partitionId=" + partitionId + ", offset=" + offset +
+      ", size=" + size + ", firstOffset=" + firstOffset + "]";
   }
 }

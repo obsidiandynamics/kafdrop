@@ -23,6 +23,10 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}        
     spec:
+      {{- if .Values.hostAliases }}
+      hostAliases:
+        {{ toYaml .Values.hostAliases | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

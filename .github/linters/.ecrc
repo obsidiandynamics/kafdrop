@@ -1,0 +1,37 @@
+{
+  "Verbose": false,
+  "Debug": false,
+  "IgnoreDefaults": false,
+  "SpacesAftertabs": true,
+  "NoColor": false,
+  "Exclude": [
+    ".editorconfig",
+    ".github",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "README.md",
+    "chart",
+    "docker-compose",
+    "docs",
+    "kaas_local_jaas.conf",
+    "mvnw",
+    "mvnw.cmd",
+    "pom.xml",
+    "src/main/assembly",
+    "src/main/docker",
+    "src/main/resources",
+    "src/test/resources",
+    "target",
+    "theme"
+  ],
+  "AllowedContentTypes": [],
+  "PassedFiles": [],
+  "Disable": {
+    "EndOfLine": false,
+    "Indentation": false,
+    "IndentSize": true,
+    "InsertFinalNewline": false,
+    "TrimTrailingWhitespace": false,
+    "MaxLineLength": false
+  }
+}

@@ -18,8 +18,14 @@
 
 package kafdrop.model;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class TopicPartitionVO {
   private final int id;
@@ -65,24 +71,24 @@ public final class TopicPartitionVO {
 
   public List<PartitionReplica> getInSyncReplicas() {
     return inSyncReplicaStream()
-        .sorted(Comparator.comparingInt(PartitionReplica::getId))
-        .collect(Collectors.toList());
+      .sorted(Comparator.comparingInt(PartitionReplica::getId))
+      .collect(Collectors.toList());
   }
 
   private Stream<PartitionReplica> inSyncReplicaStream() {
     return replicas.values().stream()
-        .filter(PartitionReplica::isInSync);
+      .filter(PartitionReplica::isInSync);
   }
 
   public List<PartitionReplica> getOfflineReplicas() {
     return offlineReplicasStream()
-        .sorted(Comparator.comparingInt(PartitionReplica::getId))
-        .collect(Collectors.toList());
+      .sorted(Comparator.comparingInt(PartitionReplica::getId))
+      .collect(Collectors.toList());
   }
 
   private Stream<PartitionReplica> offlineReplicasStream() {
     return replicas.values().stream()
-        .filter(PartitionReplica::isOffline);
+      .filter(PartitionReplica::isOffline);
   }
 
   public boolean isUnderReplicated() {
@@ -137,6 +143,7 @@ public final class TopicPartitionVO {
 
   @Override
   public String toString() {
-    return TopicPartitionVO.class.getSimpleName() + " [id=" + id +", firstOffset=" + firstOffset + ", size=" + size + "]";
+    return TopicPartitionVO.class.getSimpleName() + " [id=" + id + ", firstOffset=" + firstOffset + ", size=" + size
+      + "]";
   }
 }
