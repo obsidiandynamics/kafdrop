@@ -25,6 +25,7 @@
 
     <script src="<@spring.url '/js/jquery-3.5.1.slim.min.js'/>"></script>
     <script src="<@spring.url '/js/bootstrap.bundle.min.js'/>"></script>
+    <script src="<@spring.url '/js/json-bigint-1.0.0.min.js'/>"></script>
     <script src="<@spring.url '/js/global.js'/>"></script>
     <script async defer src="<@spring.url '/js/github-buttons.js'/>"></script>
 
