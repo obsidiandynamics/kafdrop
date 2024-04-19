@@ -6,6 +6,7 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -13,8 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 
 @Component
@@ -50,25 +52,20 @@ public final class KafkaConfiguration {
     }
 
     LOG.info("Checking properties file {}", propertiesFile);
-    if (StringUtils.isNotBlank(propertiesFile)) {
-      InputStream inputStream = null;
+    Optional<AbstractResource> readablePropertyFile = StringUtils.isBlank(propertiesFile) ? Optional.empty() :
+      Stream.of(new FileSystemResource(propertiesFile),
+          new ClassPathResource(propertiesFile))
+        .filter(Resource::isReadable)
+        .findFirst();
+    if (readablePropertyFile.isPresent()) {
+      LOG.info("Loading properties from {}", propertiesFile);
+      final var propertyOverrides = new Properties();
       try {
-        Resource fileSystemResource = new FileSystemResource(this.propertiesFile);
-        Resource classPathResource = new ClassPathResource(this.propertiesFile);
-        if (fileSystemResource.isReadable()) {
-          inputStream = fileSystemResource.getInputStream();
-        } else if (classPathResource.isReadable()) {
-          inputStream = classPathResource.getInputStream();
-        }
-        if (inputStream != null) {
-          LOG.info("Loading properties from {}", this.propertiesFile);
-          final var propertyOverrides = new Properties();
-          propertyOverrides.load(inputStream);
-          properties.putAll(propertyOverrides);
-        }
+        propertyOverrides.load(readablePropertyFile.get().getInputStream());
       } catch (IOException e) {
         throw new KafkaConfigurationException(e);
       }
+      properties.putAll(propertyOverrides);
     }
   }
 }
