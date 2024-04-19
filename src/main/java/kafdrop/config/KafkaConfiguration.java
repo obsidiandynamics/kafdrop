@@ -51,7 +51,7 @@ public final class KafkaConfiguration {
 
     LOG.info("Checking properties file {}", propertiesFile);
     if (StringUtils.isNotBlank(propertiesFile)) {
-      InputStream inputStream;
+      InputStream inputStream = null;
       try {
         Resource fileSystemResource = new FileSystemResource(this.propertiesFile);
         Resource classPathResource = new ClassPathResource(this.propertiesFile);
@@ -59,14 +59,13 @@ public final class KafkaConfiguration {
           inputStream = fileSystemResource.getInputStream();
         } else if (classPathResource.isReadable()) {
           inputStream = classPathResource.getInputStream();
-        } else {
-          throw new KafkaConfigurationException(new IllegalArgumentException(
-            "Kafka properties file %s is not valid or can not be found".formatted(this.propertiesFile)));
         }
-        LOG.info("Loading properties from {}", this.propertiesFile);
-        final var propertyOverrides = new Properties();
-        propertyOverrides.load(inputStream);
-        properties.putAll(propertyOverrides);
+        if (inputStream != null) {
+          LOG.info("Loading properties from {}", this.propertiesFile);
+          final var propertyOverrides = new Properties();
+          propertyOverrides.load(inputStream);
+          properties.putAll(propertyOverrides);
+        }
       } catch (IOException e) {
         throw new KafkaConfigurationException(e);
       }
