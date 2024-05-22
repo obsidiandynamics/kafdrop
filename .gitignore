@@ -18,3 +18,4 @@ kafka.properties*
 kafka.truststore.jks*
 kafka.keystore.jks*
 /.vs
+.java-version

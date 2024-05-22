@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 @Tag(name = "consumer-controller", description = "Consumer Controller")
 @Controller
 @RequestMapping("/consumer")
@@ -44,7 +47,7 @@ public final class ConsumerController {
 
   @RequestMapping("/{groupId:.+}")
   public String consumerDetail(@PathVariable("groupId") String groupId, Model model) throws ConsumerNotFoundException {
-    final var consumer = kafkaMonitor.getConsumersByGroup(groupId).stream().findAny();
+    final var consumer = kafkaMonitor.getConsumersByGroup(new String(Base64.getDecoder().decode(groupId), StandardCharsets.UTF_8)).stream().findAny();
 
     model.addAttribute("consumer", consumer.orElseThrow(() -> new ConsumerNotFoundException(groupId)));
     return "consumer-detail";
@@ -58,7 +61,7 @@ public final class ConsumerController {
   @GetMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId)
     throws ConsumerNotFoundException {
-    final var consumer = kafkaMonitor.getConsumersByGroup(groupId).stream().findAny();
+    final var consumer = kafkaMonitor.getConsumersByGroup(new String(Base64.getDecoder().decode(groupId), StandardCharsets.UTF_8)).stream().findAny();
 
     return consumer.orElseThrow(() -> new ConsumerNotFoundException(groupId));
   }

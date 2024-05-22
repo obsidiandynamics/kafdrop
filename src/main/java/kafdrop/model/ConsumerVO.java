@@ -20,6 +20,8 @@ package kafdrop.model;
 
 import org.apache.commons.lang3.Validate;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -27,15 +29,22 @@ import java.util.TreeMap;
 
 public final class ConsumerVO implements Comparable<ConsumerVO> {
   private final String groupId;
+
+  private final String groupIdBase64;
   private final Map<String, ConsumerTopicVO> topics = new TreeMap<>();
 
   public ConsumerVO(String groupId) {
     Validate.notEmpty("groupId is required");
     this.groupId = groupId;
+    this.groupIdBase64 = new String (Base64.getEncoder().encode(groupId.getBytes(StandardCharsets.UTF_8)));
   }
 
   public String getGroupId() {
     return groupId;
+  }
+
+  public String getGroupIdBase64() {
+    return groupIdBase64;
   }
 
   public void addTopic(ConsumerTopicVO topic) {
