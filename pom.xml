@@ -6,11 +6,11 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.6</version>
+        <version>3.3.0</version>
     </parent>
     <groupId>com.obsidiandynamics.kafdrop</groupId>
     <artifactId>kafdrop</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.2-SNAPSHOT</version>
 
     <description>For when you have a Kafka cluster to monitor</description>
 
@@ -20,9 +20,9 @@
         <!-- name of parameter changed in latest mvn javadoc plugin version-->
         <additionalOptions>-Xdoclint:none</additionalOptions>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <protobuf.version>3.22.3</protobuf.version>
-        <testcontainers.version>1.18.0</testcontainers.version>
-        <kafka-libs.version>7.3.3</kafka-libs.version>
+        <protobuf.version>4.27.1</protobuf.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
+        <kafka-libs.version>7.6.0</kafka-libs.version>
     </properties>
 
     <scm>
@@ -112,12 +112,12 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.11.1</version>
+            <version>1.11.3</version>
         </dependency>
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack-core</artifactId>
-            <version>0.9.3</version>
+            <version>0.9.8</version>
         </dependency>
 
         <!-- Spring Boot -->
@@ -178,7 +178,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.1.0</version>
+            <version>2.5.0</version>
         </dependency>
 
         <!-- Spring test -->
@@ -209,15 +209,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>17</source>
                     <target>17</target>
                     <fork>true</fork>
-                    <compilerVersion>17</compilerVersion>
-                    <compilerArgs>
-                        <arg>--add-exports=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>

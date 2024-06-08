@@ -95,16 +95,22 @@ Launch container in background:
 ```sh
 docker run -d --rm -p 9000:9000 \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
-    -e JVM_OPTS="-Xms32M -Xmx64M" \
     -e SERVER_SERVLET_CONTEXTPATH="/" \
     obsidiandynamics/kafdrop
 ```
 
+Launch container with some specific JVM options:
+```sh
+docker run -d --rm -p 9000:9000 \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e JVM_OPTS="-Xms32M -Xmx64M" \
+    -e SERVER_SERVLET_CONTEXTPATH="/" \
+    obsidiandynamics/kafdrop
+```
 Launch container in background with protobuff definitions:
 ```sh
 docker run -d --rm -v <path_to_protobuff_descriptor_files>:/var/protobuf_desc -p 9000:9000 \
     -e KAFKA_BROKERCONNECT=<host:port,host:port> \
-    -e JVM_OPTS="-Xms32M -Xmx64M" \
     -e SERVER_SERVLET_CONTEXTPATH="/" \
     -e CMD_ARGS="--message.format=PROTOBUF --protobufdesc.directory=/var/protobuf_desc" \
     obsidiandynamics/kafdrop
@@ -304,22 +310,23 @@ docker run -d --rm -p 9000:9000 \
 
 #### Environment Variables
 ##### Basic configuration
-|Name                   |Description
-|-----------------------|-------------------------------
-|`KAFKA_BROKERCONNECT`  |Bootstrap list of Kafka host/port pairs. Defaults to `localhost:9092`.
-|`KAFKA_PROPERTIES`     |Additional properties to configure the broker connection (base-64 encoded).
-|`KAFKA_TRUSTSTORE`     |Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
-|`KAFKA_KEYSTORE`       |Private key for mutual TLS authentication (base-64 encoded).
+|Name                        |Description
+|----------------------------|-------------------------------
+|`KAFKA_BROKERCONNECT`       |Bootstrap list of Kafka host/port pairs. Defaults to `localhost:9092`.
+|`KAFKA_PROPERTIES`          |Additional properties to configure the broker connection (base-64 encoded).
+|`KAFKA_TRUSTSTORE`          |Certificate for broker authentication (base-64 encoded). Required for TLS/SSL.
+|`KAFKA_KEYSTORE`            |Private key for mutual TLS authentication (base-64 encoded).
 |`SERVER_SERVLET_CONTEXTPATH`|The context path to serve requests on (must end with a `/`). Defaults to `/`.
-|`SERVER_PORT`          |The web server port to listen on. Defaults to `9000`.
-|`SCHEMAREGISTRY_CONNECT `|The endpoint of Schema Registry for Avro or Protobuf message
-|`SCHEMAREGISTRY_AUTH`  |Optional basic auth credentials in the form `username:password`.
-|`CMD_ARGS`             |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`.
+|`SERVER_PORT`               |The web server port to listen on. Defaults to `9000`.
+|`MANAGEMENT_SERVER_PORT`    |The Spring Actuator server port to listen on. Defaults to `9000`.
+|`SCHEMAREGISTRY_CONNECT `   |The endpoint of Schema Registry for Avro or Protobuf message
+|`SCHEMAREGISTRY_AUTH`       |Optional basic auth credentials in the form `username:password`.
+|`CMD_ARGS`                  |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`.
 
 ##### Advanced configuration
 | Name                     |Description
 |--------------------------|-------------------------------
-| `JVM_OPTS`               |JVM options.
+| `JVM_OPTS`               |JVM options. E.g.```JVM_OPTS: "-Xms16M -Xmx64M -Xss360K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"```
 | `JMX_PORT`               |Port to use for JMX. No default; if unspecified, JMX will not be exposed.
 | `HOST`                   |The hostname to report for the RMI registry (used for JMX). Defaults to `localhost`.
 | `KAFKA_PROPERTIES_FILE`  |Internal location where the Kafka properties file will be written to (if `KAFKA_PROPERTIES` is set). Defaults to `kafka.properties`.
