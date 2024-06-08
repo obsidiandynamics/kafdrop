@@ -7,7 +7,7 @@
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/obsidiandynamics/kafdrop.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/obsidiandynamics/kafdrop/context:java)
 
 
-<em>Kafdrop is a web UI for viewing Kafka topics and browsing consumer groups.</em> The tool displays information such as brokers, topics, partitions, consumers, and lets you view messages. 
+<em>Kafdrop is a web UI for viewing Kafka topics and browsing consumer groups.</em> The tool displays information such as brokers, topics, partitions, consumers, and lets you view messages.
 
 ![Overview Screenshot](docs/images/overview.png?raw=true)
 
@@ -65,14 +65,14 @@ Finally, a default message and key format (e.g. to deserialize Avro messages or 
 --message.format=AVRO
 --message.keyFormat=DEFAULT
 ```
-Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages. 
+Valid format values are `DEFAULT`, `AVRO`, `PROTOBUF`. This can also be configured at the topic level via dropdown when viewing messages.
 If key format is unspecified, message format will be used for key too.
 
 ## Configure Protobuf message type
-### Option 1: Using Protobuf Descriptor 
-In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file. 
-Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s). 
-Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime. 
+### Option 1: Using Protobuf Descriptor
+In case of protobuf message type, the definition of a message could be compiled and transmitted using a descriptor file.
+Thus, in order for kafdrop to recognize the message, the application will need to access to the descriptor file(s).
+Kafdrop will allow user to select descriptor and well as specifying name of one of the message type provided by the descriptor at runtime.
 
 To configure a folder with protobuf descriptor file(s) (.desc), follow:
 ```
@@ -283,6 +283,31 @@ docker run -d --rm -p 9000:9000 \
     obsidiandynamics/kafdrop
 ```
 
+It's sometimes needed to load extra classes, e.g. for a SASL client callback handler. To facilitate that, it is possible to mount a folder with extra JARs, like this:
+
+```sh
+cat << EOF > kafka.properties
+security.protocol=SASL_SSL
+sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule;
+sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler
+EOF
+
+mkdir extra-kafdrop-classes
+wget --directory-prefix=extra-kafdrop-classes https://repo1.maven.org/maven2/software/amazon/msk/aws-msk-iam-auth/1.0.0/aws-msk-iam-auth-1.0.0.jar
+
+docker run -d --rm -p 9000:9000 \
+    -v $(pwd)/kafka.properties:/tmp/kafka.properties:ro \
+    -v $(pwd)/kafka.truststore.jks:/tmp/kafka.truststore.jks:ro \
+    -v $(pwd)/kafka.keystore.jks:/tmp/kafka.keystore.jks:ro \
+    -v $(pwd)/extra-kafdrop-classes:/extra-classes:ro \
+    -e KAFKA_BROKERCONNECT=<host:port,host:port> \
+    -e KAFKA_PROPERTIES_FILE=/tmp/kafka.properties \
+    -e KAFKA_TRUSTSTORE_FILE=/tmp/kafka.truststore.jks \   # optional
+    -e KAFKA_KEYSTORE_FILE=/tmp/kafka.keystore.jks \       # optional
+    obsidiandynamics/kafdrop
+```
+
+
 #### Environment Variables
 ##### Basic configuration
 |Name                        |Description
@@ -296,7 +321,7 @@ docker run -d --rm -p 9000:9000 \
 |`MANAGEMENT_SERVER_PORT`    |The Spring Actuator server port to listen on. Defaults to `9000`.
 |`SCHEMAREGISTRY_CONNECT `   |The endpoint of Schema Registry for Avro or Protobuf message
 |`SCHEMAREGISTRY_AUTH`       |Optional basic auth credentials in the form `username:password`.
-|`CMD_ARGS`                  |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`. 
+|`CMD_ARGS`                  |Command line arguments to Kafdrop, e.g. `--message.format` or `--protobufdesc.directory` or `--server.port`.
 
 ##### Advanced configuration
 | Name                     |Description
@@ -349,7 +374,7 @@ Add a logout page in `/usr/local/opt/nginx/html/401.html`:
 Use the following snippet for `/usr/local/etc/nginx/nginx.conf`:
 ```
 worker_processes 4;
-  
+
 events {
   worker_connections 1024;
 }
@@ -409,7 +434,7 @@ See [here](CONTRIBUTING.md).
 
 To cut an official release, these are the steps:
 
-1. Commit a new version on master that has the `-SNAPSHOT` suffix stripped (see `pom.xml`). Once the commit is merged, the CI will treat it as a release build, and will end up publishing more artifacts than the regular (non-release/snapshot) build. One of those will be a dockerhub push to the specific version and "latest" tags. (The regular build doesn't update "latest"). 
+1. Commit a new version on master that has the `-SNAPSHOT` suffix stripped (see `pom.xml`). Once the commit is merged, the CI will treat it as a release build, and will end up publishing more artifacts than the regular (non-release/snapshot) build. One of those will be a dockerhub push to the specific version and "latest" tags. (The regular build doesn't update "latest").
 
 2. You can then edit the release description in GitHub to describe what went into the release.
 
