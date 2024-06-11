@@ -18,35 +18,18 @@
 
 package kafdrop.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
-import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
-import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
-import kafdrop.form.SearchMessageForm;
-import kafdrop.model.MessageVO;
-import kafdrop.model.TopicPartitionVO;
-import kafdrop.model.TopicVO;
-import kafdrop.service.KafkaMonitor;
-import kafdrop.service.MessageInspector;
-import kafdrop.service.TopicNotFoundException;
-import kafdrop.util.AvroMessageDeserializer;
-import kafdrop.util.DefaultMessageDeserializer;
-import kafdrop.util.Deserializers;
-import kafdrop.util.KeyFormat;
-import kafdrop.util.MessageDeserializer;
-import kafdrop.util.MessageFormat;
-import kafdrop.util.MsgPackMessageDeserializer;
-import kafdrop.util.ProtobufMessageDeserializer;
-import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import kafdrop.config.GlueSchemaRegistryConfig;
+import kafdrop.util.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,13 +40,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "message-controller", description = "Message Controller")
+import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
+import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
+import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
+import kafdrop.config.GlueSchemaRegistryConfig.GlueSchemaRegistryProperties;
+import kafdrop.model.MessageVO;
+import kafdrop.model.TopicPartitionVO;
+import kafdrop.model.TopicVO;
+import kafdrop.service.KafkaMonitor;
+import kafdrop.service.MessageInspector;
+import kafdrop.service.TopicNotFoundException;
+
 @Controller
 public final class MessageController {
   private final KafkaMonitor kafkaMonitor;
@@ -74,22 +68,21 @@ public final class MessageController {
 
   private final SchemaRegistryProperties schemaRegistryProperties;
 
+  private final GlueSchemaRegistryProperties glueSchemaRegistryProperties;
+
   private final ProtobufDescriptorProperties protobufProperties;
 
-  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector,
-                           MessageFormatProperties messageFormatProperties,
-                           SchemaRegistryProperties schemaRegistryProperties,
-                           ProtobufDescriptorProperties protobufProperties) {
+  public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector, MessageFormatProperties messageFormatProperties, SchemaRegistryProperties schemaRegistryProperties, ProtobufDescriptorProperties protobufProperties, GlueSchemaRegistryProperties glueSchemaRegistryProperties) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
     this.schemaRegistryProperties = schemaRegistryProperties;
+    this.glueSchemaRegistryProperties = glueSchemaRegistryProperties;
     this.protobufProperties = protobufProperties;
   }
 
   /**
    * Human friendly view of reading all topic messages sorted by timestamp.
-   *
    * @param topicName Name of topic
    * @param model
    * @return View for seeing all messages in a topic sorted by timestamp.
@@ -97,7 +90,7 @@ public final class MessageController {
   @GetMapping("/topic/{name:.+}/allmessages")
   public String viewAllMessages(@PathVariable("name") String topicName,
                                 Model model, @RequestParam(name = "count", required = false) Integer count) {
-    final int size = (count != null ? count : 100);
+    final int size = (count != null? count : 100);
     final MessageFormat defaultFormat = messageFormatProperties.getFormat();
     final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
     final TopicVO topic = kafkaMonitor.getTopic(topicName)
@@ -132,8 +125,7 @@ public final class MessageController {
 
   /**
    * Human friendly view of reading messages.
-   *
-   * @param topicName   Name of topic
+   * @param topicName Name of topic
    * @param messageForm Message form for submitting requests to view messages.
    * @param errors
    * @param model
@@ -177,10 +169,8 @@ public final class MessageController {
     if (!messageForm.isEmpty() && !errors.hasErrors()) {
 
       final var deserializers = new Deserializers(
-        getDeserializer(topicName, messageForm.getKeyFormat(), messageForm.getDescFile(),
-          messageForm.getMsgTypeName(), messageForm.getIsAnyProto()),
-        getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName(),
-          messageForm.getIsAnyProto())
+        getDeserializer(topicName, messageForm.getKeyFormat(), messageForm.getDescFile(),messageForm.getMsgTypeName(), messageForm.getIsAnyProto()),
+        getDeserializer(topicName, messageForm.getFormat(), messageForm.getDescFile(), messageForm.getMsgTypeName(), messageForm.getIsAnyProto())
       );
 
       model.addAttribute("messages",
@@ -195,72 +185,10 @@ public final class MessageController {
     return "message-inspector";
   }
 
-  /**
-   * Human friendly view of searching messages.
-   *
-   * @param topicName         Name of topic
-   * @param searchMessageForm Message form for submitting requests to search messages.
-   * @param errors
-   * @param model
-   * @return View for seeing messages in a partition.
-   */
-  @GetMapping("/topic/{name:.+}/search-messages")
-  public String searchMessageForm(@PathVariable("name") String topicName,
-                                  @Valid @ModelAttribute("searchMessageForm") SearchMessageForm searchMessageForm,
-                                  BindingResult errors,
-                                  Model model) {
-    final MessageFormat defaultFormat = messageFormatProperties.getFormat();
-    final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
-
-    if (searchMessageForm.isEmpty()) {
-      final SearchMessageForm defaultForm = new SearchMessageForm();
-
-      defaultForm.setSearchText("");
-      defaultForm.setFormat(defaultFormat);
-      defaultForm.setKeyFormat(defaultFormat);
-      defaultForm.setMaximumCount(100);
-      defaultForm.setStartTimestamp(new Date(0));
-      model.addAttribute("searchMessageForm", defaultForm);
-    }
-
-    final TopicVO topic = kafkaMonitor.getTopic(topicName)
-      .orElseThrow(() -> new TopicNotFoundException(topicName));
-
-    model.addAttribute("topic", topic);
-    model.addAttribute("defaultFormat", defaultFormat);
-    model.addAttribute("messageFormats", MessageFormat.values());
-    model.addAttribute("defaultKeyFormat", defaultKeyFormat);
-    model.addAttribute("keyFormats", KeyFormat.values());
-    model.addAttribute("descFiles", protobufProperties.getDescFilesList());
-
-    if (!searchMessageForm.isEmpty() && !errors.hasErrors()) {
-
-      final var deserializers = new Deserializers(
-        getDeserializer(topicName, searchMessageForm.getKeyFormat(), searchMessageForm.getDescFile(),
-          searchMessageForm.getMsgTypeName(),
-          protobufProperties.getParseAnyProto()),
-        getDeserializer(topicName, searchMessageForm.getFormat(), searchMessageForm.getDescFile(),
-          searchMessageForm.getMsgTypeName(),
-          protobufProperties.getParseAnyProto())
-      );
-
-      var searchResults = kafkaMonitor.searchMessages(
-        topicName,
-        searchMessageForm.getSearchText(),
-        searchMessageForm.getMaximumCount(),
-        searchMessageForm.getStartTimestamp(),
-        deserializers);
-
-      model.addAttribute("messages", searchResults.getMessages());
-      model.addAttribute("details", searchResults.getCompletionDetails());
-    }
-
-    return "search-message";
-  }
 
   /**
-   * Returns the selected message format based on the form submission
-   *
+   * Returns the selected nessagr format based on the
+   * form submission
    * @param format String representation of format name
    * @return
    */
@@ -269,7 +197,7 @@ public final class MessageController {
       return MessageFormat.AVRO;
     } else if ("PROTOBUF".equalsIgnoreCase(format)) {
       return MessageFormat.PROTOBUF;
-    } else if ("MSGPACK".equalsIgnoreCase(format)) {
+    } else if ("MSGPACK".equalsIgnoreCase(format)){
       return MessageFormat.MSGPACK;
     } else {
       return MessageFormat.DEFAULT;
@@ -277,11 +205,11 @@ public final class MessageController {
   }
 
 
+
   /**
    * Return a JSON list of all partition offset info for the given topic. If specific partition
    * and offset parameters are given, then this returns actual kafka messages from that partition
    * (if the offsets are valid; if invalid offsets are passed then the message list is empty).
-   *
    * @param topicName Name of topic.
    * @return Offset or message data.
    */
@@ -310,8 +238,7 @@ public final class MessageController {
         .orElseThrow(() -> new TopicNotFoundException(topicName));
 
       List<Object> partitionList = new ArrayList<>();
-      topic.getPartitions().forEach(vo -> partitionList.add(new PartitionOffsetInfo(vo.getId(), vo.getFirstOffset(),
-        vo.getSize())));
+      topic.getPartitions().forEach(vo -> partitionList.add(new PartitionOffsetInfo(vo.getId(), vo.getFirstOffset(), vo.getSize())));
 
       return partitionList;
     } else {
@@ -336,15 +263,11 @@ public final class MessageController {
     }
   }
 
-  private MessageDeserializer getDeserializer(String topicName, MessageFormat format, String descFile,
-                                              String msgTypeName, boolean isAnyProto) {
+  private MessageDeserializer getDeserializer(String topicName, MessageFormat format, String descFile, String msgTypeName, boolean isAnyProto) {
     final MessageDeserializer deserializer;
 
     if (format == MessageFormat.AVRO) {
-      final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
-      final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
-
-      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
+      deserializer = new AvroMessageDeserializer(topicName, schemaRegistryProperties, glueSchemaRegistryProperties);
     } else if (format == MessageFormat.PROTOBUF && null != descFile) {
       // filter the input file name
 
@@ -454,9 +377,7 @@ public final class MessageController {
       return keyFormat;
     }
 
-    public void setKeyFormat(MessageFormat keyFormat) {
-      this.keyFormat = keyFormat;
-    }
+    public void setKeyFormat(MessageFormat keyFormat) { this.keyFormat = keyFormat; }
 
     public MessageFormat getFormat() {
       return format;

@@ -119,6 +119,25 @@
             <artifactId>msgpack-core</artifactId>
             <version>0.9.8</version>
         </dependency>
+      <!-- https://mvnrepository.com/artifact/software.amazon.msk/aws-msk-iam-auth -->
+      <dependency>
+        <groupId>software.amazon.msk</groupId>
+        <artifactId>aws-msk-iam-auth</artifactId>
+        <version>2.1.0</version>
+        <scope>runtime</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-sts</artifactId>
+        <version>1.12.739</version>
+      </dependency>
+
+      <dependency>
+        <groupId>software.amazon.glue</groupId>
+        <artifactId>schema-registry-serde</artifactId>
+        <version>1.1.15</version>
+      </dependency>
 
         <!-- Spring Boot -->
         <dependency>
