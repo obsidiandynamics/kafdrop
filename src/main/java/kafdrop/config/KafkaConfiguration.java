@@ -52,16 +52,16 @@ public final class KafkaConfiguration {
     }
 
     LOG.info("Checking properties file {}", propertiesFile);
-    Optional<AbstractResource> readablePropertyFile = StringUtils.isBlank(propertiesFile) ? Optional.empty() :
+    Optional<AbstractResource> propertiesResource = StringUtils.isBlank(propertiesFile) ? Optional.empty() :
       Stream.of(new FileSystemResource(propertiesFile),
           new ClassPathResource(propertiesFile))
         .filter(Resource::isReadable)
         .findFirst();
-    if (readablePropertyFile.isPresent()) {
+    if (propertiesResource.isPresent()) {
       LOG.info("Loading properties from {}", propertiesFile);
       final var propertyOverrides = new Properties();
       try {
-        propertyOverrides.load(readablePropertyFile.get().getInputStream());
+        propertyOverrides.load(propertiesResource.get().getInputStream());
       } catch (IOException e) {
         throw new KafkaConfigurationException(e);
       }
