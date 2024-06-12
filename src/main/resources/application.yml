@@ -37,7 +37,7 @@ kafdrop.monitor:
   clientId: Kafdrop
 
 kafka:
-  brokerConnect: "${KAFKA_BROKER_CONNECT:boot-81iy9xcc.c1.kafka-serverless.ap-south-1.amazonaws.com:9098}"
+  brokerConnect: "${KAFKA_BROKER_CONNECT}"
   saslMechanism: "AWS_MSK_IAM"
   securityProtocol: "SASL_SSL"
   truststoreFile: "${KAFKA_TRUSTSTORE_FILE:kafka.truststore.jks}"
@@ -49,5 +49,5 @@ kafka:
 
 schemaRegistry:
   glue:
-    registryName: "${GLUE_SCHEMA_REGISTRY_NAME:ind-dev1-glue-schema-registry}"
-    region: "${GLUE_REGION:ap-south-1}"
+    registryName: "${GLUE_SCHEMA_REGISTRY_NAME}"
+    region: "${GLUE_REGION}"
