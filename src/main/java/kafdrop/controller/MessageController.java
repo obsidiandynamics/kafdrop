@@ -217,7 +217,7 @@ public final class MessageController {
 
       defaultForm.setSearchText("");
       defaultForm.setFormat(defaultFormat);
-      defaultForm.setKeyFormat(defaultFormat);
+      defaultForm.setKeyFormat(defaultKeyFormat);
       defaultForm.setMaximumCount(100);
       defaultForm.setStartTimestamp(new Date(0));
       model.addAttribute("searchMessageForm", defaultForm);
