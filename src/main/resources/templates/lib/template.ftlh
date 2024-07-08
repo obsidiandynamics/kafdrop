@@ -22,6 +22,7 @@
     <link type="text/css" rel="stylesheet" href="<@spring.url '/css/bootstrap.min.css'/>"/>
     <link type="text/css" rel="stylesheet" href="<@spring.url '/css/font-awesome.min.css'/>"/>
     <link type="text/css" rel="stylesheet" href="<@spring.url '/css/global.css'/>"/>
+    <link type="image/svg+xml" rel="icon" href="<@spring.url '/images/kafdrop-logo.svg'/>">
 
     <script src="<@spring.url '/js/jquery-3.5.1.slim.min.js'/>"></script>
     <script src="<@spring.url '/js/bootstrap.bundle.min.js'/>"></script>
