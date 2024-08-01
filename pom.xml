@@ -23,6 +23,7 @@
         <protobuf.version>3.25.5</protobuf.version>
         <testcontainers.version>1.20.3</testcontainers.version>
         <kafka-libs.version>7.7.1</kafka-libs.version>
+        <docker.platforms>linux/amd64,linux/arm64</docker.platforms>
     </properties>
 
     <scm>
@@ -252,6 +253,11 @@
                                         <descriptorRef>artifact</descriptorRef>
                                     </assembly>
                                 </assemblies>
+                                <buildx>
+                                    <platforms>
+                                        <platform>${docker.platforms}</platform>
+                                    </platforms>
+                                </buildx>
                                 <contextDir>${project.build.directory}/docker-ready</contextDir>
                                 <noCache>true</noCache>
                             </build>
