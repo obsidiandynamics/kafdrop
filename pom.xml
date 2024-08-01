@@ -239,24 +239,24 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.spotify</groupId>
+                <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>1.2.2</version>
+                <version>0.45.0</version>
                 <configuration>
-                    <imageName>obsidiandynamics/kafdrop</imageName>
-                    <forceTags>true</forceTags>
-                    <dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
-                    <imageTags>
-                        <imageTag>${project.version}</imageTag>
-                        <imageTag>latest</imageTag>
-                    </imageTags>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}-bin.tar.gz</include>
-                        </resource>
-                    </resources>
+                    <images>
+                        <image>
+                            <name>obsidiandynamics/kafdrop:${project.version}</name>
+                            <build>
+                                <assemblies>
+                                    <assembly>
+                                        <descriptorRef>artifact</descriptorRef>
+                                    </assembly>
+                                </assemblies>
+                                <contextDir>${project.build.directory}/docker-ready</contextDir>
+                                <noCache>true</noCache>
+                            </build>
+                        </image>
+                    </images>
                 </configuration>
             </plugin>
             <plugin>
