@@ -7,13 +7,13 @@ package kafdrop.protos;
  * Protobuf type {@code kafdrop.Person}
  */
 public final class Person extends
-  com.google.protobuf.GeneratedMessage implements
+  com.google.protobuf.GeneratedMessageV3 implements
   // @@protoc_insertion_point(message_implements:kafdrop.Person)
   PersonOrBuilder {
   private static final long serialVersionUID = 0L;
 
   // Use Person.newBuilder() to construct.
-  private Person(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+  private Person(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
 
@@ -107,6 +107,7 @@ public final class Person extends
         data_ = data_.getUnmodifiableView();
       }
       this.unknownFields = unknownFields.build();
+      makeExtensionsImmutable();
     }
   }
 
@@ -116,7 +117,7 @@ public final class Person extends
   }
 
   @java.lang.Override
-  protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
   internalGetFieldAccessorTable() {
     return kafdrop.protos.PersonProto.internal_static_kafdrop_Person_fieldAccessorTable
       .ensureFieldAccessorsInitialized(
@@ -417,20 +418,20 @@ public final class Person extends
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
     throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 1, name_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
     }
     if (id_ != 0) {
       output.writeInt32(2, id_);
     }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(email_)) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 3, email_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(email_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, email_);
     }
     if (contact_ != kafdrop.protos.Person.Contact.TELEPHONE.getNumber()) {
       output.writeEnum(4, contact_);
     }
     for (int i = 0; i < data_.size(); i++) {
-      com.google.protobuf.GeneratedMessage.writeString(output, 5, data_.getRaw(i));
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 5, data_.getRaw(i));
     }
     unknownFields.writeTo(output);
   }
@@ -441,15 +442,15 @@ public final class Person extends
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(1, name_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
     }
     if (id_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(2, id_);
     }
-    if (!com.google.protobuf.GeneratedMessage.isStringEmpty(email_)) {
-      size += com.google.protobuf.GeneratedMessage.computeStringSize(3, email_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(email_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, email_);
     }
     if (contact_ != kafdrop.protos.Person.Contact.TELEPHONE.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
@@ -555,7 +556,7 @@ public final class Person extends
 
   public static kafdrop.protos.Person parseFrom(java.io.InputStream input)
     throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessage
+    return com.google.protobuf.GeneratedMessageV3
       .parseWithIOException(PARSER, input);
   }
 
@@ -563,13 +564,13 @@ public final class Person extends
     java.io.InputStream input,
     com.google.protobuf.ExtensionRegistryLite extensionRegistry)
     throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessage
+    return com.google.protobuf.GeneratedMessageV3
       .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
   public static kafdrop.protos.Person parseDelimitedFrom(java.io.InputStream input)
     throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessage
+    return com.google.protobuf.GeneratedMessageV3
       .parseDelimitedWithIOException(PARSER, input);
   }
 
@@ -577,14 +578,14 @@ public final class Person extends
     java.io.InputStream input,
     com.google.protobuf.ExtensionRegistryLite extensionRegistry)
     throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessage
+    return com.google.protobuf.GeneratedMessageV3
       .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
 
   public static kafdrop.protos.Person parseFrom(
     com.google.protobuf.CodedInputStream input)
     throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessage
+    return com.google.protobuf.GeneratedMessageV3
       .parseWithIOException(PARSER, input);
   }
 
@@ -592,7 +593,7 @@ public final class Person extends
     com.google.protobuf.CodedInputStream input,
     com.google.protobuf.ExtensionRegistryLite extensionRegistry)
     throws java.io.IOException {
-    return com.google.protobuf.GeneratedMessage
+    return com.google.protobuf.GeneratedMessageV3
       .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
@@ -617,7 +618,7 @@ public final class Person extends
 
   @java.lang.Override
   protected Builder newBuilderForType(
-    com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+    com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
     Builder builder = new Builder(parent);
     return builder;
   }
@@ -626,7 +627,7 @@ public final class Person extends
    * Protobuf type {@code kafdrop.Person}
    */
   public static final class Builder extends
-    com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+    com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
     // @@protoc_insertion_point(builder_implements:kafdrop.Person)
     kafdrop.protos.PersonOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -635,7 +636,7 @@ public final class Person extends
     }
 
     @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
     internalGetFieldAccessorTable() {
       return kafdrop.protos.PersonProto.internal_static_kafdrop_Person_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
@@ -648,13 +649,13 @@ public final class Person extends
     }
 
     private Builder(
-      com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
       maybeForceBuilderInitialization();
     }
 
     private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessage
+      if (com.google.protobuf.GeneratedMessageV3
         .alwaysUseFieldBuilders) {
       }
     }

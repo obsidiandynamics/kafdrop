@@ -20,7 +20,7 @@ public final class PersonProto {
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_kafdrop_Person_descriptor;
   static final
-  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
     internal_static_kafdrop_Person_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
@@ -47,7 +47,7 @@ public final class PersonProto {
     internal_static_kafdrop_Person_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_kafdrop_Person_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
       internal_static_kafdrop_Person_descriptor,
       new java.lang.String[]{"Name", "Id", "Email", "Contact", "Data",});
   }
