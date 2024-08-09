@@ -89,7 +89,7 @@ public final class ClusterController {
     final var clusterSummary = kafkaMonitor.getClusterSummary(topics);
 
     final var missingBrokerIds = clusterSummary.getExpectedBrokerIds().stream()
-      .filter(brokerId -> brokers.stream().noneMatch(b -> b.getId() == brokerId))
+      .filter(brokerId -> brokers.stream().noneMatch(b -> b.id() == brokerId))
       .collect(Collectors.toList());
 
     model.addAttribute("brokers", brokers);
