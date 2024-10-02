@@ -60,6 +60,7 @@ public interface KafkaMonitor {
 
   SearchResultsVO searchMessages(String topic,
                                  String searchString,
+                                 Integer partition,
                                  Integer maximumCount,
                                  Date startTimestamp,
                                  Deserializers deserializers);

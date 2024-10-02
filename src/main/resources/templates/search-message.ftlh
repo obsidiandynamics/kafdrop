@@ -70,12 +70,22 @@
     <form method="GET" action="<@spring.url '/topic/${topic.name}/search-messages'/>" id="searchMessageForm" class="card-body">
         <div class="row g-3">
             <@spring.bind path="searchMessageForm.searchText"/>
-            <div class="col-7 form-group ${spring.status.error?string("has-error", "")}">
+            <div class="col-5 form-group ${spring.status.error?string("has-error", "")}">
                 <label class="control-label" for="searchText">Search text</label>
                 <@spring.formInput path="searchMessageForm.searchText" attributes='class="form-control" size="40"'/>
                 <#if spring.status.error>
                     <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
                 </#if>
+            </div>
+            <@spring.bind path="searchMessageForm.partition"/>
+            <div class="col-2 form-group ${spring.status.error?string("has-error", "")}">
+                <label class="control-label" for="partition">Partition</label>
+                <select class="form-control" id="partition" name="partition">
+                    <option value="-1">All</option>
+                    <#list partitions as p>
+                        <option value="${p}">${p}</option>
+                    </#list>
+                </select>
             </div>
             <@spring.bind path="searchMessageForm.startTimestamp"/>
             <div class="col form-group ${spring.status.error?string("has-error", "")}">
