@@ -210,10 +210,10 @@ public final class KafkaHighLevelConsumer {
                                            Deserializers deserializers) {
     initializeClient();
     List<TopicPartition> partitions = determinePartitionsForTopic(topic);
-    if(partition != -1) {
+    if (partition != -1) {
       var partitionOpt = partitions.stream().filter(p -> p.partition() == partition).findAny();
-      if(partitionOpt.isEmpty()) {
-        throw new IllegalArgumentException("Partition does not exists in the topic");
+      if (partitionOpt.isEmpty()) {
+        throw new IllegalArgumentException("Partition does not exist in topic");
       }
       partitions = List.of(partitionOpt.get());
     }

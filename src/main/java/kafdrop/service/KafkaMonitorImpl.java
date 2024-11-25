@@ -251,10 +251,10 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   public SearchResultsVO searchMessages(String topic,
                                         String searchString,
                                         Integer partition,
-                                        Integer maxmuimCount,
+                                        Integer maximumCount,
                                         Date startTimestamp,
                                         Deserializers deserializers) {
-    final var records = highLevelConsumer.searchRecords(topic, searchString, partition, maxmuimCount, startTimestamp,
+    final var records = highLevelConsumer.searchRecords(topic, searchString, partition, maximumCount, startTimestamp,
       deserializers);
     final var results = new SearchResultsVO();
 
