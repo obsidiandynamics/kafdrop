@@ -28,6 +28,10 @@ import kafdrop.model.SearchResultsVO;
 import kafdrop.model.TopicVO;
 import kafdrop.util.Deserializers;
 import org.apache.kafka.common.TopicPartition;
+import kafdrop.model.*;
+import kafdrop.util.*;
+
+import org.apache.kafka.clients.producer.RecordMetadata;
 
 import java.util.Collection;
 import java.util.Date;
@@ -77,6 +81,8 @@ public interface KafkaMonitor {
    * @param topic name of the topic to delete
    */
   void deleteTopic(String topic);
+  
+  RecordMetadata publishMessage(CreateMessageVO message, Serializers serializers);
 
   List<AclVO> getAcls();
 }
