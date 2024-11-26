@@ -20,6 +20,8 @@ public class SearchMessageForm {
   @Max(1000)
   private Integer maximumCount;
 
+  private Integer partition;
+
   private MessageFormat format;
 
   private MessageFormat keyFormat;
@@ -102,5 +104,13 @@ public class SearchMessageForm {
 
   public void setMsgTypeName(String msgTypeName) {
     this.msgTypeName = msgTypeName;
+  }
+
+  public Integer getPartition() {
+    return partition;
+  }
+
+  public void setPartition(Integer partition) {
+    this.partition = partition;
   }
 }

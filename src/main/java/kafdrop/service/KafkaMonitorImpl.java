@@ -250,10 +250,11 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   @Override
   public SearchResultsVO searchMessages(String topic,
                                         String searchString,
-                                        Integer maxmuimCount,
+                                        Integer partition,
+                                        Integer maximumCount,
                                         Date startTimestamp,
                                         Deserializers deserializers) {
-    final var records = highLevelConsumer.searchRecords(topic, searchString, maxmuimCount, startTimestamp,
+    final var records = highLevelConsumer.searchRecords(topic, searchString, partition, maximumCount, startTimestamp,
       deserializers);
     final var results = new SearchResultsVO();
 
