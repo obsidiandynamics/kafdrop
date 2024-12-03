@@ -279,6 +279,7 @@ public final class MessageController {
       defaultForm.setSearchText("");
       defaultForm.setFormat(defaultFormat);
       defaultForm.setKeyFormat(defaultKeyFormat);
+      defaultForm.setPartition(-1);
       defaultForm.setMaximumCount(100);
       defaultForm.setStartTimestamp(new Date(0));
       model.addAttribute("searchMessageForm", defaultForm);
@@ -292,6 +293,7 @@ public final class MessageController {
     model.addAttribute("messageFormats", MessageFormat.values());
     model.addAttribute("defaultKeyFormat", defaultKeyFormat);
     model.addAttribute("keyFormats", KeyFormat.values());
+    model.addAttribute("partitions", topic.getPartitions().stream().map(TopicPartitionVO::getId).toList());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
     if (!searchMessageForm.isEmpty() && !errors.hasErrors()) {
@@ -308,6 +310,7 @@ public final class MessageController {
       var searchResults = kafkaMonitor.searchMessages(
         topicName,
         searchMessageForm.getSearchText(),
+        searchMessageForm.getPartition(),
         searchMessageForm.getMaximumCount(),
         searchMessageForm.getStartTimestamp(),
         deserializers);

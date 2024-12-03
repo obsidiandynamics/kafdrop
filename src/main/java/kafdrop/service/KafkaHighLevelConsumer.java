@@ -204,11 +204,19 @@ public final class KafkaHighLevelConsumer {
    */
   synchronized SearchResults searchRecords(String topic,
                                            String searchString,
+                                           Integer partition,
                                            Integer maximumCount,
                                            Date startTimestamp,
                                            Deserializers deserializers) {
     initializeClient();
-    final List<TopicPartition> partitions = determinePartitionsForTopic(topic);
+    List<TopicPartition> partitions = determinePartitionsForTopic(topic);
+    if (partition != -1) {
+      var partitionOpt = partitions.stream().filter(p -> p.partition() == partition).findAny();
+      if (partitionOpt.isEmpty()) {
+        throw new IllegalArgumentException("Partition does not exist in topic");
+      }
+      partitions = List.of(partitionOpt.get());
+    }
     kafkaConsumer.assign(partitions);
     seekToTimestamp(partitions, startTimestamp);
 
