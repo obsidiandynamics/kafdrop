@@ -103,6 +103,24 @@
                     </tbody>
                 </table>
             </#if>
+            <form id="update-retention-period-form" action="<@spring.url '/topic/${topic.name}/set-retention-period'/>" method="POST">
+                <table table table-bordered table-sm small style="margin-top: 20px">
+                    <tbody>
+                        <tr>
+                            <td>Retention period in ms </td>
+                        </tr>
+                        <tr>
+                            <td align="center"><input type="number" name="retentionTime" required></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button style="margin-top: 5px; height: 50%" class="btn btn-success" type="submit"> <i class="fa"></i> Set </button>
+            </form>
+            <#if errorMessage??>
+                <p>Error setting retention period: ${errorMessage}</p>
+            <#elseif topicName??>
+                <p>Successfully set retention period</p>
+            </#if>
         </div>
 
     </div>
@@ -170,6 +188,7 @@
 <script>
   $(document).ready(function () {
     let removalConfirmed = false;
+    let updateRetentionConfirmed = false;
 
     $('#delete-topic-form').submit(function (event) {
       if (!removalConfirmed) {
@@ -180,5 +199,15 @@
         }
       }
     });
+
+    $('#update-retention-period-form').submit(function (event) {
+          if (!updateRetentionConfirmed) {
+            event.preventDefault();
+            if(confirm('Are you sure you want to update the topic retention time?')) {
+              updateRetentionConfirmed = true;
+              $('#update-retention-period-form').submit();
+            }
+          }
+        });
   });
 </script>
