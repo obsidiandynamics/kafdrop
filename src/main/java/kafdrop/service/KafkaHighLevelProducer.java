@@ -21,48 +21,48 @@ import kafdrop.util.Serializers;
 @Service
 public final class KafkaHighLevelProducer {
 
-	private static final Logger LOG = LoggerFactory.getLogger(KafkaHighLevelProducer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(KafkaHighLevelProducer.class);
 
-	private KafkaProducer<byte[], byte[]> kafkaProducer;
+  private KafkaProducer<byte[], byte[]> kafkaProducer;
 
-	private final KafkaConfiguration kafkaConfiguration;
+  private final KafkaConfiguration kafkaConfiguration;
 
-	public KafkaHighLevelProducer(KafkaConfiguration kafkaConfiguration) {
-		this.kafkaConfiguration = kafkaConfiguration;
-	}
+  public KafkaHighLevelProducer(KafkaConfiguration kafkaConfiguration) {
+    this.kafkaConfiguration = kafkaConfiguration;
+  }
 
-	@PostConstruct
-	private void initializeClient() {
-		if (kafkaProducer == null) {
-			final var properties = new Properties();
-			properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
-			properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
-			properties.put(ProducerConfig.ACKS_CONFIG, "all");
-			properties.put(ProducerConfig.RETRIES_CONFIG, 0);
-			properties.put(ProducerConfig.LINGER_MS_CONFIG, 1);
-			properties.put(ProducerConfig.CLIENT_ID_CONFIG, "kafdrop-producer");
-			kafkaConfiguration.applyCommon(properties);
-			
-			kafkaProducer = new KafkaProducer<>(properties);
-		}
-	}
-	
-	public RecordMetadata publishMessage(CreateMessageVO message, Serializers searilazers) {
-		initializeClient();
-		
-		final ProducerRecord<byte[], byte[]> record = new ProducerRecord<byte[], byte[]>(message.getTopic(),
-				message.getTopicPartition(),
-				searilazers.getKeySerializer().serializeMessage(message.getKey()),
-				searilazers.getValueSerializer().serializeMessage(message.getValue()));
+  @PostConstruct
+  private void initializeClient() {
+    if (kafkaProducer == null) {
+      final var properties = new Properties();
+      properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
+      properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
+      properties.put(ProducerConfig.ACKS_CONFIG, "all");
+      properties.put(ProducerConfig.RETRIES_CONFIG, 0);
+      properties.put(ProducerConfig.LINGER_MS_CONFIG, 1);
+      properties.put(ProducerConfig.CLIENT_ID_CONFIG, "kafdrop-producer");
+      kafkaConfiguration.applyCommon(properties);
 
-		Future<RecordMetadata> result = kafkaProducer.send(record);
-		try {
-			RecordMetadata recordMetadata = result.get();
-			LOG.info("Record published successfully [{}]", recordMetadata);
-			return recordMetadata;
-		} catch (Exception e) {
-			LOG.error("Failed to publish message", e);
-			throw new KafkaProducerException(e);
-		}
-	}
+      kafkaProducer = new KafkaProducer<>(properties);
+    }
+  }
+
+  public RecordMetadata publishMessage(CreateMessageVO message, Serializers serializers) {
+    initializeClient();
+
+    final ProducerRecord<byte[], byte[]> record = new ProducerRecord<byte[], byte[]>(message.getTopic(),
+      message.getTopicPartition(),
+      serializers.getKeySerializer().serializeMessage(message.getKey()),
+      serializers.getValueSerializer().serializeMessage(message.getValue()));
+
+    Future<RecordMetadata> result = kafkaProducer.send(record);
+    try {
+      RecordMetadata recordMetadata = result.get();
+      LOG.info("Record published successfully [{}]", recordMetadata);
+      return recordMetadata;
+    } catch (Exception e) {
+      LOG.error("Failed to publish message", e);
+      throw new KafkaProducerException(e);
+    }
+  }
 }

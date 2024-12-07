@@ -47,6 +47,7 @@ import kafdrop.util.MessageFormat;
 import kafdrop.util.MsgPackMessageDeserializer;
 import kafdrop.util.ProtobufMessageDeserializer;
 import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -67,6 +68,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import kafdrop.model.CreateMessageVO;
 
@@ -201,59 +203,59 @@ public final class MessageController {
 
     return "message-inspector";
   }
-  
+
   @PostMapping("/topic/{name:.+}/addmessage")
   public String addMessage(
-          @PathVariable("name")
-          String topicName,
-          @ModelAttribute("addMessageForm") CreateMessageVO body,
-          Model model) {
-	  try {
-		  final MessageFormat defaultFormat = messageFormatProperties.getFormat();
-		  final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
-		  
-		  final var serializers = new Serializers(
-		          getSerializer(topicName, defaultKeyFormat, "", ""),
-		          getSerializer(topicName, defaultFormat, "", ""));
-		  RecordMetadata recordMetadata = kafkaMonitor.publishMessage(body, serializers);
-		  
-		  final var deserializers = new Deserializers(
-		          getDeserializer(topicName, defaultKeyFormat, "", ""),
-		          getDeserializer(topicName, defaultFormat, "", "")
-		      );
-		  
-		  final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
+    @PathVariable("name")
+    String topicName,
+    @ModelAttribute("addMessageForm") CreateMessageVO body,
+    Model model) {
+    try {
+      final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+      final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
 
-	      defaultForm.setCount(100l);
-	      defaultForm.setOffset(recordMetadata.offset());
-	      defaultForm.setPartition(body.getTopicPartition());
-	      defaultForm.setFormat(defaultFormat);
-	      defaultForm.setKeyFormat(defaultFormat);
+      final var serializers = new Serializers(
+        getSerializer(topicName, defaultKeyFormat, "", ""),
+        getSerializer(topicName, defaultFormat, "", ""));
+      RecordMetadata recordMetadata = kafkaMonitor.publishMessage(body, serializers);
 
-	      model.addAttribute("messageForm", defaultForm);
-		  
-		  final TopicVO topic = kafkaMonitor.getTopic(topicName)
-			        .orElseThrow(() -> new TopicNotFoundException(topicName));
-		  
-		  model.addAttribute("topic", topic);
+      final var deserializers = new Deserializers(
+        getDeserializer(topicName, defaultKeyFormat, "", ""),
+        getDeserializer(topicName, defaultFormat, "", "")
+      );
 
-		  model.addAttribute("defaultFormat", defaultFormat);
-		  model.addAttribute("messageFormats", MessageFormat.values());
-		  model.addAttribute("defaultKeyFormat", defaultKeyFormat);
-		  model.addAttribute("keyFormats",KeyFormat.values());
-		  model.addAttribute("descFiles", protobufProperties.getDescFilesList());
-		  model.addAttribute("messages",
-                  messageInspector.getMessages(topicName,
-                                               body.getTopicPartition(),
-                                               recordMetadata.offset(),
-                                               100,
-                                               deserializers));
-          model.addAttribute("isAnyProtoOpts", List.of(true, false));
+      final PartitionOffsetInfo defaultForm = new PartitionOffsetInfo();
 
-	  } catch(Exception ex) {
-		  model.addAttribute("errorMessage", ex.getMessage());
-	  }
-	  return "message-inspector";
+      defaultForm.setCount(100l);
+      defaultForm.setOffset(recordMetadata.offset());
+      defaultForm.setPartition(body.getTopicPartition());
+      defaultForm.setFormat(defaultFormat);
+      defaultForm.setKeyFormat(defaultFormat);
+
+      model.addAttribute("messageForm", defaultForm);
+
+      final TopicVO topic = kafkaMonitor.getTopic(topicName)
+        .orElseThrow(() -> new TopicNotFoundException(topicName));
+
+      model.addAttribute("topic", topic);
+
+      model.addAttribute("defaultFormat", defaultFormat);
+      model.addAttribute("messageFormats", MessageFormat.values());
+      model.addAttribute("defaultKeyFormat", defaultKeyFormat);
+      model.addAttribute("keyFormats", KeyFormat.values());
+      model.addAttribute("descFiles", protobufProperties.getDescFilesList());
+      model.addAttribute("messages",
+        messageInspector.getMessages(topicName,
+          body.getTopicPartition(),
+          recordMetadata.offset(),
+          100,
+          deserializers));
+      model.addAttribute("isAnyProtoOpts", List.of(true, false));
+
+    } catch (Exception ex) {
+      model.addAttribute("errorMessage", ex.getMessage());
+    }
+    return "message-inspector";
   }
 
   /**
@@ -435,29 +437,29 @@ public final class MessageController {
 
     return deserializer;
   }
-  
-  private MessageSerializer getSerializer(String topicName, MessageFormat format, String descFile, String msgTypeName) {
-	  final MessageSerializer serializer;
-	  
-	  if (format == MessageFormat.AVRO) {
-	      final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
-	      final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
 
-	      serializer = new AvroMessageSerializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
-	    } else if (format == MessageFormat.PROTOBUF) {
-	      // filter the input file name
-	      final var descFileName = descFile.replace(".desc", "")
-	          .replaceAll("\\.", "")
-	          .replaceAll("/", "");
-	      final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
-	      serializer = new ProtobufMessageSerializer(fullDescFile, msgTypeName);
-	    } else if (format == MessageFormat.MSGPACK) {
-	    	serializer = new MsgPackMessageSerializer();
-	    } else {
-	    	serializer = new DefaultMessageSerializer();
-	    }
-	  
-	  return serializer;
+  private MessageSerializer getSerializer(String topicName, MessageFormat format, String descFile, String msgTypeName) {
+    final MessageSerializer serializer;
+
+    if (format == MessageFormat.AVRO) {
+      final var schemaRegistryUrl = schemaRegistryProperties.getConnect();
+      final var schemaRegistryAuth = schemaRegistryProperties.getAuth();
+
+      serializer = new AvroMessageSerializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
+    } else if (format == MessageFormat.PROTOBUF) {
+      // filter the input file name
+      final var descFileName = descFile.replace(".desc", "")
+        .replaceAll("\\.", "")
+        .replaceAll("/", "");
+      final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
+      serializer = new ProtobufMessageSerializer(fullDescFile, msgTypeName);
+    } else if (format == MessageFormat.MSGPACK) {
+      serializer = new MsgPackMessageSerializer();
+    } else {
+      serializer = new DefaultMessageSerializer();
+    }
+
+    return serializer;
   }
 
   /**

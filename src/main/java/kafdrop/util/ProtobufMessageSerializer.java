@@ -21,55 +21,55 @@ import com.google.protobuf.Descriptors.FileDescriptor;
 
 public class ProtobufMessageSerializer implements MessageSerializer {
 
-	private String fullDescFile;
-	private String msgTypeName;
+  private String fullDescFile;
+  private String msgTypeName;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufMessageSerializer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufMessageSerializer.class);
 
-	public ProtobufMessageSerializer(String fullDescFile, String msgTypeName) {
-		this.fullDescFile = fullDescFile;
-		this.msgTypeName = msgTypeName;
-	}
+  public ProtobufMessageSerializer(String fullDescFile, String msgTypeName) {
+    this.fullDescFile = fullDescFile;
+    this.msgTypeName = msgTypeName;
+  }
 
-	@Override
-	public byte[] serializeMessage(String value) {
-		try (InputStream input = new FileInputStream(new File(fullDescFile))) {
-			FileDescriptorSet set = FileDescriptorSet.parseFrom(input);
+  @Override
+  public byte[] serializeMessage(String value) {
+    try (InputStream input = new FileInputStream(new File(fullDescFile))) {
+      FileDescriptorSet set = FileDescriptorSet.parseFrom(input);
 
-			List<FileDescriptor> fileDescriptors = new ArrayList<>();
-			for (FileDescriptorProto ffdp : set.getFileList()) {
-				FileDescriptor fileDescriptor = Descriptors.FileDescriptor.buildFrom(ffdp,
-						(FileDescriptor[]) fileDescriptors.toArray(new FileDescriptor[fileDescriptors.size()]));
-				fileDescriptors.add(fileDescriptor);
-			}
+      List<FileDescriptor> fileDescriptors = new ArrayList<>();
+      for (FileDescriptorProto ffdp : set.getFileList()) {
+        FileDescriptor fileDescriptor = Descriptors.FileDescriptor.buildFrom(ffdp,
+          (FileDescriptor[]) fileDescriptors.toArray(new FileDescriptor[fileDescriptors.size()]));
+        fileDescriptors.add(fileDescriptor);
+      }
 
-			final var descriptors = fileDescriptors.stream().flatMap(desc -> desc.getMessageTypes().stream())
-					.collect(Collectors.toList());
+      final var descriptors = fileDescriptors.stream().flatMap(desc -> desc.getMessageTypes().stream())
+        .collect(Collectors.toList());
 
-			final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeName.equals(desc.getName()))
-					.findFirst();
-			if (messageDescriptor.isEmpty()) {
-				final String errorMsg = String.format("Can't find specific message type: %s", msgTypeName);
-				LOGGER.error(errorMsg);
-				throw new SerializationException(errorMsg);
-			}
-			
-			return DynamicMessage.parseFrom(messageDescriptor.get(),
-					value.getBytes()).toByteArray();
-			
-		} catch (FileNotFoundException e) {
-			final String errorMsg = String.format("Couldn't open descriptor file: %s", fullDescFile);
-			LOGGER.error(errorMsg, e);
-			throw new SerializationException(errorMsg);
-		} catch (IOException e) {
-			final String errorMsg = "Can't decode Protobuf message";
-			LOGGER.error(errorMsg, e);
-			throw new SerializationException(errorMsg);
-		} catch (DescriptorValidationException e) {
-			final String errorMsg = String.format("Can't compile proto message type: %s", msgTypeName);
-			LOGGER.error(errorMsg, e);
-			throw new SerializationException(errorMsg);
-		}
-	}
+      final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeName.equals(desc.getName()))
+        .findFirst();
+      if (messageDescriptor.isEmpty()) {
+        final String errorMsg = String.format("Can't find specific message type: %s", msgTypeName);
+        LOGGER.error(errorMsg);
+        throw new SerializationException(errorMsg);
+      }
+
+      return DynamicMessage.parseFrom(messageDescriptor.get(),
+        value.getBytes()).toByteArray();
+
+    } catch (FileNotFoundException e) {
+      final String errorMsg = String.format("Couldn't open descriptor file: %s", fullDescFile);
+      LOGGER.error(errorMsg, e);
+      throw new SerializationException(errorMsg);
+    } catch (IOException e) {
+      final String errorMsg = "Can't decode Protobuf message";
+      LOGGER.error(errorMsg, e);
+      throw new SerializationException(errorMsg);
+    } catch (DescriptorValidationException e) {
+      final String errorMsg = String.format("Can't compile proto message type: %s", msgTypeName);
+      LOGGER.error(errorMsg, e);
+      throw new SerializationException(errorMsg);
+    }
+  }
 
 }
