@@ -39,13 +39,18 @@ import kafdrop.service.KafkaMonitor;
 import kafdrop.service.MessageInspector;
 import kafdrop.service.TopicNotFoundException;
 import kafdrop.util.AvroMessageDeserializer;
+import kafdrop.util.AvroMessageSerializer;
 import kafdrop.util.DefaultMessageDeserializer;
+import kafdrop.util.DefaultMessageSerializer;
 import kafdrop.util.Deserializers;
 import kafdrop.util.KeyFormat;
 import kafdrop.util.MessageDeserializer;
 import kafdrop.util.MessageFormat;
+import kafdrop.util.MessageSerializer;
 import kafdrop.util.MsgPackMessageDeserializer;
+import kafdrop.util.MsgPackMessageSerializer;
 import kafdrop.util.ProtobufMessageDeserializer;
+import kafdrop.util.ProtobufMessageSerializer;
 import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
 
 import java.io.File;
@@ -54,8 +59,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-import kafdrop.util.*;
-
+import kafdrop.util.Serializers;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
