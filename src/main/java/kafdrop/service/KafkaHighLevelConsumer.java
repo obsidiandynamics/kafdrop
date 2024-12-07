@@ -212,10 +212,9 @@ public final class KafkaHighLevelConsumer {
     List<TopicPartition> partitions = determinePartitionsForTopic(topic);
     if (partition != -1) {
       var partitionOpt = partitions.stream().filter(p -> p.partition() == partition).findAny();
-      if (partitionOpt.isEmpty()) {
-        throw new IllegalArgumentException("Partition does not exist in topic");
-      }
-      partitions = List.of(partitionOpt.get());
+      partitions = List.of(partitionOpt.orElseThrow(
+        () -> new IllegalArgumentException("Partition " + partition + " does not exist in topic")
+      ));
     }
     kafkaConsumer.assign(partitions);
     seekToTimestamp(partitions, startTimestamp);

@@ -29,6 +29,11 @@
         #partitionSizes {
             margin-left: 16px;
         }
+        
+        .top-nav-buttons{
+        	margin-left: 16px;
+        	margin-top: 16px;	
+        }
 
         .badge {
             margin-right: 5px;
@@ -83,6 +88,54 @@
     <span class="badge badge-light">Size:</span> <span
             id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
 </div>
+
+	<div>
+		<a class="btn btn-success top-nav-buttons" href="<@spring.url '/topic/${topic.name}/allmessages'/>">
+	        <i class="fa fa-eye"></i> All Messages
+	    </a>
+	    <a href="javascript:void(0)" class="btn btn-success top-nav-buttons" data-toggle="modal" data-target="#addMessageModal"> Add Message </a>
+    </div>
+    
+    
+    <div class="modal" id="addMessageModal" tabindex="-1" role="dialog" aria-labelledby="addMessageModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="addMessageModalLabel">Add Message</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <form method="POST" action="<@spring.url '/topic/${topic.name}/addmessage'/>" id="addMessageForm">
+	      <div class="modal-body">
+	        	<div class="form-group">
+	        		<label for="topicPartition">Topic Partition</label>
+				    <select name="topicPartition" class="form-control" id="topicPartition">
+				      <#list topic.partitions as p>
+		                    <option value="${p.id}" data-first-offset="${p.firstOffset}" data-last-offset="${p.size}"
+		                            <#if p.id == selectedPartition>selected="selected"</#if>>${p.id}</option>
+		              </#list>
+				    </select>
+	        	</div>
+	        	<div class="form-group">
+				    <label for="messageKey">Key</label>
+				    <input type="text" class="form-control" name="key" id="messageKey" placeholder="Key">
+				</div>
+				<div class="form-group">
+				    <label for="messageValue">Value</label>
+				    <input type="text" class="form-control" name="value" id="messageValue" placeholder="Value">
+				</div>
+				<input type="hidden" name="topic" value="${topic.name}">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	        <input type="submit" type="button" class="btn btn-success"></input>
+	      </div>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+
 
 <div id="messageFormPanel" class="card">
     <form method="GET" action="<@spring.url '/topic/${topic.name}/messages'/>" id="messageForm" class="form-inline card-body">
@@ -162,6 +215,7 @@
         </div>
         &nbsp;&nbsp;
         <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> View Messages</button>
+        <button id="viewMessagesBtn" class="btn btn-success" type="submit" ><i class="fa fa-search"></i> Search </button>
     </form>
 </div>
 
