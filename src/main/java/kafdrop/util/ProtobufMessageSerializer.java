@@ -21,10 +21,9 @@ import com.google.protobuf.Descriptors.FileDescriptor;
 
 public class ProtobufMessageSerializer implements MessageSerializer {
 
-  private String fullDescFile;
-  private String msgTypeName;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufMessageSerializer.class);
+  private final String fullDescFile;
+  private final String msgTypeName;
 
   public ProtobufMessageSerializer(String fullDescFile, String msgTypeName) {
     this.fullDescFile = fullDescFile;
@@ -39,23 +38,21 @@ public class ProtobufMessageSerializer implements MessageSerializer {
       List<FileDescriptor> fileDescriptors = new ArrayList<>();
       for (FileDescriptorProto ffdp : set.getFileList()) {
         FileDescriptor fileDescriptor = Descriptors.FileDescriptor.buildFrom(ffdp,
-          (FileDescriptor[]) fileDescriptors.toArray(new FileDescriptor[fileDescriptors.size()]));
+          fileDescriptors.toArray(new FileDescriptor[fileDescriptors.size()]));
         fileDescriptors.add(fileDescriptor);
       }
 
-      final var descriptors = fileDescriptors.stream().flatMap(desc -> desc.getMessageTypes().stream())
-        .collect(Collectors.toList());
+      final var descriptors =
+        fileDescriptors.stream().flatMap(desc -> desc.getMessageTypes().stream()).collect(Collectors.toList());
 
-      final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeName.equals(desc.getName()))
-        .findFirst();
+      final var messageDescriptor = descriptors.stream().filter(desc -> msgTypeName.equals(desc.getName())).findFirst();
       if (messageDescriptor.isEmpty()) {
         final String errorMsg = String.format("Can't find specific message type: %s", msgTypeName);
         LOGGER.error(errorMsg);
         throw new SerializationException(errorMsg);
       }
 
-      return DynamicMessage.parseFrom(messageDescriptor.get(),
-        value.getBytes()).toByteArray();
+      return DynamicMessage.parseFrom(messageDescriptor.get(), value.getBytes()).toByteArray();
 
     } catch (FileNotFoundException e) {
       final String errorMsg = String.format("Couldn't open descriptor file: %s", fullDescFile);

@@ -22,10 +22,8 @@ import kafdrop.util.Serializers;
 public final class KafkaHighLevelProducer {
 
   private static final Logger LOG = LoggerFactory.getLogger(KafkaHighLevelProducer.class);
-
-  private KafkaProducer<byte[], byte[]> kafkaProducer;
-
   private final KafkaConfiguration kafkaConfiguration;
+  private KafkaProducer<byte[], byte[]> kafkaProducer;
 
   public KafkaHighLevelProducer(KafkaConfiguration kafkaConfiguration) {
     this.kafkaConfiguration = kafkaConfiguration;
@@ -51,8 +49,7 @@ public final class KafkaHighLevelProducer {
     initializeClient();
 
     final ProducerRecord<byte[], byte[]> record = new ProducerRecord<byte[], byte[]>(message.getTopic(),
-      message.getTopicPartition(),
-      serializers.getKeySerializer().serializeMessage(message.getKey()),
+      message.getTopicPartition(), serializers.getKeySerializer().serializeMessage(message.getKey()),
       serializers.getValueSerializer().serializeMessage(message.getValue()));
 
     Future<RecordMetadata> result = kafkaProducer.send(record);
