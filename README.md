@@ -251,6 +251,23 @@ Kafdrop supports TLS (SSL) and SASL connections for [encryption and authenticati
 * `kafka.keystore.jks`: specifying the private key to authenticate the client to the broker, if mutual TLS authentication is required.
 * `kafka.properties`: specifying the necessary configuration, including key/truststore passwords, cipher suites, enabled TLS protocol versions, username/password pairs, etc. When supplying the truststore and/or keystore files, the `ssl.truststore.location` and `ssl.keystore.location` properties will be assigned automatically.
 
+### Running from JAVA
+Connect kafka with SASL/SCRAM Authentication
+
+first create a kafka.properties file with the following content:
+
+```yml
+sasl.mechanism: SCRAM-SHA-256
+security.protocol: SASL_PLAINTEXT
+sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="your_username" password="your_password";
+```
+
+then run kafdrop with the following command:
+
+```shell
+/opt/java/bin/java -jar ./kafdrop-4.1.0.jar --kafka.brokerConnect=xx.xx.xx.xx:9092 --kafka.propertiesFile=./kafka.properties
+```
+
 ### Using Docker
 The three files above can be supplied to a Docker instance in base-64-encoded form via environment variables:
 
