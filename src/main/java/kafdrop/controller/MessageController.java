@@ -32,49 +32,28 @@ import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
 import kafdrop.form.SearchMessageForm;
+import kafdrop.model.CreateMessageVO;
 import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
 import kafdrop.service.KafkaMonitor;
 import kafdrop.service.MessageInspector;
 import kafdrop.service.TopicNotFoundException;
-import kafdrop.util.AvroMessageDeserializer;
-import kafdrop.util.AvroMessageSerializer;
-import kafdrop.util.DefaultMessageDeserializer;
-import kafdrop.util.DefaultMessageSerializer;
-import kafdrop.util.Deserializers;
-import kafdrop.util.KeyFormat;
-import kafdrop.util.MessageDeserializer;
-import kafdrop.util.MessageFormat;
-import kafdrop.util.MessageSerializer;
-import kafdrop.util.MsgPackMessageDeserializer;
-import kafdrop.util.MsgPackMessageSerializer;
-import kafdrop.util.ProtobufMessageDeserializer;
-import kafdrop.util.ProtobufMessageSerializer;
-import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-
-import kafdrop.util.Serializers;
+import kafdrop.util.*;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import kafdrop.model.CreateMessageVO;
+import java.util.List;
 
 @Tag(name = "message-controller", description = "Message Controller")
 @Controller
@@ -127,7 +106,7 @@ public final class MessageController {
       getDeserializer(topicName, defaultKeyFormat, "", "", protobufProperties.getParseAnyProto()),
       getDeserializer(topicName, defaultFormat, "", "", protobufProperties.getParseAnyProto()));
 
-    final List<MessageVO> messages = messageInspector.getMessages(topicName, size, deserializers);
+    final List<MessageVO> messages = new ArrayList<>();
 
     for (TopicPartitionVO partition : topic.getPartitions()) {
       messages.addAll(messageInspector.getMessages(topicName,
@@ -141,6 +120,40 @@ public final class MessageController {
     model.addAttribute("messages", messages);
 
     return "topic-messages";
+  }
+
+  @Operation(summary = "getAllMessages", description = "Get all messages from topic")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid topic name")
+  })
+  @GetMapping(value = "/topic/{name:.+}/allmessages", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public List<MessageVO> getAllMessages(@PathVariable("name") String topicName,
+                                        @RequestParam(name = "count", required = false) Integer count) {
+    final int size = (count != null ? count : 100);
+    final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
+    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
+
+    final var deserializers = new Deserializers(
+      getDeserializer(topicName, defaultKeyFormat, "", "", protobufProperties.getParseAnyProto()),
+      getDeserializer(topicName, defaultFormat, "", "", protobufProperties.getParseAnyProto()));
+
+    final List<MessageVO> messages = new ArrayList<>();
+
+    for (TopicPartitionVO partition : topic.getPartitions()) {
+      messages.addAll(messageInspector.getMessages(topicName,
+        partition.getId(),
+        partition.getFirstOffset(),
+        size,
+        deserializers));
+    }
+
+    messages.sort(Comparator.comparing(MessageVO::getTimestamp));
+
+    return messages;
   }
 
   /**
@@ -588,6 +601,5 @@ public final class MessageController {
     public void setIsAnyProto(Boolean isAnyProto) {
       this.isAnyProto = isAnyProto;
     }
-
   }
 }
