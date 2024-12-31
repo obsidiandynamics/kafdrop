@@ -262,7 +262,7 @@ security.protocol: SASL_PLAINTEXT
 sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="your_username" password="your_password";
 ```
 
-then run kafdrop with the following command:
+Then run Kafdrop with the following command:
 
 ```shell
 /opt/java/bin/java -jar ./kafdrop-4.1.0.jar --kafka.brokerConnect=xx.xx.xx.xx:9092 --kafka.propertiesFile=./kafka.properties
