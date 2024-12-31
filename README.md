@@ -254,7 +254,7 @@ Kafdrop supports TLS (SSL) and SASL connections for [encryption and authenticati
 ### Running from JAVA
 Connect kafka with SASL/SCRAM Authentication
 
-first create a kafka.properties file with the following content:
+First create a `kafka.properties` file with the following content:
 
 ```yml
 sasl.mechanism: SCRAM-SHA-256
