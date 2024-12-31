@@ -265,7 +265,9 @@ sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule requir
 Then run Kafdrop with the following command:
 
 ```shell
-/opt/java/bin/java -jar ./kafdrop-4.1.0.jar --kafka.brokerConnect=xx.xx.xx.xx:9092 --kafka.propertiesFile=./kafka.properties
+java -jar target/kafdrop-<version>.jar \
+    --kafka.brokerConnect=<host:port,host:port> \
+    --kafka.propertiesFile=./kafka.properties
 ```
 
 ### Using Docker
