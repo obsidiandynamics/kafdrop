@@ -21,6 +21,8 @@ package kafdrop.controller;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,10 +34,8 @@ import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
 import kafdrop.form.SearchMessageForm;
-import kafdrop.model.CreateMessageVO;
-import kafdrop.model.MessageVO;
-import kafdrop.model.TopicPartitionVO;
-import kafdrop.model.TopicVO;
+import kafdrop.form.SearchMessageFormForJson;
+import kafdrop.model.*;
 import kafdrop.service.KafkaMonitor;
 import kafdrop.service.MessageInspector;
 import kafdrop.service.TopicNotFoundException;
@@ -50,10 +50,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Tag(name = "message-controller", description = "Message Controller")
 @Controller
@@ -122,6 +119,13 @@ public final class MessageController {
     return "topic-messages";
   }
 
+  /**
+   * JSON array of reading all topic messages sorted by timestamp.
+   *
+   * @param topicName Name of topic
+   * @param count Count of messages
+   * @return JSON array for seeing all messages in a topic sorted by timestamp.
+   */
   @Operation(summary = "getAllMessages", description = "Get all messages from topic")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Success"),
@@ -339,6 +343,66 @@ public final class MessageController {
     }
 
     return "search-message";
+  }
+
+  /**
+   *
+   * @param topicName Name of topic
+   * @param searchMessageForm Message form for submitting requests to search messages (all fields are not required):<br>
+   *                          &nbsp;* searchText (default value = "")<br>
+   *                          &nbsp;* maximumCount default value = "1000")<br>
+   *                          &nbsp;* partition (default value = "-1")<br>
+   *                          &nbsp;* format (default value = "DEFAULT")<br>
+   *                          &nbsp;* keyFormat (default value = "DEFAULT")<br>
+   *                          &nbsp;* startTimestamp (default value = "1970-01-01 00:00:00.000")
+   * @param keys Keys to filter messages (not required)
+   * @param errors
+   * @return JSON array of found messages and completionDetails about search results
+   */
+  @Operation(summary = "searchMessages", description = "Search messages and return results as JSON")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "400", description = "Body has validation errors"),
+    @ApiResponse(responseCode = "404", description = "Invalid topic name")
+  })
+  @GetMapping(value = "/topic/{name:.+}/search-messages", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public SearchResultsVO searchMessages(@PathVariable("name") String topicName,
+                                        @Valid @ModelAttribute SearchMessageFormForJson searchMessageForm,
+                                        @Parameter(description = "Keys to filter messages", explode = Explode.TRUE)
+                                        @RequestParam(name = "keys", required = false) String[] keys,
+                                        BindingResult errors) {
+
+    if (errors.hasErrors()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errors.getAllErrors().toString());
+
+    kafkaMonitor.getTopic(topicName)
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
+
+    final var deserializers = new Deserializers(
+      getDeserializer(topicName, searchMessageForm.getKeyFormat(), null, null,
+        protobufProperties.getParseAnyProto()),
+      getDeserializer(topicName, searchMessageForm.getFormat(), null, null,
+        protobufProperties.getParseAnyProto())
+    );
+
+    var searchResultsVO = kafkaMonitor.searchMessages(
+      topicName,
+      searchMessageForm.getSearchText(),
+      searchMessageForm.getPartition(),
+      searchMessageForm.getMaximumCount(),
+      searchMessageForm.getStartTimestamp(),
+      deserializers);
+
+    if (keys != null) {
+      var filteredByKeyMessages = searchResultsVO.getMessages().stream()
+        .filter(
+          messageVO -> Arrays.asList(keys).contains(messageVO.getKey()))
+        .toList();
+
+      searchResultsVO.setMessages(filteredByKeyMessages);
+    }
+
+    return searchResultsVO;
   }
 
   /**
