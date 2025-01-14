@@ -357,7 +357,7 @@ public final class MessageController {
    *                          &nbsp;* startTimestamp (default value = "1970-01-01 00:00:00.000")
    * @param keys Keys to filter messages (not required)
    * @param errors
-   * @return JSON array of found messages and completionDetails about search results
+   * @return JSON array of found messages (sorted by timestamp) and completionDetails about search results
    */
   @Operation(summary = "searchMessages", description = "Search messages and return results as JSON")
   @ApiResponses(value = {
@@ -401,6 +401,8 @@ public final class MessageController {
 
       searchResultsVO.setMessages(filteredByKeyMessages);
     }
+
+    searchResultsVO.getMessages().sort(Comparator.comparing(MessageVO::getTimestamp));
 
     return searchResultsVO;
   }
