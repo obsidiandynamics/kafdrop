@@ -43,6 +43,7 @@ import kafdrop.util.AvroMessageSerializer;
 import kafdrop.util.DefaultMessageDeserializer;
 import kafdrop.util.DefaultMessageSerializer;
 import kafdrop.util.Deserializers;
+import kafdrop.util.IntMessageDeserializer;
 import kafdrop.util.KeyFormat;
 import kafdrop.util.MessageDeserializer;
 import kafdrop.util.MessageFormat;
@@ -435,6 +436,8 @@ public final class MessageController {
       deserializer = new ProtobufSchemaRegistryMessageDeserializer(topicName, schemaRegistryUrl, schemaRegistryAuth);
     } else if (format == MessageFormat.MSGPACK) {
       deserializer = new MsgPackMessageDeserializer();
+    } else if (format == MessageFormat.INT) {
+      deserializer = new IntMessageDeserializer();
     } else {
       deserializer = new DefaultMessageDeserializer();
     }
