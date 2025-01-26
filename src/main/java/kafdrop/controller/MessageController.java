@@ -397,12 +397,11 @@ public final class MessageController {
       var filteredByKeyMessages = searchResultsVO.getMessages().stream()
         .filter(
           messageVO -> Arrays.asList(keys).contains(messageVO.getKey()))
+        .sorted(Comparator.comparing(MessageVO::getTimestamp))
         .toList();
 
       searchResultsVO.setMessages(filteredByKeyMessages);
     }
-
-    searchResultsVO.getMessages().sort(Comparator.comparing(MessageVO::getTimestamp));
 
     return searchResultsVO;
   }
