@@ -12,6 +12,10 @@ final class ByteUtils {
     return new String(readBytes(buffer), StandardCharsets.UTF_8);
   }
 
+  static String readInt(ByteBuffer buffer) {
+    return String.valueOf(buffer.getInt());
+  }
+
   private static byte[] readBytes(ByteBuffer buffer) {
     return readBytes(buffer, buffer.limit());
   }
