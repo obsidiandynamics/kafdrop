@@ -5,6 +5,7 @@ import kafdrop.config.KafkaConfiguration;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
 import kafdrop.service.SearchResults.CompletionReason;
+import kafdrop.util.DefaultMessageDeserializer;
 import kafdrop.util.Deserializers;
 import kafdrop.util.MessageDeserializer;
 import org.apache.commons.lang3.tuple.Pair;
@@ -35,6 +36,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public final class KafkaHighLevelConsumer {
@@ -277,13 +279,15 @@ public final class KafkaHighLevelConsumer {
                                                     ScanStatus scanStatus) {
     var records = polled.records(partition);
     if (!records.isEmpty()) {
-
+      var headerDeserializer = new DefaultMessageDeserializer();
       scanStatus = ScanStatus.createInstance(scanStatus, records.get(0).timestamp(), records.size());
       // Add to found records if it matches the search criteria
       foundRecords.addAll(records.stream()
         .filter(rec ->
           containsValue(deserializers.getKeyDeserializer(), rec.key(), loweredSearchString) ||
-            containsValue(deserializers.getValueDeserializer(), rec.value(), loweredSearchString))
+            containsValue(deserializers.getValueDeserializer(), rec.value(), loweredSearchString) ||
+            StreamSupport.stream(rec.headers().spliterator(), false)
+              .anyMatch(h -> containsValue(headerDeserializer, h.value(), loweredSearchString)))
         .map(rec -> createConsumerRecord(rec, deserializers))
         .toList());
     }
