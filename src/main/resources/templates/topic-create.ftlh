@@ -46,6 +46,8 @@
                     </tr>
                     </tbody>
                 </table>
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
 
                 <button class="btn btn-success" type="submit">
                     <i class="fa fa-plus"></i> Create
