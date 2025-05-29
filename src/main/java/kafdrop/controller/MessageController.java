@@ -18,8 +18,27 @@
 
 package kafdrop.controller;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -32,6 +51,7 @@ import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
 import kafdrop.form.SearchMessageForm;
+import kafdrop.model.CreateMessageVO;
 import kafdrop.model.MessageVO;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
@@ -52,29 +72,7 @@ import kafdrop.util.MsgPackMessageSerializer;
 import kafdrop.util.ProtobufMessageDeserializer;
 import kafdrop.util.ProtobufMessageSerializer;
 import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-
 import kafdrop.util.Serializers;
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.Date;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import kafdrop.model.CreateMessageVO;
 
 @Tag(name = "message-controller", description = "Message Controller")
 @Controller
@@ -423,9 +421,15 @@ public final class MessageController {
     } else if (format == MessageFormat.PROTOBUF && null != descFile) {
       // filter the input file name
 
-      final var descFileName = descFile.replace(".desc", "")
-        .replace(".", "")
-        .replace("/", "");
+      // Sanitize descFile to prevent path traversal by getting only the filename component.
+      // descFile is guaranteed not to be null by the surrounding if-condition.
+      String sanitizedBaseName = java.nio.file.Paths.get(descFile).getFileName().toString();
+
+      // Apply original transformations to the sanitized base file name.
+      final var descFileName = sanitizedBaseName.replace(".desc", "")
+        .replace(".", "") // This removes all dots from the filename.
+        .replace("/", ""); // This removes slashes (likely redundant after getFileName).
+      
       final var fullDescFile = protobufProperties.getDirectory() + File.separator + descFileName + ".desc";
       deserializer = new ProtobufMessageDeserializer(fullDescFile, msgTypeName, isAnyProto);
     } else if (format == MessageFormat.PROTOBUF) {
