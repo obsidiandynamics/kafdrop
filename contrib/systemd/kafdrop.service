@@ -1,0 +1,31 @@
+# Systemd unit file for KafDrop
+# Thanks to Kafka users on the internet for the starter template
+
+[Unit]
+Description=KafDrop server
+Documentation=https://github.com/obsidiandynamics/kafdrop
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target kafka.target
+
+[Service]
+Type=simple
+ExecStart=/opt/kafdrop/start.sh
+SuccessExitStatus=143
+Restart=on-abnormal
+# Logging
+SyslogIdentifier=kafdrop
+# Paths
+User=kafdrop
+Group=kafdrop
+PrivateTmp=yes
+# Network service
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+# Restrict privileges
+NoNewPrivileges=true
+# paths
+WorkingDirectory=/opt/kafdrop
+ReadOnlyPaths=/opt/kafdrop
+RuntimeDirectory=kafdrop
+
+[Install]
+WantedBy=multi-user.target
