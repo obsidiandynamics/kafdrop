@@ -126,22 +126,7 @@ public final class MessageController {
     model.addAttribute("keyFormats", KeyFormat.values());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
-    final var deserializers = new Deserializers(
-      getDeserializer(topicName, defaultKeyFormat, "", "", protobufProperties.getParseAnyProto()),
-      getDeserializer(topicName, defaultFormat, "", "", protobufProperties.getParseAnyProto()));
-
-    final List<MessageVO> messages = new ArrayList<>();
-
-    for (TopicPartitionVO partition : topic.getPartitions()) {
-      messages.addAll(messageInspector.getMessages(topicName,
-        partition.getId(),
-        partition.getFirstOffset(),
-        size,
-        deserializers));
-    }
-
-    messages.sort(Comparator.comparing(MessageVO::getTimestamp));
-    model.addAttribute("messages", messages);
+    model.addAttribute("messages", getMessages(topicName, defaultKeyFormat, defaultFormat, topic, size));
 
     return "topic-messages";
   }
@@ -168,6 +153,10 @@ public final class MessageController {
     final TopicVO topic = kafkaMonitor.getTopic(topicName)
       .orElseThrow(() -> new TopicNotFoundException(topicName));
 
+    return getMessages(topicName, defaultKeyFormat, defaultFormat, topic, size);
+  }
+
+  private @org.jetbrains.annotations.NotNull List<MessageVO> getMessages(String topicName, MessageFormat defaultKeyFormat, MessageFormat defaultFormat, TopicVO topic, int size) {
     final var deserializers = new Deserializers(
       getDeserializer(topicName, defaultKeyFormat, "", "", protobufProperties.getParseAnyProto()),
       getDeserializer(topicName, defaultFormat, "", "", protobufProperties.getParseAnyProto()));
@@ -183,7 +172,6 @@ public final class MessageController {
     }
 
     messages.sort(Comparator.comparing(MessageVO::getTimestamp));
-
     return messages;
   }
 
@@ -347,29 +335,34 @@ public final class MessageController {
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
     if (!searchMessageForm.isEmpty() && !errors.hasErrors()) {
-
-      final var deserializers = new Deserializers(
-        getDeserializer(topicName, searchMessageForm.getKeyFormat(), searchMessageForm.getDescFile(),
-          searchMessageForm.getMsgTypeName(),
-          protobufProperties.getParseAnyProto()),
-        getDeserializer(topicName, searchMessageForm.getFormat(), searchMessageForm.getDescFile(),
-          searchMessageForm.getMsgTypeName(),
-          protobufProperties.getParseAnyProto())
-      );
-
-      var searchResults = kafkaMonitor.searchMessages(
-        topicName,
-        searchMessageForm.getSearchText(),
-        searchMessageForm.getPartition(),
-        searchMessageForm.getMaximumCount(),
-        searchMessageForm.getStartTimestamp(),
-        deserializers);
+      final var searchResults = searchMessageVOs(topicName, searchMessageForm, searchMessageForm.getDescFile(),
+        searchMessageForm.getMsgTypeName());
 
       model.addAttribute("messages", searchResults.getMessages());
       model.addAttribute("details", searchResults.getCompletionDetails());
     }
 
     return "search-message";
+  }
+
+  private SearchResultsVO searchMessageVOs(String topicName, SearchMessageFormForJson searchMessageForm, String descFile,
+                                         String msgTypeName) {
+    final var deserializers = new Deserializers(
+      getDeserializer(topicName, searchMessageForm.getKeyFormat(), descFile,
+        msgTypeName,
+        protobufProperties.getParseAnyProto()),
+      getDeserializer(topicName, searchMessageForm.getFormat(), descFile,
+        msgTypeName,
+        protobufProperties.getParseAnyProto())
+    );
+
+    return kafkaMonitor.searchMessages(
+      topicName,
+      searchMessageForm.getSearchText(),
+      searchMessageForm.getPartition(),
+      searchMessageForm.getMaximumCount(),
+      searchMessageForm.getStartTimestamp(),
+      deserializers);
   }
 
   /**
@@ -405,20 +398,7 @@ public final class MessageController {
     kafkaMonitor.getTopic(topicName)
       .orElseThrow(() -> new TopicNotFoundException(topicName));
 
-    final var deserializers = new Deserializers(
-      getDeserializer(topicName, searchMessageForm.getKeyFormat(), null, null,
-        protobufProperties.getParseAnyProto()),
-      getDeserializer(topicName, searchMessageForm.getFormat(), null, null,
-        protobufProperties.getParseAnyProto())
-    );
-
-    var searchResultsVO = kafkaMonitor.searchMessages(
-      topicName,
-      searchMessageForm.getSearchText(),
-      searchMessageForm.getPartition(),
-      searchMessageForm.getMaximumCount(),
-      searchMessageForm.getStartTimestamp(),
-      deserializers);
+    final var searchResultsVO = searchMessageVOs(topicName, searchMessageForm, null, null);
 
     if (keys != null) {
       var filteredByKeyMessages = searchResultsVO.getMessages().stream()
