@@ -156,7 +156,10 @@ public final class MessageController {
     return getMessages(topicName, defaultKeyFormat, defaultFormat, topic, size);
   }
 
-  private @org.jetbrains.annotations.NotNull List<MessageVO> getMessages(String topicName, MessageFormat defaultKeyFormat, MessageFormat defaultFormat, TopicVO topic, int size) {
+  private @org.jetbrains.annotations.NotNull List<MessageVO> getMessages(String topicName,
+                                                                         MessageFormat defaultKeyFormat,
+                                                                         MessageFormat defaultFormat, TopicVO topic,
+                                                                         int size) {
     final var deserializers = new Deserializers(
       getDeserializer(topicName, defaultKeyFormat, "", "", protobufProperties.getParseAnyProto()),
       getDeserializer(topicName, defaultFormat, "", "", protobufProperties.getParseAnyProto()));
@@ -345,8 +348,9 @@ public final class MessageController {
     return "search-message";
   }
 
-  private SearchResultsVO searchMessageVOs(String topicName, SearchMessageFormForJson searchMessageForm, String descFile,
-                                         String msgTypeName) {
+  private SearchResultsVO searchMessageVOs(String topicName, SearchMessageFormForJson searchMessageForm,
+                                           String descFile,
+                                           String msgTypeName) {
     final var deserializers = new Deserializers(
       getDeserializer(topicName, searchMessageForm.getKeyFormat(), descFile,
         msgTypeName,
