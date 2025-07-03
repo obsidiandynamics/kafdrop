@@ -221,7 +221,16 @@ public final class KafkaHighLevelConsumer {
     kafkaConsumer.assign(partitions);
     seekToTimestamp(partitions, startTimestamp);
 
-    return searchRecords(searchString, maximumCount, deserializers);
+    var records = searchRecords(searchString, maximumCount, deserializers);
+    var filteredByTimestampResults = records.getResults().stream()
+      .filter(result -> result.timestamp() >= startTimestamp.getTime())
+      .toList();
+
+    return new SearchResults(
+      filteredByTimestampResults,
+      records.getCompletionReason(),
+      records.getFinalMessageTimestamp(),
+      records.getMessagesScannedCount());
   }
 
   private void seekToTimestamp(List<TopicPartition> partitions, Date startTimestamp) {

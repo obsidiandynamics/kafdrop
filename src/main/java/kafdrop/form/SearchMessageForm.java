@@ -10,40 +10,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-public class SearchMessageForm {
-
-  @NotBlank
-  private String searchText;
-
-  @NotNull
-  @Min(1)
-  @Max(1000)
-  private Integer maximumCount;
-
-  private Integer partition;
-
-  private MessageFormat format;
-
-  private MessageFormat keyFormat;
+public class SearchMessageForm extends SearchMessageFormForJson {
 
   private String descFile;
 
   private String msgTypeName;
 
-  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-  private Date startTimestamp;
-
   public SearchMessageForm(String searchText, MessageFormat format) {
-    this.searchText = searchText;
-    this.format = format;
-  }
-
-  public Date getStartTimestamp() {
-    return startTimestamp;
-  }
-
-  public void setStartTimestamp(Date startTimestamp) {
-    this.startTimestamp = startTimestamp;
+    super (searchText, format);
   }
 
   public SearchMessageForm(String searchText) {
@@ -51,43 +25,6 @@ public class SearchMessageForm {
   }
 
   public SearchMessageForm() {
-  }
-
-  @JsonIgnore
-  public boolean isEmpty() {
-    return searchText == null || searchText.isEmpty();
-  }
-
-  public String getSearchText() {
-    return searchText;
-  }
-
-  public void setSearchText(String searchText) {
-    this.searchText = searchText;
-  }
-
-  public Integer getMaximumCount() {
-    return maximumCount;
-  }
-
-  public void setMaximumCount(Integer maximumCount) {
-    this.maximumCount = maximumCount;
-  }
-
-  public MessageFormat getKeyFormat() {
-    return keyFormat;
-  }
-
-  public void setKeyFormat(MessageFormat keyFormat) {
-    this.keyFormat = keyFormat;
-  }
-
-  public MessageFormat getFormat() {
-    return format;
-  }
-
-  public void setFormat(MessageFormat format) {
-    this.format = format;
   }
 
   public String getDescFile() {
@@ -106,11 +43,4 @@ public class SearchMessageForm {
     this.msgTypeName = msgTypeName;
   }
 
-  public Integer getPartition() {
-    return partition;
-  }
-
-  public void setPartition(Integer partition) {
-    this.partition = partition;
-  }
 }
