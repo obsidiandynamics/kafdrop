@@ -87,10 +87,10 @@
                     </#list>
                 </select>
             </div>
-            <@spring.bind path="searchMessageForm.startTimestampUi"/>
+            <@spring.bind path="searchMessageForm.startTimestamp"/>
             <div class="col form-group ${spring.status.error?string("has-error", "")}">
                 <label class=control-label" for="maximumCount">Start Timestamp</label>
-                <@spring.formInput path="searchMessageForm.startTimestampUi" attributes='pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]+" class="form-control ${spring.status.error?string("has-error", "")}" size="30"'/>
+                <@spring.formInput path="searchMessageForm.startTimestamp" attributes='pattern="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]+" class="form-control ${spring.status.error?string("has-error", "")}" size="30"'/>
                 <span class="form-text">yyyy-MM-dd HH:mm:ss.SSS</span>
                 <#if spring.status.error>
                     <span class="text-danger"><i class="fa fa-times-circle"></i><@spring.showErrors "<br/>"/></span>
