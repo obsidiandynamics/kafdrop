@@ -29,14 +29,17 @@ public class SearchMessageFormForJson {
   private MessageFormat format;
   @Schema(example = "DEFAULT")
   private MessageFormat keyFormat;
-  @Schema(type = "string", example = "1970-01-01 03:00:00.000")
+  @Schema(type = "string", example = "1970-01-01T00:00:00.000Z")
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
   private Date startTimestamp;
+  @Schema(description = "Keys to filter messages", example = "[\"key1\", \"key2\"]")
+  private String[] keys;
 
   protected SearchMessageFormForJson() {
     // Default constructor
   }
+
   protected SearchMessageFormForJson(String searchText, MessageFormat format) {
     this.searchText = searchText;
     this.format = format;

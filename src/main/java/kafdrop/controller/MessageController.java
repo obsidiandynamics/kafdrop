@@ -35,49 +35,22 @@ import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperti
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
 import kafdrop.form.SearchMessageForm;
 import kafdrop.form.SearchMessageFormForJson;
-import kafdrop.model.CreateMessageVO;
-import kafdrop.model.MessageVO;
-import kafdrop.model.SearchResultsVO;
-import kafdrop.model.TopicPartitionVO;
-import kafdrop.model.TopicVO;
+import kafdrop.model.*;
 import kafdrop.service.KafkaMonitor;
 import kafdrop.service.MessageInspector;
 import kafdrop.service.TopicNotFoundException;
-import kafdrop.util.AvroMessageDeserializer;
-import kafdrop.util.AvroMessageSerializer;
-import kafdrop.util.DefaultMessageDeserializer;
-import kafdrop.util.DefaultMessageSerializer;
-import kafdrop.util.Deserializers;
-import kafdrop.util.KeyFormat;
-import kafdrop.util.MessageDeserializer;
-import kafdrop.util.MessageFormat;
-import kafdrop.util.MessageSerializer;
-import kafdrop.util.MsgPackMessageDeserializer;
-import kafdrop.util.MsgPackMessageSerializer;
-import kafdrop.util.ProtobufMessageDeserializer;
-import kafdrop.util.ProtobufMessageSerializer;
-import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
-import kafdrop.util.Serializers;
+import kafdrop.util.*;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Tag(name = "message-controller", description = "Message Controller")
 @Controller
@@ -135,7 +108,7 @@ public final class MessageController {
    * JSON array of reading all topic messages sorted by timestamp.
    *
    * @param topicName Name of topic
-   * @param count Count of messages
+   * @param count     Count of messages
    * @return JSON array for seeing all messages in a topic sorted by timestamp.
    */
   @Operation(summary = "getAllMessages", description = "Get all messages from topic")
@@ -370,31 +343,36 @@ public final class MessageController {
   }
 
   /**
+   * Searches for messages in a specific topic based on criteria provided in the request body.
+   * This endpoint expects a POST request with a JSON payload.
    *
-   * @param topicName Name of topic
-   * @param searchMessageForm Message form for submitting requests to search messages (all fields are not required):<br>
-   *                          &nbsp;* searchText (default value = "")<br>
-   *                          &nbsp;* maximumCount default value = "1000")<br>
-   *                          &nbsp;* partition (default value = "-1")<br>
-   *                          &nbsp;* format (default value = "DEFAULT")<br>
-   *                          &nbsp;* keyFormat (default value = "DEFAULT")<br>
-   *                          &nbsp;* startTimestamp (default value = "1970-01-01 00:00:00.000")
-   * @param keys Keys to filter messages (not required)
-   * @param errors
-   * @return JSON array of found messages (sorted by timestamp) and completionDetails about search results
+   * @param topicName         The name of the topic to search within.
+   * @param searchMessageForm A JSON object in the request body containing the search criteria. All fields are optional.
+   *                          <ul>
+   *                              <li><b>searchText</b>: Text to search for in the message payload. (Default: "")</li>
+   *                              <li><b>maximumCount</b>: Maximum number of messages to return. (Default: 1000)</li>
+   *                              <li><b>partition</b>: Specific partition to search in. (Default: -1 for all partitions)</li>
+   *                              <li><b>format</b>: Deserialization format for the message value. (Default: DEFAULT)</li>
+   *                              <li><b>keyFormat</b>: Deserialization format for the message key. (Default: DEFAULT)</li>
+   *                              <li><b>startTimestamp</b>: Start timestamp in ISO 8601 UTC format. (Example: {@code 1970-01-01T00:00:00.000Z})</li>
+   *                              <li><b>keys</b>: An array of message keys to filter by. (Example: {@code ["key1", "key2"]})</li>
+   *                          </ul>
+   * @param errors            BindingResult for validation, automatically populated by Spring.
+   * @return A {@link SearchResultsVO} object containing the found messages (sorted by timestamp) and search completion details.
    */
+
   @Operation(summary = "searchMessages", description = "Search messages and return results as JSON")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Success"),
     @ApiResponse(responseCode = "400", description = "Body has validation errors"),
     @ApiResponse(responseCode = "404", description = "Invalid topic name")
   })
-  @GetMapping(value = "/topic/{name:.+}/search-messages", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/topic/{name:.+}/search-messages",
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public SearchResultsVO searchMessages(@PathVariable("name") String topicName,
-                                        @Valid @ModelAttribute SearchMessageFormForJson searchMessageForm,
-                                        @Parameter(description = "Keys to filter messages", explode = Explode.TRUE)
-                                        @RequestParam(name = "keys", required = false) String[] keys,
+                                        @Valid @RequestBody SearchMessageFormForJson searchMessageForm,
                                         BindingResult errors) {
 
     if (errors.hasErrors()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errors.getAllErrors().toString());
@@ -404,10 +382,10 @@ public final class MessageController {
 
     final var searchResultsVO = searchMessageVOs(topicName, searchMessageForm, null, null);
 
-    if (keys != null) {
+    if (searchMessageForm.getKeys() != null) {
       var filteredByKeyMessages = searchResultsVO.getMessages().stream()
         .filter(
-          messageVO -> Arrays.asList(keys).contains(messageVO.getKey()))
+          messageVO -> Arrays.asList(searchMessageForm.getKeys()).contains(messageVO.getKey()))
         .sorted(Comparator.comparing(MessageVO::getTimestamp))
         .toList();
 

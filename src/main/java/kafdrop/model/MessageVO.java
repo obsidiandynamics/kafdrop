@@ -30,7 +30,7 @@ public final class MessageVO {
   private String message;
   private String key;
   private Map<String, String> headers;
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
   private Date timestamp;
 
   public int getPartition() {
