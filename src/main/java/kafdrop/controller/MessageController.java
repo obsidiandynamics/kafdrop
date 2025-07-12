@@ -389,7 +389,8 @@ public final class MessageController {
    *                              "key2"]})</li>
    *                          </ul>
    * @param errors            BindingResult for validation, automatically populated by Spring.
-   * @return A {@link SearchResultsVO} object containing the found messages (sorted by timestamp) and search completion details.
+   * @return A {@link SearchResultsVO} object containing the found messages (sorted by timestamp) and search
+   * completion details.
    */
 
   @Operation(summary = "searchMessages", description = "Search messages and return results as JSON")
