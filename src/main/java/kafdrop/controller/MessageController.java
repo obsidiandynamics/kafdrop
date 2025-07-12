@@ -32,7 +32,10 @@ import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
 import kafdrop.form.SearchMessageForm;
+import kafdrop.form.SearchMessageFormForJson;
+import kafdrop.model.CreateMessageVO;
 import kafdrop.model.MessageVO;
+import kafdrop.model.SearchResultsVO;
 import kafdrop.model.TopicPartitionVO;
 import kafdrop.model.TopicVO;
 import kafdrop.service.KafkaMonitor;
@@ -53,15 +56,9 @@ import kafdrop.util.MsgPackMessageSerializer;
 import kafdrop.util.ProtobufMessageDeserializer;
 import kafdrop.util.ProtobufMessageSerializer;
 import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-
 import kafdrop.util.Serializers;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -69,13 +66,18 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import kafdrop.model.CreateMessageVO;
+import java.util.List;
 
 @Tag(name = "message-controller", description = "Message Controller")
 @Controller
@@ -124,11 +126,45 @@ public final class MessageController {
     model.addAttribute("keyFormats", KeyFormat.values());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
+    model.addAttribute("messages", getMessages(topicName, defaultKeyFormat, defaultFormat, topic, size));
+
+    return "topic-messages";
+  }
+
+  /**
+   * JSON array of reading all topic messages sorted by timestamp.
+   *
+   * @param topicName Name of topic
+   * @param count     Count of messages
+   * @return JSON array for seeing all messages in a topic sorted by timestamp.
+   */
+  @Operation(summary = "getAllMessages", description = "Get all messages from topic")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "404", description = "Invalid topic name")
+  })
+  @GetMapping(value = "/topic/{name:.+}/allmessages", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public List<MessageVO> getAllMessages(@PathVariable("name") String topicName,
+                                        @RequestParam(name = "count", required = false) Integer count) {
+    final int size = (count != null ? count : 100);
+    final MessageFormat defaultFormat = messageFormatProperties.getFormat();
+    final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
+    final TopicVO topic = kafkaMonitor.getTopic(topicName)
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
+
+    return getMessages(topicName, defaultKeyFormat, defaultFormat, topic, size);
+  }
+
+  private @org.jetbrains.annotations.NotNull List<MessageVO> getMessages(String topicName,
+                                                                         MessageFormat defaultKeyFormat,
+                                                                         MessageFormat defaultFormat, TopicVO topic,
+                                                                         int size) {
     final var deserializers = new Deserializers(
       getDeserializer(topicName, defaultKeyFormat, "", "", protobufProperties.getParseAnyProto()),
       getDeserializer(topicName, defaultFormat, "", "", protobufProperties.getParseAnyProto()));
 
-    final List<MessageVO> messages = messageInspector.getMessages(topicName, size, deserializers);
+    final List<MessageVO> messages = new ArrayList<>();
 
     for (TopicPartitionVO partition : topic.getPartitions()) {
       messages.addAll(messageInspector.getMessages(topicName,
@@ -139,9 +175,7 @@ public final class MessageController {
     }
 
     messages.sort(Comparator.comparing(MessageVO::getTimestamp));
-    model.addAttribute("messages", messages);
-
-    return "topic-messages";
+    return messages;
   }
 
   /**
@@ -304,29 +338,94 @@ public final class MessageController {
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
 
     if (!searchMessageForm.isEmpty() && !errors.hasErrors()) {
-
-      final var deserializers = new Deserializers(
-        getDeserializer(topicName, searchMessageForm.getKeyFormat(), searchMessageForm.getDescFile(),
-          searchMessageForm.getMsgTypeName(),
-          protobufProperties.getParseAnyProto()),
-        getDeserializer(topicName, searchMessageForm.getFormat(), searchMessageForm.getDescFile(),
-          searchMessageForm.getMsgTypeName(),
-          protobufProperties.getParseAnyProto())
-      );
-
-      var searchResults = kafkaMonitor.searchMessages(
-        topicName,
-        searchMessageForm.getSearchText(),
-        searchMessageForm.getPartition(),
-        searchMessageForm.getMaximumCount(),
-        searchMessageForm.getStartTimestamp(),
-        deserializers);
+      final var searchResults = searchMessageVOs(topicName, searchMessageForm, searchMessageForm.getDescFile(),
+        searchMessageForm.getMsgTypeName());
 
       model.addAttribute("messages", searchResults.getMessages());
       model.addAttribute("details", searchResults.getCompletionDetails());
     }
 
     return "search-message";
+  }
+
+  private SearchResultsVO searchMessageVOs(String topicName, SearchMessageFormForJson searchMessageForm,
+                                           String descFile,
+                                           String msgTypeName) {
+    final var deserializers = new Deserializers(
+      getDeserializer(topicName, searchMessageForm.getKeyFormat(), descFile,
+        msgTypeName,
+        protobufProperties.getParseAnyProto()),
+      getDeserializer(topicName, searchMessageForm.getFormat(), descFile,
+        msgTypeName,
+        protobufProperties.getParseAnyProto())
+    );
+
+    return kafkaMonitor.searchMessages(
+      topicName,
+      searchMessageForm.getSearchText(),
+      searchMessageForm.getPartition(),
+      searchMessageForm.getMaximumCount(),
+      searchMessageForm.getStartTimestamp(),
+      deserializers);
+  }
+
+  /**
+   * Searches for messages in a specific topic based on criteria provided in the request body.
+   * This endpoint expects a POST request with a JSON payload.
+   *
+   * @param topicName         The name of the topic to search within.
+   * @param searchMessageForm A JSON object in the request body containing the search criteria. All fields are optional.
+   *                          <ul>
+   *                              <li><b>searchText</b>: Text to search for in the message payload. (Default: "")</li>
+   *                              <li><b>maximumCount</b>: Maximum number of messages to return. (Default: 1000)</li>
+   *                              <li><b>partition</b>: Specific partition to search in. (Default: -1 for all
+   *                              partitions)</li>
+   *                              <li><b>format</b>: Deserialization format for the message value. (Default: DEFAULT)
+   *                              </li>
+   *                              <li><b>keyFormat</b>: Deserialization format for the message key. (Default:
+   *                              DEFAULT)</li>
+   *                              <li><b>startTimestamp</b>: Start timestamp in ISO 8601 UTC format. (Example: {@code
+   *                              1970-01-01T00:00:00.000Z})</li>
+   *                              <li><b>keys</b>: An array of message keys to filter by. (Example: {@code ["key1",
+   *                              "key2"]})</li>
+   *                          </ul>
+   * @param errors            BindingResult for validation, automatically populated by Spring.
+   * @return A {@link SearchResultsVO} object containing the found messages (sorted by timestamp) and search
+   * completion details.
+   */
+
+  @Operation(summary = "searchMessages", description = "Search messages and return results as JSON")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Success"),
+    @ApiResponse(responseCode = "400", description = "Body has validation errors"),
+    @ApiResponse(responseCode = "404", description = "Invalid topic name")
+  })
+  @PostMapping(value = "/topic/{name:.+}/search-messages",
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    consumes = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  public SearchResultsVO searchMessages(@PathVariable("name") String topicName,
+                                        @Valid @RequestBody SearchMessageFormForJson searchMessageForm,
+                                        BindingResult errors) {
+
+    if (errors.hasErrors()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errors.getAllErrors().toString());
+
+    kafkaMonitor.getTopic(topicName)
+      .orElseThrow(() -> new TopicNotFoundException(topicName));
+
+    final var searchResultsVO = searchMessageVOs(topicName, searchMessageForm, null, null);
+
+    if (searchMessageForm.getKeys() != null) {
+      var filteredByKeyMessages = searchResultsVO.getMessages().stream()
+        .filter(
+          messageVO -> Arrays.asList(searchMessageForm.getKeys()).contains(messageVO.getKey()))
+        .sorted(Comparator.comparing(MessageVO::getTimestamp))
+        .toList();
+
+      searchResultsVO.setMessages(filteredByKeyMessages);
+    }
+
+    return searchResultsVO;
   }
 
   /**
@@ -591,6 +690,5 @@ public final class MessageController {
     public void setIsAnyProto(Boolean isAnyProto) {
       this.isAnyProto = isAnyProto;
     }
-
   }
 }

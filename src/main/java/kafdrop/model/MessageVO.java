@@ -18,6 +18,8 @@
 
 package kafdrop.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +30,7 @@ public final class MessageVO {
   private String message;
   private String key;
   private Map<String, String> headers;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
   private Date timestamp;
 
   public int getPartition() {
