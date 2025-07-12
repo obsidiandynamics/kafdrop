@@ -377,11 +377,16 @@ public final class MessageController {
    *                          <ul>
    *                              <li><b>searchText</b>: Text to search for in the message payload. (Default: "")</li>
    *                              <li><b>maximumCount</b>: Maximum number of messages to return. (Default: 1000)</li>
-   *                              <li><b>partition</b>: Specific partition to search in. (Default: -1 for all partitions)</li>
-   *                              <li><b>format</b>: Deserialization format for the message value. (Default: DEFAULT)</li>
-   *                              <li><b>keyFormat</b>: Deserialization format for the message key. (Default: DEFAULT)</li>
-   *                              <li><b>startTimestamp</b>: Start timestamp in ISO 8601 UTC format. (Example: {@code 1970-01-01T00:00:00.000Z})</li>
-   *                              <li><b>keys</b>: An array of message keys to filter by. (Example: {@code ["key1", "key2"]})</li>
+   *                              <li><b>partition</b>: Specific partition to search in. (Default: -1 for all
+   *                              partitions)</li>
+   *                              <li><b>format</b>: Deserialization format for the message value. (Default: DEFAULT)
+   *                              </li>
+   *                              <li><b>keyFormat</b>: Deserialization format for the message key. (Default:
+   *                              DEFAULT)</li>
+   *                              <li><b>startTimestamp</b>: Start timestamp in ISO 8601 UTC format. (Example: {@code
+   *                              1970-01-01T00:00:00.000Z})</li>
+   *                              <li><b>keys</b>: An array of message keys to filter by. (Example: {@code ["key1",
+   *                              "key2"]})</li>
    *                          </ul>
    * @param errors            BindingResult for validation, automatically populated by Spring.
    * @return A {@link SearchResultsVO} object containing the found messages (sorted by timestamp) and search completion details.
