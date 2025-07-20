@@ -88,14 +88,15 @@
     <span class="badge badge-light">Size:</span> <span
             id="partitionSize">${curPartition.size - curPartition.firstOffset}</span>
 </div>
-
 	<div>
 		<a class="btn btn-success top-nav-buttons" href="<@spring.url '/topic/${topic.name}/allmessages'/>">
 	        <i class="fa fa-eye"></i> All Messages
 	    </a>
-	    <a href="javascript:void(0)" class="btn btn-success top-nav-buttons" data-toggle="modal" data-target="#addMessageModal"> Add Message </a>
+      <#if sendEnabled>
+          <a href="javascript:void(0)" class="btn btn-success top-nav-buttons" data-toggle="modal" data-target="#addMessageModal"> Add Message </a>
+      </#if>
     </div>
-    
+
     
     <div class="modal" id="addMessageModal" tabindex="-1" role="dialog" aria-labelledby="addMessageModalLabel" aria-hidden="true">
 	  <div class="modal-dialog" role="document">

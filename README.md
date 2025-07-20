@@ -235,6 +235,13 @@ By default, you could create a topic. If you don't want this feature, you could 
 --topic.createEnabled=false
 ```
 
+## Message Configuration
+By default, you couldn't send messages to a topic. If you want to enable this feature, you could enable it with:
+
+```
+--message.sendEnabled=true
+```
+
 ## Actuator
 Health and info endpoints are available at the following path: `/actuator`
 
