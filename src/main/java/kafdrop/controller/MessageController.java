@@ -58,6 +58,7 @@ import kafdrop.util.ProtobufMessageSerializer;
 import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
 import kafdrop.util.Serializers;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -92,15 +93,19 @@ public final class MessageController {
 
   private final ProtobufDescriptorProperties protobufProperties;
 
+  private final boolean sendEnabled;
+
   public MessageController(KafkaMonitor kafkaMonitor, MessageInspector messageInspector,
                            MessageFormatProperties messageFormatProperties,
                            SchemaRegistryProperties schemaRegistryProperties,
-                           ProtobufDescriptorProperties protobufProperties) {
+                           ProtobufDescriptorProperties protobufProperties,
+                           @Value("${message.sendEnabled:false}") boolean sendEnabled) {
     this.kafkaMonitor = kafkaMonitor;
     this.messageInspector = messageInspector;
     this.messageFormatProperties = messageFormatProperties;
     this.schemaRegistryProperties = schemaRegistryProperties;
     this.protobufProperties = protobufProperties;
+    this.sendEnabled = sendEnabled;
   }
 
   /**
@@ -221,6 +226,7 @@ public final class MessageController {
     model.addAttribute("keyFormats", KeyFormat.values());
     model.addAttribute("descFiles", protobufProperties.getDescFilesList());
     model.addAttribute("isAnyProtoOpts", List.of(true, false));
+    model.addAttribute("sendEnabled", sendEnabled);
 
     if (!messageForm.isEmpty() && !errors.hasErrors()) {
 
@@ -250,6 +256,9 @@ public final class MessageController {
     @ModelAttribute("addMessageForm") CreateMessageVO body,
     Model model) {
     try {
+      if (!sendEnabled) {
+        throw new IllegalStateException("Message sending is not enabled.");
+      }
       final MessageFormat defaultFormat = messageFormatProperties.getFormat();
       final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
 
