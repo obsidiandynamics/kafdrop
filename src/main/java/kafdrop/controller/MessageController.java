@@ -255,11 +255,10 @@ public final class MessageController {
     String topicName,
     @ModelAttribute("addMessageForm") CreateMessageVO body,
     Model model) {
-    if (!sendEnabled) {
-      model.addAttribute("errorMessage", "Message sending is not enabled.");
-      return "message-inspector";
-    }
     try {
+      if (!sendEnabled) {
+        throw new IllegalStateException("Message sending is not enabled.");
+      }
       final MessageFormat defaultFormat = messageFormatProperties.getFormat();
       final MessageFormat defaultKeyFormat = messageFormatProperties.getKeyFormat();
 

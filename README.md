@@ -236,7 +236,7 @@ By default, you could create a topic. If you don't want this feature, you could 
 ```
 
 ## Message Configuration
-By default, you couldn't send messages to a topic. If you want to enable this feature, you could enable it with:
+By default, you cannot send messages to a topic. You can enable it with:
 
 ```
 --message.sendEnabled=true
