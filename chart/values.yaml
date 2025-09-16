@@ -1,5 +1,10 @@
 replicaCount: 1
 
+## extraEnvVars:
+##   - name: FOO
+##     value: "bar"
+extraEnvVars: []
+
 image:
   repository: obsidiandynamics/kafdrop
   tag: latest
