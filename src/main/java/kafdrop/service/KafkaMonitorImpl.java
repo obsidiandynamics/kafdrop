@@ -21,17 +21,17 @@ package kafdrop.service;
 import kafdrop.model.AclVO;
 import kafdrop.model.BrokerVO;
 import kafdrop.model.ClusterSummaryVO;
-import kafdrop.model.ConsumerVO;
-import kafdrop.model.ConsumerTopicVO;
 import kafdrop.model.ConsumerPartitionVO;
+import kafdrop.model.ConsumerTopicVO;
+import kafdrop.model.ConsumerVO;
 import kafdrop.model.CreateMessageVO;
 import kafdrop.model.CreateTopicVO;
 import kafdrop.model.MessageVO;
 import kafdrop.model.SearchResultsVO;
-import kafdrop.model.TopicVO;
 import kafdrop.model.TopicPartitionVO;
-import kafdrop.util.Serializers;
+import kafdrop.model.TopicVO;
 import kafdrop.util.Deserializers;
+import kafdrop.util.Serializers;
 import org.apache.kafka.clients.admin.ConfigEntry.ConfigSource;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,10 +50,10 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -270,7 +269,7 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
       final var messageVos = new ArrayList<MessageVO>();
       results.setMessages(messageVos);
 
-      for (var record : records.getResults()) {
+      for (var record : records.results()) {
         final var messageVo = new MessageVO();
         messageVo.setPartition(record.partition());
         messageVo.setOffset(record.offset());
@@ -281,24 +280,24 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
         messageVos.add(messageVo);
       }
 
-      switch (records.getCompletionReason()) {
+      switch (records.completionReason()) {
         case FOUND_REQUESTED_NUMBER_OF_RESULTS:
           results.setCompletionDetails(String.format("Search completed after finding requested number of results.  " +
-            "Scanned %d messages.", records.getMessagesScannedCount()));
+            "Scanned %d messages.", records.messagesScannedCount()));
           break;
         case EXCEEDED_MAX_SCAN_COUNT:
           results.setCompletionDetails(
             String.format(
               "Search timed out after scanning %d messages. Last scanned message timestamp was %2$tF %2$tT." +
                 " Adjust your time span for more results.",
-              records.getMessagesScannedCount(),
-              records.getFinalMessageTimestamp()));
+              records.messagesScannedCount(),
+              records.finalMessageTimestamp()));
           break;
         case NO_MORE_MESSAGES_IN_TOPIC:
           results.setCompletionDetails(
             String.format(
               "Search reached the end of the topic before finding requested number of results.  Scanned %d messages.",
-              records.getMessagesScannedCount()));
+              records.messagesScannedCount()));
           break;
       }
 
