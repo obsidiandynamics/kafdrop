@@ -222,15 +222,15 @@ public final class KafkaHighLevelConsumer {
     seekToTimestamp(partitions, startTimestamp);
 
     var records = searchRecords(searchString, maximumCount, deserializers);
-    var filteredByTimestampResults = records.getResults().stream()
+    var filteredByTimestampResults = records.results().stream()
       .filter(result -> result.timestamp() >= startTimestamp.getTime())
       .toList();
 
     return new SearchResults(
       filteredByTimestampResults,
-      records.getCompletionReason(),
-      records.getFinalMessageTimestamp(),
-      records.getMessagesScannedCount());
+      records.completionReason(),
+      records.finalMessageTimestamp(),
+      records.messagesScannedCount());
   }
 
   private void seekToTimestamp(List<TopicPartition> partitions, Date startTimestamp) {
@@ -261,11 +261,13 @@ public final class KafkaHighLevelConsumer {
       completionReason = CompletionReason.NO_MORE_MESSAGES_IN_TOPIC;
     } else if (foundRecords.size() >= maximumCount) {
       completionReason = CompletionReason.FOUND_REQUESTED_NUMBER_OF_RESULTS;
-    } else if (scanStatus.scannedCount() >= SEARCH_MAX_MESSAGES_TO_SCAN) {
-      completionReason = CompletionReason.EXCEEDED_MAX_SCAN_COUNT;
-    } else {
-      throw new IllegalStateException("This situation is unexpected");
-    }
+    } else //noinspection ConstantValue Defensive else-branch added to counter changes in above while condition
+
+      if (scanStatus.scannedCount() >= SEARCH_MAX_MESSAGES_TO_SCAN) {
+        completionReason = CompletionReason.EXCEEDED_MAX_SCAN_COUNT;
+      } else {
+        throw new IllegalStateException("This situation is unexpected");
+      }
 
     return new SearchResults(foundRecords, completionReason, new Date(scanStatus.endingTimestamp()),
       scanStatus.scannedCount());
