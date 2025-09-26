@@ -34,7 +34,7 @@ public final class TopicVO implements Comparable<TopicVO> {
   private Map<String, String> config = Collections.emptyMap();
 
   public TopicVO(String name) {
-    this.name = name;
+    this.name = Objects.requireNonNull(name);
   }
 
   public String getName() {
@@ -46,7 +46,7 @@ public final class TopicVO implements Comparable<TopicVO> {
   }
 
   public void setConfig(Map<String, String> config) {
-    this.config = config;
+    this.config = (config == null) ? Collections.emptyMap() : config;
   }
 
   public Collection<TopicPartitionVO> getPartitions() {
@@ -54,7 +54,7 @@ public final class TopicVO implements Comparable<TopicVO> {
   }
 
   public void setPartitions(Map<Integer, TopicPartitionVO> partitions) {
-    this.partitions = partitions;
+    this.partitions = Objects.requireNonNull(partitions);
   }
 
   public Optional<TopicPartitionVO> getPartition(int partitionId) {
