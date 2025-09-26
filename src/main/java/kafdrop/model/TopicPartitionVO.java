@@ -19,6 +19,7 @@
 package kafdrop.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public final class TopicPartitionVO {
   }
 
   public Collection<PartitionReplica> getReplicas() {
-    return replicas.values();
+    return Collections.unmodifiableCollection(replicas.values());
   }
 
   public void addReplica(PartitionReplica replica) {
