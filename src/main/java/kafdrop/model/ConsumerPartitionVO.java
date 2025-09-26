@@ -18,8 +18,6 @@
 
 package kafdrop.model;
 
-import java.util.Objects;
-
 public final class ConsumerPartitionVO {
   private final String groupId;
   private final String topic;
@@ -29,8 +27,8 @@ public final class ConsumerPartitionVO {
   private long firstOffset;
 
   public ConsumerPartitionVO(String groupId, String topic, int partitionId) {
-    this.groupId = Objects.requireNonNull(groupId);
-    this.topic = Objects.requireNonNull(topic);
+    this.groupId = groupId;
+    this.topic = topic;
     this.partitionId = partitionId;
   }
 
