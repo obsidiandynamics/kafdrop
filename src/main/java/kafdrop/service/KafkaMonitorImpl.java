@@ -39,10 +39,12 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Headers;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -79,17 +81,17 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
   @Override
   public List<BrokerVO> getBrokers() {
     final var clusterDescription = highLevelAdminClient.describeCluster();
-    final var brokerVos = new ArrayList<BrokerVO>(clusterDescription.nodes.size());
-    for (var node : clusterDescription.nodes) {
-      final var isController = node.id() == clusterDescription.controller.id();
-      brokerVos.add(new BrokerVO(node.id(), node.host(), node.port(), node.rack(), isController));
-    }
-    return brokerVos;
+    return clusterDescription.nodes().stream()
+      .map(node -> {
+        boolean isController = node.id() == clusterDescription.controller().id();
+        return new BrokerVO(node.id(), node.host(), node.port(), node.rack(), isController);
+      })
+      .toList();
   }
 
   @Override
   public Optional<BrokerVO> getBroker(int id) {
-    return getBrokers().stream().filter(brokerVo -> brokerVo.getId() == id).findAny();
+    return getBrokers().stream().filter(brokerVo -> brokerVo.id() == id).findAny();
   }
 
   @Override
