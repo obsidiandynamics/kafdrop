@@ -362,6 +362,39 @@ docker run -d --rm -p 9000:9000 \
 | `SSL_KEY_STORE_PASSWORD` | Keystore password
 | `SSL_KEY_ALIAS`          | Key alias
 
+
+##### Logging level configuration
+
+Kafdrop supports configuring logging levels through environment variables.
+For example, setting:
+
+```sh
+LOGGING_LEVEL_ROOT=WARN
+```
+will set the root logger level to WARN.
+
+Logger endpoints are exposed via Spring Boot Actuator at: `/actuator/loggers`
+
+In addition to the root logger, you can fine-tune log verbosity for specific Kafdrop packages such as `kafdrop`, `kafdrop.config`, `kafdrop.service`, and `kafdrop.controller`.
+
+| Environment Variable               | Description |
+|------------------------------------|-------------|
+| `LOGGING_LEVEL_ROOT`               | Logging level for the root logger (`ERROR`, `WARN`, `INFO`, `DEBUG`, or `TRACE`) |
+| `LOGGING_LEVEL_KAFDROP`            | Logging level for the `kafdrop` logger (`ERROR`, `WARN`, `INFO`, `DEBUG`, or `TRACE`) |
+| `LOGGING_LEVEL_KAFDROP_CONFIG`     | Logging level for the `kafdrop.config` logger (`ERROR`, `WARN`, `INFO`, `DEBUG`, or `TRACE`) |
+| `LOGGING_LEVEL_KAFDROP_SERVICE`    | Logging level for the `kafdrop.service` logger (`ERROR`, `WARN`, `INFO`, `DEBUG`, or `TRACE`) |
+| `LOGGING_LEVEL_KAFDROP_CONTROLLER` | Logging level for the `kafdrop.controller` logger (`ERROR`, `WARN`, `INFO`, `DEBUG`, or `TRACE`) |
+
+A typical production configuration might set:
+
+```sh
+LOGGING_LEVEL_ROOT=WARN
+LOGGING_LEVEL_KAFDROP_CONFIG=WARN
+```
+to reduce log verbosity while keeping other Kafdrop logs at INFO.
+
+For more information on configuring logging in Spring Boot applications, see the official [Spring Boot logging documentation](https://docs.spring.io/spring-boot/reference/features/logging.html).
+
 ### Using Helm
 Like in the Docker example, supply the files in base-64 form:
 
