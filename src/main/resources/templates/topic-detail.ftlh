@@ -156,7 +156,7 @@
                 <tbody>
                 <#list consumers![] as c>
                     <tr>
-                        <td><a href="<@spring.url '/consumer/${c.groupId}'/>">${c.groupId}</a></td>
+                        <td><a href="<@spring.url '/consumer/${c.groupIdBase64}'/>">${c.groupId}</a></td>
                         <td>${c.getTopic(topic.name).lag}</td>
                     </tr>
                 </#list>
