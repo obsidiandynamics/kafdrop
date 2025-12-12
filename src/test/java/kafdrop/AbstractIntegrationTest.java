@@ -16,7 +16,7 @@ import java.util.Map;
 @ContextConfiguration(initializers = AbstractIntegrationTest.Initializer.class)
 abstract class AbstractIntegrationTest {
   static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-    static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka").withTag("5.4.3"));
+    static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka").withTag("7.7.7"));
 
     public static Map<String, Object> getProperties() {
       Startables.deepStart(List.of(kafka)).join();
