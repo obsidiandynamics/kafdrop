@@ -25,6 +25,9 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+springdoc:
+  enable-kotlin: false # Kafdrop does not use Kotlin; enabling it causes #803
+
 management:
   endpoints:
     web:
