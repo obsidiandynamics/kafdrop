@@ -121,19 +121,17 @@ Then access the web UI at [http://localhost:9000](http://localhost:9000).
 > **Hey there!** We hope you really like Kafdrop! Please take a moment to [⭐](https://github.com/obsidiandynamics/kafdrop)the repo or [Tweet](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fobsidiandynamics%2Fkafdrop&text=Get%20Kafdrop%20%E2%80%94%20a%20web-based%20UI%20for%20viewing%20%23ApacheKafka%20topics%20and%20browsing%20consumers%20) about it.
 
 ## Running in Kubernetes (using a Helm Chart)
-Clone the repository (if necessary):
-```sh
-git clone https://github.com/obsidiandynamics/kafdrop && cd kafdrop
-```
 
 Apply the chart:
 ```sh
-helm upgrade -i kafdrop chart --set image.tag=3.x.x \
+helm upgrade -i kafdrop ghcr.io/dan-hill2802/charts/kafdrop --version x.x.x --set image.tag=3.x.x \
     --set kafka.brokerConnect=<host:port,host:port> \
     --set server.servlet.contextPath="/" \
     --set cmdArgs="--message.format=AVRO --schemaregistry.connect=http://localhost:8080" \ #optional
     --set jvm.opts="-Xms32M -Xmx64M"
 ```
+
+Replace `--version x.x.x` with the desired chart version. [Available versions](https://github.com/obsidiandynamics/kafdrop/pkgs/container/charts%2Fkafdrop/versions)
 
 For all Helm configuration options, have a peek into [chart/values.yaml](chart/values.yaml).
 
