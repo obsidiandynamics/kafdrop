@@ -357,6 +357,8 @@ docker run -d --rm -p 9000:9000 \
 | `KAFKA_TRUSTSTORE_FILE`  |Internal location where the truststore file will be written to (if `KAFKA_TRUSTSTORE` is set). Defaults to `kafka.truststore.jks`.
 | `KAFKA_KEYSTORE_FILE`    |Internal location where the keystore file will be written to (if `KAFKA_KEYSTORE` is set). Defaults to `kafka.keystore.jks`.
 | `SSL_ENABLED`            | Enabling HTTPS (SSL) for Kafdrop server. Default is `false`
+| `SSL_CERTIFICATE`        | Path to PEM-encoded certificate chain file (alternative to keystore)
+| `SSL_CERTIFICATE_PRIVATE_KEY` | Path to PEM-encoded private key file (alternative to keystore)
 | `SSL_KEY_STORE_TYPE`     | Type of SSL keystore. Default is `PKCS12`
 | `SSL_KEY_STORE`          | Path to keystore file
 | `SSL_KEY_STORE_PASSWORD` | Keystore password
