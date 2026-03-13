@@ -9,6 +9,8 @@ on:
 
 jobs:
   build:
+    permissions:
+      packages: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -61,3 +63,20 @@ jobs:
       name: push latest if it's a release
       if: ${{ ! endsWith( env.app_ver, '-SNAPSHOT' ) }}
       run: docker buildx imagetools create docker.io/obsidiandynamics/kafdrop:$app_ver --tag docker.io/obsidiandynamics/kafdrop:latest
+
+      # Helm chart release
+    -
+      name: Login to GHCR
+      if: ${{ ! endsWith( env.app_ver, '-SNAPSHOT' ) }}
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${ GITHUB_REPOSITORY_OWNER }
+        password: ${{ secrets.GITHUB_TOKEN }}
+    -
+      name: publish chart to GitHub packages
+      if: ${{ ! endsWith( env.app_ver, '-SNAPSHOT' ) }}
+      run: |
+        helm dependency build charts/kafdrop
+        helm package charts/kafdrop --version "$app_ver"
+        helm push "kafdrop-$app_ver.tgz" oci://ghcr.io/"${GITHUB_REPOSITORY_OWNER}"/charts
