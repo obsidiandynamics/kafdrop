@@ -52,6 +52,13 @@ public final class KafkaHighLevelProducer {
       message.getTopicPartition(), serializers.getKeySerializer().serializeMessage(message.getKey()),
       serializers.getValueSerializer().serializeMessage(message.getValue()));
 
+    for (var header : message.getHeaders()) {
+      if (header.getKey() != null && !header.getKey().isBlank()) {
+        final var v = header.getValue() != null ? header.getValue() : "";
+        record.headers().add(header.getKey(), v.getBytes());
+      }
+    }
+
     Future<RecordMetadata> result = kafkaProducer.send(record);
     try {
       RecordMetadata recordMetadata = result.get();

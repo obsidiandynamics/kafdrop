@@ -98,11 +98,11 @@
     </div>
 
     
-    <div class="modal" id="addMessageModal" tabindex="-1" role="dialog" aria-labelledby="addMessageModalLabel" aria-hidden="true">
-	  <div class="modal-dialog" role="document">
+    <div class="modal fade" id="addMessageModal" tabindex="-1" role="dialog" aria-labelledby="addMessageModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-lg" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <h5 class="modal-title" id="addMessageModalLabel">Add Message</h5>
+	        <h5 class="modal-title" id="addMessageModalLabel"><i class="fa fa-paper-plane"></i>&nbsp; Add Message</h5>
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 	          <span aria-hidden="true">&times;</span>
 	        </button>
@@ -110,7 +110,7 @@
 	      <form method="POST" action="<@spring.url '/topic/${topic.name}/addmessage'/>" id="addMessageForm">
 	      <div class="modal-body">
 	        	<div class="form-group">
-	        		<label for="topicPartition">Topic Partition</label>
+	        		<label for="topicPartition"><i class="fa fa-sitemap"></i>&nbsp; Topic Partition</label>
 				    <select name="topicPartition" class="form-control" id="topicPartition">
 				      <#list topic.partitions as p>
 		                    <option value="${p.id}" data-first-offset="${p.firstOffset}" data-last-offset="${p.size}"
@@ -119,23 +119,70 @@
 				    </select>
 	        	</div>
 	        	<div class="form-group">
-				    <label for="messageKey">Key</label>
-				    <input type="text" class="form-control" name="key" id="messageKey" placeholder="Key">
+				    <label for="messageKey"><i class="fa fa-key"></i>&nbsp; Key</label>
+				    <input type="text" class="form-control" name="key" id="messageKey" placeholder="Message key (optional)">
 				</div>
 				<div class="form-group">
-				    <label for="messageValue">Value</label>
-				    <input type="text" class="form-control" name="value" id="messageValue" placeholder="Value">
+				    <div class="d-flex justify-content-between align-items-center mb-1">
+				        <label for="messageValue" class="mb-0"><i class="fa fa-file-text-o"></i>&nbsp; Value</label>
+				        <button type="button" class="btn btn-sm btn-outline-info" id="formatJsonBtn" title="Pretty-print JSON">
+				            <i class="fa fa-code"></i>&nbsp; Format JSON
+				        </button>
+				    </div>
+				    <textarea class="form-control" name="value" id="messageValue" rows="8"
+				              placeholder='{"key": "value"}' style="font-family: monospace; font-size: 0.85em; resize: vertical;"></textarea>
+				    <small class="form-text text-muted"><span id="valueCharCount">0</span> characters</small>
+				</div>
+				<div class="form-group">
+				    <div class="d-flex justify-content-between align-items-center mb-1">
+				        <label class="mb-0"><i class="fa fa-list"></i>&nbsp; Headers <small class="text-muted">(optional)</small></label>
+				        <button type="button" class="btn btn-sm btn-secondary" id="addHeaderBtn">
+				            <i class="fa fa-plus"></i>&nbsp; Add Header
+				        </button>
+				    </div>
+				    <div id="headersContainer"></div>
 				</div>
 				<input type="hidden" name="topic" value="${topic.name}">
 	      </div>
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	        <input type="submit" type="button" class="btn btn-success"></input>
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i>&nbsp; Close</button>
+	        <button type="submit" class="btn btn-success"><i class="fa fa-paper-plane"></i>&nbsp; Send Message</button>
 	      </div>
 	      </form>
 	    </div>
 	  </div>
 	</div>
+
+	<script type="text/javascript">
+	(function() {
+	    document.getElementById('formatJsonBtn').addEventListener('click', function() {
+	        var ta = document.getElementById('messageValue');
+	        try {
+	            ta.value = JSON.stringify(JSON.parse(ta.value), null, 2);
+	            ta.classList.remove('is-invalid');
+	        } catch (e) {
+	            ta.classList.add('is-invalid');
+	        }
+	    });
+
+	    document.getElementById('messageValue').addEventListener('input', function() {
+	        document.getElementById('valueCharCount').textContent = this.value.length;
+	    });
+
+	    document.getElementById('addHeaderBtn').addEventListener('click', function() {
+	        var container = document.getElementById('headersContainer');
+	        var index = container.children.length;
+	        var row = document.createElement('div');
+	        row.className = 'input-group mb-1';
+	        row.innerHTML = '<input type="text" class="form-control" name="headers[' + index + '].key" placeholder="Header name">' +
+	            '<input type="text" class="form-control" name="headers[' + index + '].value" placeholder="Header value">' +
+	            '<div class="input-group-append">' +
+	            '<button type="button" class="btn btn-outline-danger" onclick="this.closest(\'.input-group\').remove()">' +
+	            '<i class="fa fa-trash"></i></button></div>';
+	        container.appendChild(row);
+	    });
+	})();
+	</script>
 
 
 <div id="messageFormPanel" class="card">
@@ -257,13 +304,27 @@
     <#if messages?? && messages?size gt 0>
         <#list messages as msg>
             <div class="message-detail">
+                <#if sendEnabled>
+                    <button type="button" class="btn btn-sm btn-outline-secondary float-right copy-msg-btn"
+                            data-msg-index="${msg?index}"
+                            data-partition="${msg.partition}"
+                            data-key="${msg.key!''}"
+                            title="Duplicate this message">
+                        <i class="fa fa-copy"></i>
+                    </button>
+                    <div class="d-none" id="msg-hdr-${msg?index}">
+                        <#list msg.headers?keys as hk>
+                            <span data-k="${hk}" data-v="${(msg.headers[hk])!''}"></span>
+                        </#list>
+                    </div>
+                </#if>
                 <span class="badge badge-light">Offset:</span> ${msg.offset} &nbsp;
                 <span class="badge badge-light">Key:</span> ${msg.key!''} &nbsp;
                 <span class="badge badge-light">Timestamp:</span> ${msg.timestamp?string('yyyy-MM-dd HH:mm:ss.SSS')}
                 <span class="badge badge-light">Headers:</span> ${msg.headersFormatted}
                 <div>
                     <a href="#" class="toggle-msg"><i class="fa fa-chevron-circle-right">&nbsp;</i></a>
-                    <pre class="message-body">${msg.message!''}</pre>
+                    <pre class="message-body" id="msg-body-${msg?index}">${msg.message!''}</pre>
                 </div>
             </div>
         </#list>
@@ -271,5 +332,53 @@
         No messages found in partition ${(messageForm.partition)!"PARTITION_NOT_SET"} at offset ${messageForm.offset}
     </#if>
 </div>
+
+<#if sendEnabled>
+<script>
+(function () {
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.copy-msg-btn');
+    if (!btn) return;
+
+    var idx = btn.dataset.msgIndex;
+    document.getElementById('topicPartition').value = btn.dataset.partition;
+    document.getElementById('messageKey').value = btn.dataset.key;
+
+    var ta = document.getElementById('messageValue');
+    ta.value = document.getElementById('msg-body-' + idx).textContent;
+    document.getElementById('valueCharCount').textContent = ta.value.length;
+
+    var container = document.getElementById('headersContainer');
+    container.innerHTML = '';
+    var hdrSpans = document.querySelectorAll('#msg-hdr-' + idx + ' span[data-k]');
+    hdrSpans.forEach(function (span, i) {
+      var row = document.createElement('div');
+      row.className = 'input-group mb-1';
+
+      var ki = document.createElement('input');
+      ki.type = 'text'; ki.className = 'form-control';
+      ki.name = 'headers[' + i + '].key'; ki.value = span.dataset.k;
+
+      var vi = document.createElement('input');
+      vi.type = 'text'; vi.className = 'form-control';
+      vi.name = 'headers[' + i + '].value'; vi.value = span.dataset.v;
+
+      var append = document.createElement('div');
+      append.className = 'input-group-append';
+      var del = document.createElement('button');
+      del.type = 'button'; del.className = 'btn btn-outline-danger';
+      del.innerHTML = '<i class="fa fa-trash"></i>';
+      del.onclick = function () { this.closest('.input-group').remove(); };
+      append.appendChild(del);
+
+      row.appendChild(ki); row.appendChild(vi); row.appendChild(append);
+      container.appendChild(row);
+    });
+
+    $('#addMessageModal').modal('show');
+  });
+})();
+</script>
+</#if>
 
 <@template.footer/>
