@@ -305,7 +305,7 @@
         <#list messages as msg>
             <div class="message-detail">
                 <#if sendEnabled>
-                    <button type="button" class="btn btn-sm btn-outline-secondary float-right copy-msg-btn"
+                    <button type="button" class="btn btn-sm btn-secondary float-right copy-msg-btn"
                             data-msg-index="${msg?index}"
                             data-partition="${msg.partition}"
                             data-key="${msg.key!''}"
