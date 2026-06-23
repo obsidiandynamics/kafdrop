@@ -32,7 +32,7 @@ management:
   endpoints:
     web:
       base-path: /actuator
-      exposure.include: "*"
+      exposure.include: "health"
   server:
     port: 9000
 
