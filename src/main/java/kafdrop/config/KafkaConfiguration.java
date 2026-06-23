@@ -29,8 +29,10 @@ public final class KafkaConfiguration {
   private String saslMechanism;
   private String securityProtocol;
   private String truststoreFile;
+  private String truststorePassword;
   private String propertiesFile;
   private String keystoreFile;
+  private String keystorePassword;
 
   public void applyCommon(Properties properties) {
     properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerConnect);
@@ -43,12 +45,18 @@ public final class KafkaConfiguration {
     if (new File(truststoreFile).isFile()) {
       LOG.info("Assigning truststore location to {}", truststoreFile);
       properties.put("ssl.truststore.location", truststoreFile);
+      if (truststorePassword != null && !truststorePassword.isEmpty()) {
+        properties.put("ssl.truststore.password", truststorePassword);
+      }
     }
 
     LOG.info("Checking keystore file {}", keystoreFile);
     if (new File(keystoreFile).isFile()) {
       LOG.info("Assigning keystore location to {}", keystoreFile);
       properties.put("ssl.keystore.location", keystoreFile);
+      if (keystorePassword != null && !keystorePassword.isEmpty()) {
+        properties.put("ssl.keystore.password", keystorePassword);
+      }
     }
 
     LOG.info("Checking properties file {}", propertiesFile);

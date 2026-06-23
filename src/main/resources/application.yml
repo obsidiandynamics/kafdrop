@@ -44,5 +44,7 @@ kafka:
   saslMechanism: "PLAIN"
   securityProtocol: "SASL_PLAINTEXT"
   truststoreFile: "${KAFKA_TRUSTSTORE_FILE:kafka.truststore.jks}"
-  propertiesFile : "${KAFKA_PROPERTIES_FILE:kafka.properties}"
   keystoreFile: "${KAFKA_KEYSTORE_FILE:kafka.keystore.jks}"
+  propertiesFile: "${KAFKA_PROPERTIES_FILE:kafka.properties}"
+  truststorePassword: "${KAFKA_TRUSTSTORE_PASSWORD}"
+  keystorePassword: "${KAFKA_KEYSTORE_PASSWORD}"
