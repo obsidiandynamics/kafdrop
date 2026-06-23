@@ -50,6 +50,12 @@ ingress:
   hosts: []
   tls: []
 
+route:
+  enabled: false
+  # tls:
+  #   termination: edge
+  #   insecureEdgeTerminationPolicy: Allow
+
 resources:
   # limits:
   #  cpu: 100m
