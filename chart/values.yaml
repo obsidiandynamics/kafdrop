@@ -4,6 +4,7 @@ image:
   repository: obsidiandynamics/kafdrop
   tag: latest
   pullPolicy: Always
+  pullSecret:
 
 kafka:
   brokerConnect: localhost:9092
