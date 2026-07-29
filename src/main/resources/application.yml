@@ -20,10 +20,9 @@ spring:
   jackson:
     deserialization:
       fail_on_unknown_properties: false
-      read_unknown_enum_values_as_null: true
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+    datatype:
+      enum:
+        read_unknown_enum_values_as_null: true
 
 springdoc:
   enable-kotlin: false # Kafdrop does not use Kotlin; enabling it causes #803
