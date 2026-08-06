@@ -420,11 +420,12 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
 
   private List<ConsumerGroupOffsets> getConsumerOffsets(Set<String> topics) {
     final var consumerGroups = highLevelAdminClient.listConsumerGroups();
-    return consumerGroups.stream()
-      .map(this::resolveOffsets)
+    final var offsetsByGroup = highLevelAdminClient.listConsumerGroupOffsetsBatch(consumerGroups);
+    return offsetsByGroup.entrySet().stream()
+      .map(entry -> new ConsumerGroupOffsets(entry.getKey(), entry.getValue()))
       .map(offsets -> offsets.forTopics(topics))
       .filter(not(ConsumerGroupOffsets::isEmpty))
-      .collect(Collectors.toList());
+      .toList();
   }
 
   @Override

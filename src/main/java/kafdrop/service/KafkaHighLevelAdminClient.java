@@ -6,6 +6,7 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.admin.DeleteTopicsOptions;
+import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsSpec;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,6 +107,31 @@ public final class KafkaHighLevelAdminClient {
         throw new KafkaAdminClientException(e);
       }
     }
+  }
+
+  Map<String, Map<TopicPartition, OffsetAndMetadata>> listConsumerGroupOffsetsBatch(Set<String> groupIds) {
+    if (groupIds.isEmpty()) {
+      return Collections.emptyMap();
+    }
+
+    final var groupSpecs = groupIds.stream()
+      .collect(Collectors.toMap(Function.identity(), _ -> new ListConsumerGroupOffsetsSpec()));
+    final var result = adminClient.listConsumerGroupOffsets(groupSpecs);
+
+    final var offsetsByGroup = new HashMap<String, Map<TopicPartition, OffsetAndMetadata>>(groupIds.size(), 1f);
+    for (var groupId : groupIds) {
+      try {
+        offsetsByGroup.put(groupId, result.partitionsToOffsetAndMetadata(groupId).get());
+      } catch (InterruptedException | ExecutionException e) {
+        if (e.getCause() instanceof GroupAuthorizationException) {
+          LOG.info("Not authorized to view consumer group {}; skipping", groupId);
+          offsetsByGroup.put(groupId, Collections.emptyMap());
+        } else {
+          throw new KafkaAdminClientException(e);
+        }
+      }
+    }
+    return offsetsByGroup;
   }
 
   Map<String, Config> describeTopicConfigs(Set<String> topicNames) {
