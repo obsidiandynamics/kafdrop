@@ -171,7 +171,12 @@
 
 	    document.getElementById('addHeaderBtn').addEventListener('click', function() {
 	        var container = document.getElementById('headersContainer');
-	        var index = container.children.length;
+	        var maxIndex = -1;
+	        container.querySelectorAll('input[name^="headers["]').forEach(function (el) {
+	            var m = el.name.match(/^headers\[(\d+)\]\./);
+	            if (m) maxIndex = Math.max(maxIndex, parseInt(m[1], 10));
+	        });
+	        var index = maxIndex + 1;
 	        var row = document.createElement('div');
 	        row.className = 'input-group mb-1';
 	        row.innerHTML = '<input type="text" class="form-control" name="headers[' + index + '].key" placeholder="Header name">' +
