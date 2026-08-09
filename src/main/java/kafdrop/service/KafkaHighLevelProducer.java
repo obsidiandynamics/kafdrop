@@ -1,5 +1,6 @@
 package kafdrop.service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
@@ -55,7 +56,7 @@ public final class KafkaHighLevelProducer {
     for (var header : message.getHeaders()) {
       if (header.getKey() != null && !header.getKey().isBlank()) {
         final var v = header.getValue() != null ? header.getValue() : "";
-        record.headers().add(header.getKey(), v.getBytes());
+        record.headers().add(header.getKey(), v.getBytes(StandardCharsets.UTF_8));
       }
     }
 
