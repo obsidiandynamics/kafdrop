@@ -303,6 +303,7 @@ public final class MessageController {
     } catch (Exception ex) {
       model.addAttribute("errorMessage", ex.getMessage());
     }
+    model.addAttribute("sendEnabled", sendEnabled);
     return "message-inspector";
   }
 
