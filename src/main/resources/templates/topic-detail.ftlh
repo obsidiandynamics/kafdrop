@@ -82,6 +82,13 @@
                     <td>Total available messages</td>
                     <td>${topic.availableSize}</td>
                 </tr>
+                <#if topic.partitions?size gt 0>
+                    <#assign maxOffsetPartition = topic.partitions?sequence?sort_by("size")?last>
+                </#if>
+                <tr>
+                    <td>Highest end offset</td>
+                    <td><#if ((maxOffsetPartition.size)!0) gt 0>${maxOffsetPartition.size} (partition ${maxOffsetPartition.id})<#else>-</#if></td>
+                </tr>
                 </tbody>
             </table>
         </div>
