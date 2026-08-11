@@ -119,7 +119,8 @@ public final class KafkaHighLevelAdminClient {
     return offsetsByGroup;
   }
 
-  private Map<TopicPartition, OffsetAndMetadata> getGroupOffsets(ListConsumerGroupOffsetsResult result, String groupId) {
+  private Map<TopicPartition, OffsetAndMetadata> getGroupOffsets(ListConsumerGroupOffsetsResult result,
+                                                                 String groupId) {
     try {
       return result.partitionsToOffsetAndMetadata(groupId).get();
     } catch (InterruptedException e) {
