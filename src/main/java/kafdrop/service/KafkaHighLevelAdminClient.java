@@ -6,6 +6,7 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.admin.DeleteTopicsOptions;
+import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsSpec;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -97,16 +98,8 @@ public final class KafkaHighLevelAdminClient {
 
   Map<TopicPartition, OffsetAndMetadata> listConsumerGroupOffsetsIfAuthorized(String groupId) {
     final var offsets = adminClient.listConsumerGroupOffsets(groupId);
-    try {
-      return offsets.partitionsToOffsetAndMetadata().get();
-    } catch (InterruptedException | ExecutionException e) {
-      if (e.getCause() instanceof GroupAuthorizationException) {
-        LOG.info("Not authorized to view consumer group {}; skipping", groupId);
-        return Collections.emptyMap();
-      } else {
-        throw new KafkaAdminClientException(e);
-      }
-    }
+
+    return getGroupOffsets(offsets, groupId);
   }
 
   Map<String, Map<TopicPartition, OffsetAndMetadata>> listConsumerGroupOffsetsBatch(Set<String> groupIds) {
@@ -120,18 +113,26 @@ public final class KafkaHighLevelAdminClient {
 
     final var offsetsByGroup = new HashMap<String, Map<TopicPartition, OffsetAndMetadata>>(groupIds.size(), 1f);
     for (var groupId : groupIds) {
-      try {
-        offsetsByGroup.put(groupId, result.partitionsToOffsetAndMetadata(groupId).get());
-      } catch (InterruptedException | ExecutionException e) {
-        if (e.getCause() instanceof GroupAuthorizationException) {
-          LOG.info("Not authorized to view consumer group {}; skipping", groupId);
-          offsetsByGroup.put(groupId, Collections.emptyMap());
-        } else {
-          throw new KafkaAdminClientException(e);
-        }
+      offsetsByGroup.put(groupId, getGroupOffsets(result, groupId));
+    }
+
+    return offsetsByGroup;
+  }
+
+  private Map<TopicPartition, OffsetAndMetadata> getGroupOffsets(ListConsumerGroupOffsetsResult result, String groupId) {
+    try {
+      return result.partitionsToOffsetAndMetadata(groupId).get();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new KafkaAdminClientException(e);
+    } catch (ExecutionException e) {
+      if (e.getCause() instanceof GroupAuthorizationException) {
+        LOG.info("Not authorized to view consumer group {}; skipping", groupId);
+        return Collections.emptyMap();
+      } else {
+        throw new KafkaAdminClientException(e);
       }
     }
-    return offsetsByGroup;
   }
 
   Map<String, Config> describeTopicConfigs(Set<String> topicNames) {
