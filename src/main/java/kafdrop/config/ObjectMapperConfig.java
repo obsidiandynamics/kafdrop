@@ -1,9 +1,8 @@
 package kafdrop.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.TimeZone;
 
@@ -11,9 +10,9 @@ import java.util.TimeZone;
 public class ObjectMapperConfig {
 
   @Bean
-  public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+  public JsonMapper objectMapper(JsonMapper.Builder builder) {
     return builder
-      .timeZone(TimeZone.getDefault())
+      .defaultTimeZone(TimeZone.getDefault())
       .build();
   }
 }

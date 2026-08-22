@@ -4,13 +4,15 @@ import jakarta.annotation.PostConstruct;
 import kafdrop.config.KafkaConfiguration;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
-import org.apache.kafka.clients.admin.ConsumerGroupListing;
 import org.apache.kafka.clients.admin.DeleteTopicsOptions;
+import org.apache.kafka.clients.admin.GroupListing;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsSpec;
+import org.apache.kafka.clients.admin.ListGroupsOptions;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.GroupType;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.acl.AccessControlEntryFilter;
@@ -87,13 +89,16 @@ public final class KafkaHighLevelAdminClient {
   }
 
   Set<String> listConsumerGroups() {
-    final Collection<ConsumerGroupListing> groupListing;
+    final Collection<GroupListing> groupListing;
     try {
-      groupListing = adminClient.listConsumerGroups().valid().get();
+      ListGroupsOptions options = new ListGroupsOptions();
+      options.withTypes(Set.of(GroupType.CLASSIC, GroupType.CONSUMER, GroupType.STREAMS));
+
+      groupListing = adminClient.listGroups(options).valid().get();
     } catch (InterruptedException | ExecutionException e) {
       throw new KafkaAdminClientException(e);
     }
-    return groupListing.stream().map(ConsumerGroupListing::groupId).collect(Collectors.toSet());
+    return groupListing.stream().map(GroupListing::groupId).collect(Collectors.toSet());
   }
 
   Map<TopicPartition, OffsetAndMetadata> listConsumerGroupOffsetsIfAuthorized(String groupId) {

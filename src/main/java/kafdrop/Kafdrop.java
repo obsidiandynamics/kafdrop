@@ -18,30 +18,25 @@
 
 package kafdrop;
 
-import com.google.common.base.Strings;
-import io.undertow.server.DefaultByteBufferPool;
-import io.undertow.server.HandlerWrapper;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.DisallowedMethodsHandler;
-import io.undertow.util.HttpString;
-import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kafdrop.config.ini.IniFilePropertySource;
 import kafdrop.config.ini.IniFileReader;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
-import org.springframework.boot.web.embedded.undertow.UndertowDeploymentInfoCustomizer;
-import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,36 +63,22 @@ public class Kafdrop {
   }
 
   @Bean
-  public WebServerFactoryCustomizer<UndertowServletWebServerFactory> deploymentCustomizer() {
-    return factory -> {
-      final UndertowDeploymentInfoCustomizer customizer = deploymentInfo -> {
-        var inf = new WebSocketDeploymentInfo();
-        inf.setBuffers(new DefaultByteBufferPool(false, 64));
-        deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, inf);
-        // see https://stackoverflow.com/a/54129696
-        deploymentInfo.addInitialHandlerChainWrapper(new HandlerWrapper() {
-          @Override
-          public HttpHandler wrap(HttpHandler handler) {
-            HttpString[] disallowedHttpMethods = {
-              HttpString.tryFromString("TRACE"),
-              HttpString.tryFromString("TRACK")
-            };
-            return new DisallowedMethodsHandler(handler, disallowedHttpMethods);
-          }
-        });
-      };
-      factory.addDeploymentInfoCustomizers(customizer);
-    };
-  }
-
-  @Bean
-  public WebMvcConfigurer webConfig() {
-    return new WebMvcConfigurer() {
+  public FilterRegistrationBean<OncePerRequestFilter> blockTrackFilter() {
+    FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>();
+    registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    registration.setFilter(new OncePerRequestFilter() {
       @Override
-      public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.favorPathExtension(false);
+      protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                      @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String method = request.getMethod();
+        if ("TRACK".equals(method)) {
+          response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "TRACK method is not allowed");
+          return;
+        }
+        filterChain.doFilter(request, response);
       }
-    };
+    });
+    return registration;
   }
 
   private static final class LoggingConfigurationListener
