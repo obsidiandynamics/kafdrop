@@ -356,7 +356,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <configuration>
           <mainClass>${start.class}</mainClass>
           <layout>ZIP</layout>
