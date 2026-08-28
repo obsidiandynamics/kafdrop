@@ -1,0 +1,39 @@
+name: Package and Release Kafdrop helm chart
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: Azure/setup-helm@v1
+    - uses: actions/checkout@master
+
+    - name: Prepare gh-pages branch
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git fetch -a
+        git checkout gh-pages
+        git rebase master -s ours -f
+
+    - name: Package
+      run: cd chart && helm package .
+
+    - name: Build
+      run: cd chart && helm repo index .
+
+    - name: Commit files
+      run: |
+        git add chart/index.yaml
+        git add chart/kafdrop-*.tgz
+        git commit -m "Release new Helm chart version" -a
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        branch: gh-pages
+        force: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
