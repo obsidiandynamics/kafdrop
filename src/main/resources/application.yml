@@ -7,11 +7,13 @@ server:
     whitelabel:
       enabled: false
   ssl:
+    enabled: ${SSL_ENABLED:false}
+    certificate: ${SSL_CERTIFICATE:}
+    certificate-private-key: ${SSL_CERTIFICATE_PRIVATE_KEY:}
     key-store-type: ${SSL_KEY_STORE_TYPE:PKCS12}
     key-store: ${SSL_KEY_STORE:}
     key-store-password: ${SSL_KEY_STORE_PASSWORD:}
     key-alias: ${SSL_KEY_ALIAS:}
-    enabled: ${SSL_ENABLED:false}
 
 spring:
   jmx:
