@@ -58,6 +58,23 @@ resources:
     cpu: 1m
     memory: 128Mi
 
+logging:
+  root:
+    # Logging level for the root logger (TRACE, DEBUG, INFO, WARN, ERROR)
+    level: WARN
+  kafdrop:
+    # Logging level for the kafdrop logger (TRACE, DEBUG, INFO, WARN, ERROR)
+    level: INFO
+    config:
+      # Logging level for kafdrop.config logger (TRACE, DEBUG, INFO, WARN, ERROR)
+      level: WARN
+    service:
+      # Logging level for the kafdrop.service logger (TRACE, DEBUG, INFO, WARN, ERROR)
+      level: INFO
+    controller:
+      # Logging level for the kafdrop.controller logger (TRACE, DEBUG, INFO, WARN, ERROR)
+      level: INFO
+
 nodeSelector: {}
 
 tolerations: []
