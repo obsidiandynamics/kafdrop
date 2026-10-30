@@ -94,7 +94,16 @@ public final class KafkaHighLevelAdminClient {
       ListGroupsOptions options = new ListGroupsOptions();
       options.withTypes(Set.of(GroupType.CLASSIC, GroupType.CONSUMER, GroupType.STREAMS));
 
-      groupListing = adminClient.listGroups(options).valid().get();
+      var result = adminClient.listGroups(options);
+      var errors = result.errors().get();
+      // Listing groups by type needs ListGroups v5. Older brokers only have classic groups, so list them all.
+      if (errors.stream().anyMatch(UnsupportedVersionException.class::isInstance)) {
+        LOG.debug("Broker does not support listing groups by type; listing all groups");
+        result = adminClient.listGroups();
+        errors = result.errors().get();
+      }
+      errors.forEach(error -> LOG.warn("Error listing consumer groups", error));
+      groupListing = result.valid().get();
     } catch (InterruptedException | ExecutionException e) {
       throw new KafkaAdminClientException(e);
     }
