@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,21 +90,26 @@ public final class KafkaHighLevelAdminClient {
   }
 
   Set<String> listConsumerGroups() {
-    final Collection<GroupListing> groupListing;
+    final Collection<GroupListing> groupListing = new ArrayList<>();
     try {
       ListGroupsOptions options = new ListGroupsOptions();
       options.withTypes(Set.of(GroupType.CLASSIC, GroupType.CONSUMER, GroupType.STREAMS));
 
       var result = adminClient.listGroups(options);
+      groupListing.addAll(result.valid().get());
       var errors = result.errors().get();
-      // Listing groups by type needs ListGroups v5. Older brokers only have classic groups, so list them all.
+      // Listing groups by type needs ListGroups v5. Older brokers only have classic groups, so list them all,
+      // keeping the groups that brokers supporting v5 already returned.
       if (errors.stream().anyMatch(UnsupportedVersionException.class::isInstance)) {
+        errors.stream()
+          .filter(error -> !(error instanceof UnsupportedVersionException))
+          .forEach(error -> LOG.warn("Error listing consumer groups", error));
         LOG.debug("Broker does not support listing groups by type; listing all groups");
         result = adminClient.listGroups();
+        groupListing.addAll(result.valid().get());
         errors = result.errors().get();
       }
       errors.forEach(error -> LOG.warn("Error listing consumer groups", error));
-      groupListing = result.valid().get();
     } catch (InterruptedException | ExecutionException e) {
       throw new KafkaAdminClientException(e);
     }
