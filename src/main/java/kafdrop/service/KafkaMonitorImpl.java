@@ -81,7 +81,13 @@ public final class KafkaMonitorImpl implements KafkaMonitor {
     final var clusterDescription = highLevelAdminClient.describeCluster();
     final var brokerVos = new ArrayList<BrokerVO>(clusterDescription.nodes.size());
     for (var node : clusterDescription.nodes) {
-      final var isController = node.id() == clusterDescription.controller.id();
+      boolean isController;
+      try {
+        isController = node.id() == clusterDescription.controller.id();
+      } catch (Exception e) {
+        LOG.error("Failed to determine if node is controller",e);
+        isController = false;
+      }
       brokerVos.add(new BrokerVO(node.id(), node.host(), node.port(), node.rack(), isController));
     }
     return brokerVos;
