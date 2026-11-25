@@ -65,6 +65,16 @@ spec:
 {{- else }}
             value: "{{ .Values.cmdArgs }}"
 {{- end }}
+          - name: LOGGING_LEVEL_ROOT
+            value: {{ .Values.logging.root.level | upper | quote }}
+          - name: LOGGING_LEVEL_KAFDROP
+            value: {{ .Values.logging.kafdrop.level | upper | quote }}
+          - name: LOGGING_LEVEL_KAFDROP_CONFIG
+            value: {{ .Values.logging.kafdrop.config.level | upper | quote }}
+          - name: LOGGING_LEVEL_KAFDROP_SERVICE
+            value: {{ .Values.logging.kafdrop.service.level | upper | quote }}
+          - name: LOGGING_LEVEL_KAFDROP_CONTROLLER
+            value: {{ .Values.logging.kafdrop.controller.level | upper | quote }}
 
           ports:
             - name: http
